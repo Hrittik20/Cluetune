@@ -1,0 +1,23 @@
+---
+import StatsBoard from "../components/game/StatsBoard";
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout
+  title="Stats & Streaks"
+  description="Your Cluetune streaks, accuracy and guess distribution across every mode. Stored on your device, no account required."
+>
+  <div class="page-shell py-12 sm:py-16">
+    <header class="flex max-w-2xl flex-col gap-3">
+      <p class="eyebrow">Your record</p>
+      <h1 class="text-display-xl text-ink">Stats & streaks</h1>
+      <p class="text-body-md text-body">
+        Kept on this device, with no account and no sync. Nothing here has ever left your browser.
+      </p>
+    </header>
+
+    <div class="mt-12 max-w-4xl">
+      <StatsBoard client:load />
+    </div>
+  </div>
+</Layout>

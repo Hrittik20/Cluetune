@@ -1,0 +1,59 @@
+---
+import GameShell from "../../components/game/GameShell";
+import MeshGradient from "../../components/MeshGradient.astro";
+import Layout from "../../layouts/Layout.astro";
+import { getTrack } from "../../lib/catalog";
+import { decodeChallenge, modeLabel } from "../../lib/share";
+
+export const prerender = false;
+
+const payload = decodeChallenge(Astro.params.code!);
+const track = payload ? getTrack(payload.t) : undefined;
+
+if (!payload || !track) {
+  return Astro.redirect("/", 302);
+}
+
+const challenger = payload.n?.trim() || undefined;
+const solved = payload.a > 0;
+
+const headline = solved
+  ? `${challenger ?? "Someone"} got this in ${payload.a}. Your turn.`
+  : `${challenger ?? "Someone"} couldn’t get this one.`;
+---
+
+<Layout
+  title="Challenge"
+  description="Someone sent you a Cluetune clip. Beat their score — no account needed."
+  noindex
+>
+  <section class="relative isolate">
+    <MeshGradient intensity="soft" />
+
+    <div class="page-shell relative py-12 sm:py-16">
+      <header class="mx-auto flex max-w-2xl flex-col items-center gap-3 text-center">
+        <p class="eyebrow">{modeLabel(payload.m)} challenge</p>
+        <h1 class="text-display-xl text-ink">{headline}</h1>
+        <p class="max-w-lg text-body-md text-body">
+          Same clip, same six attempts. Nothing to install and nothing to sign up for.
+        </p>
+      </header>
+
+      <div class="mx-auto mt-10 max-w-2xl">
+        <GameShell
+          client:load
+          mode={payload.m}
+          lockedTrackId={payload.t}
+          challengerAttempt={payload.a}
+          challengerSeconds={payload.s}
+          challengerName={challenger}
+        />
+      </div>
+
+      <p class="mx-auto mt-10 max-w-md text-center text-body-sm text-mute">
+        Want more? <a href="/" class="text-link underline underline-offset-4">Unlimited mode</a> never runs
+        out.
+      </p>
+    </div>
+  </section>
+</Layout>

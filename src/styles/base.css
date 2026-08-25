@@ -1,0 +1,72 @@
+@layer base {
+  html {
+    background-color: var(--cluetune-canvas);
+    /* Prevents the double-tap zoom delay on the guess keyboard and tiles. */
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    scroll-behavior: smooth;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+
+  body {
+    background-color: var(--cluetune-canvas);
+    color: var(--cluetune-ink);
+    font-family: var(--font-sans);
+    font-size: var(--text-body-md);
+    line-height: var(--text-body-md--line-height);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background-color: var(--cluetune-selection-bg);
+    color: var(--cluetune-selection-fg);
+  }
+
+  /* Headings are sentence-case with negative tracking; balance keeps them off
+     widow lines without needing manual breaks. */
+  h1,
+  h2,
+  h3,
+  h4 {
+    text-wrap: balance;
+    scroll-margin-top: 6rem;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--cluetune-ink);
+    outline-offset: 2px;
+    border-radius: var(--radius-xs);
+  }
+
+  /* Windows dark mode renders native option lists with a light background
+     unless both properties are set explicitly. */
+  select,
+  option {
+    background-color: var(--cluetune-surface);
+    color: var(--cluetune-ink);
+  }
+
+  [hidden] {
+    display: none !important;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}

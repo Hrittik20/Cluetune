@@ -1,0 +1,122 @@
+---
+/**
+ * The brand's only decorative system: a multi-stop mesh built from the three
+ * gradient pairs. Treated as one object — never cropped to a single stop,
+ * never miniaturised to an icon, only ever used at band scale.
+ */
+interface Props {
+  /** Dials the whole mesh back on denser surfaces. */
+  intensity?: "full" | "soft";
+  class?: string;
+}
+
+const { intensity = "full", class: className = "" } = Astro.props;
+const opacity = intensity === "full" ? 0.4 : 0.2;
+---
+
+<div
+  class:list={["pointer-events-none absolute inset-0 overflow-hidden", className]}
+  aria-hidden="true"
+  style={`--mesh-opacity: ${opacity}`}
+>
+  <div class="mesh-layer">
+    <span class="blob blob-a"></span>
+    <span class="blob blob-b"></span>
+    <span class="blob blob-c"></span>
+    <span class="blob blob-d"></span>
+  </div>
+  <div class="mesh-veil"></div>
+</div>
+
+<style>
+  .mesh-layer {
+    position: absolute;
+    inset: -20%;
+    opacity: var(--mesh-opacity);
+    filter: blur(72px);
+    will-change: transform;
+  }
+
+  .blob {
+    position: absolute;
+    display: block;
+    border-radius: 9999px;
+    /* Additive blending is what turns four discs into one continuous mesh. */
+    mix-blend-mode: screen;
+  }
+
+  .blob-a {
+    top: 4%;
+    left: 2%;
+    width: 46%;
+    height: 62%;
+    background: radial-gradient(circle at 50% 50%, #007cf0 0%, transparent 68%);
+    animation: mesh-drift-a 24s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate;
+  }
+
+  .blob-b {
+    top: -6%;
+    right: 4%;
+    width: 42%;
+    height: 58%;
+    background: radial-gradient(circle at 50% 50%, #00dfd8 0%, transparent 66%);
+    animation: mesh-drift-b 29s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate;
+  }
+
+  .blob-c {
+    bottom: -12%;
+    left: 18%;
+    width: 52%;
+    height: 66%;
+    background: radial-gradient(circle at 50% 50%, #7928ca 0%, transparent 68%);
+    animation: mesh-drift-c 33s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate;
+  }
+
+  .blob-d {
+    bottom: -4%;
+    right: 6%;
+    width: 40%;
+    height: 54%;
+    background: radial-gradient(circle at 50% 50%, #ff0080 0%, transparent 66%);
+    animation: mesh-drift-d 27s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate;
+  }
+
+  /* Keeps type at full contrast over the mesh and fades it into the page. */
+  .mesh-veil {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 100% 62% at 50% 0%, transparent 0%, var(--cluetune-canvas) 72%),
+      linear-gradient(to bottom, transparent 0%, var(--cluetune-canvas) 92%);
+  }
+
+  @keyframes mesh-drift-a {
+    to {
+      transform: translate3d(12%, 8%, 0) scale(1.16);
+    }
+  }
+
+  @keyframes mesh-drift-b {
+    to {
+      transform: translate3d(-10%, 12%, 0) scale(1.22);
+    }
+  }
+
+  @keyframes mesh-drift-c {
+    to {
+      transform: translate3d(8%, -10%, 0) scale(1.12);
+    }
+  }
+
+  @keyframes mesh-drift-d {
+    to {
+      transform: translate3d(-12%, -6%, 0) scale(1.2);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .blob {
+      animation: none;
+    }
+  }
+</style>

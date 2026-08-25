@@ -1,0 +1,30 @@
+---
+import GameShell from "../components/game/GameShell";
+import MeshGradient from "../components/MeshGradient.astro";
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout
+  title="Sped-Up Round"
+  description="Every clip pitched and tempo-shifted up 1.35×, the way it sounds on your For You page. Harder than it looks."
+>
+  <section class="relative isolate">
+    <MeshGradient intensity="soft" />
+
+    <div class="page-shell relative py-12 sm:py-16">
+      <header class="mx-auto flex max-w-2xl flex-col items-center gap-3 text-center">
+        <p class="eyebrow">Sped-up round</p>
+        <h1 class="text-display-xl text-ink">Everything at 1.35×, pitch and all.</h1>
+        <p class="max-w-lg text-body-md text-body">
+          Not time-stretched — genuinely pitched up, the way the edits on your feed are. Timbre goes
+          first, so you end up chasing the melody instead of the voice. The clip ladder is shorter to
+          compensate.
+        </p>
+      </header>
+
+      <div class="mx-auto mt-10 max-w-2xl">
+        <GameShell client:load mode="sped-up" continuous showFilters />
+      </div>
+    </div>
+  </section>
+</Layout>

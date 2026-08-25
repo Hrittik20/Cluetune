@@ -1,0 +1,176 @@
+/* A deliberately small, stable component API. Base classes own layout, motion
+   and focus; tone and size live in separate variant classes so exceptions
+   never have to fight the base.
+
+   The system commits to the pill CTA scale everywhere rather than mixing the
+   marketing pill with a tight nav radius on the same screen. */
+
+@layer components {
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: --spacing(2);
+    border-radius: var(--radius-pill);
+    border: 1px solid transparent;
+    font-family: var(--font-sans);
+    font-weight: 500;
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+    transition-property: background-color, border-color, color, transform, opacity, box-shadow;
+    transition-duration: 150ms;
+    transition-timing-function: var(--ease-out-quint);
+  }
+
+  .btn:disabled,
+  .btn[aria-disabled="true"] {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  .btn:not(:disabled):active {
+    transform: scale(0.975);
+  }
+
+  /* Tone variants */
+  .btn-primary {
+    background-color: var(--cluetune-primary);
+    color: var(--cluetune-on-primary);
+  }
+
+  .btn-primary:not(:disabled):hover {
+    background-color: color-mix(in oklab, var(--cluetune-primary) 88%, var(--cluetune-canvas));
+  }
+
+  .btn-secondary {
+    background-color: transparent;
+    color: var(--cluetune-ink);
+    border-color: var(--cluetune-hairline-strong);
+  }
+
+  .btn-secondary:not(:disabled):hover {
+    background-color: var(--cluetune-canvas-soft-2);
+    border-color: var(--cluetune-ink);
+  }
+
+  .btn-ghost {
+    background-color: transparent;
+    color: var(--cluetune-body);
+  }
+
+  .btn-ghost:not(:disabled):hover {
+    background-color: var(--cluetune-canvas-soft-2);
+    color: var(--cluetune-ink);
+  }
+
+  /* Size variants */
+  .btn-lg {
+    height: 3rem;
+    padding-inline: --spacing(6);
+    font-size: var(--text-body-md);
+    line-height: var(--text-body-md--line-height);
+  }
+
+  .btn-md {
+    height: 2.5rem;
+    padding-inline: --spacing(4);
+    font-size: var(--text-body-sm);
+    line-height: var(--text-body-sm--line-height);
+  }
+
+  .btn-sm {
+    /* Stays at the 44px touch floor on coarse pointers even though it reads
+       small on desktop. */
+    height: 2rem;
+    padding-inline: --spacing(3);
+    font-size: var(--text-body-sm);
+    line-height: var(--text-body-sm--line-height);
+  }
+
+  @media (pointer: coarse) {
+    .btn-sm {
+      min-height: 44px;
+    }
+  }
+
+  .btn-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    padding: 0;
+    border-radius: 9999px;
+  }
+
+  @media (pointer: coarse) {
+    .btn-icon {
+      min-width: 44px;
+      min-height: 44px;
+    }
+  }
+
+  .card {
+    background-color: var(--cluetune-surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-level-2);
+  }
+
+  .card-soft {
+    background-color: var(--cluetune-canvas-soft);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-level-1);
+  }
+
+  .card-raised {
+    background-color: var(--cluetune-surface-raised);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-level-4);
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: --spacing(1.5);
+    border-radius: 9999px;
+    padding-inline: --spacing(2.5);
+    padding-block: --spacing(1);
+    font-size: var(--text-caption);
+    line-height: var(--text-caption--line-height);
+    font-weight: 500;
+    background-color: var(--cluetune-canvas-soft-2);
+    color: var(--cluetune-body);
+    box-shadow: var(--shadow-level-1);
+  }
+
+  .field {
+    width: 100%;
+    background-color: var(--cluetune-canvas-soft-2);
+    color: var(--cluetune-ink);
+    border: 1px solid var(--cluetune-hairline);
+    border-radius: var(--radius-pill);
+    font-size: var(--text-body-md);
+    transition-property: border-color, background-color, box-shadow;
+    transition-duration: 150ms;
+    transition-timing-function: var(--ease-out-quint);
+  }
+
+  .field::placeholder {
+    color: var(--cluetune-mute);
+  }
+
+  .field:hover {
+    border-color: var(--cluetune-hairline-strong);
+  }
+
+  /* No `outline: none` here. The component layer outranks the base
+     `:focus-visible` rule, so suppressing the outline would silently strip the
+     keyboard focus ring from every input in the app. */
+  .field:focus {
+    border-color: var(--cluetune-ink);
+    background-color: var(--cluetune-canvas-soft);
+  }
+
+  .field-lg {
+    height: 3.5rem;
+    padding-inline: --spacing(6);
+  }
+}

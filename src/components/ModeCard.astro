@@ -1,0 +1,52 @@
+---
+interface Props {
+  href: string;
+  name: string;
+  blurb: string;
+  meta: string;
+  accent?: string;
+  featured?: boolean;
+}
+
+const { href, name, blurb, meta, accent = "var(--cluetune-cyan)", featured = false } = Astro.props;
+---
+
+<a
+  href={href}
+  class:list={[
+    "group relative flex flex-col gap-3 overflow-hidden rounded-lg p-6 transition-transform duration-200 hover:-translate-y-0.5",
+    featured ? "card-raised" : "card",
+  ]}
+>
+  <span
+    aria-hidden="true"
+    class="absolute inset-x-0 top-0 h-px opacity-60 transition-opacity duration-200 group-hover:opacity-100"
+    style={`background: linear-gradient(90deg, transparent, ${accent}, transparent)`}
+  ></span>
+
+  <div class="flex items-baseline justify-between gap-3">
+    <h3 class="text-display-sm text-ink">{name}</h3>
+    <span class="eyebrow shrink-0">{meta}</span>
+  </div>
+
+  <p class="text-body-sm text-body">{blurb}</p>
+
+  <span class="mt-1 inline-flex items-center gap-1.5 text-body-sm text-ink">
+    Play
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden="true"
+      class="transition-transform duration-200 group-hover:translate-x-0.5"
+    >
+      <path
+        d="M5 12h14m-6-6 6 6-6 6"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"></path>
+    </svg>
+  </span>
+</a>

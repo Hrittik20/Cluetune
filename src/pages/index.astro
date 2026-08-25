@@ -1,11 +1,159 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
+import GameShell from "../components/game/GameShell";
+import MeshGradient from "../components/MeshGradient.astro";
+import ModeCard from "../components/ModeCard.astro";
+import Layout from "../layouts/Layout.astro";
+import { SITE } from "../consts";
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+const modes = [
+  {
+    href: "/daily",
+    name: "Daily",
+    meta: "One a day",
+    blurb: "The same clip for everyone, reset at your local midnight. Build the streak.",
+    accent: "var(--cluetune-cyan)",
+  },
+  {
+    href: "/sped-up",
+    name: "Sped-Up",
+    meta: "1.35×",
+    blurb: "Pitched and tempo-shifted, the way it sounds on your For You page.",
+    accent: "var(--cluetune-pink)",
+  },
+  {
+    href: "/lyric-flip",
+    name: "Lyric-Flip",
+    meta: "Text + audio",
+    blurb: "A scrambled, redacted hook alongside the clip. Two ways in, one answer.",
+    accent: "var(--cluetune-violet)",
+  },
+  {
+    href: "/gauntlet",
+    name: "Genre Gauntlet",
+    meta: "5 rounds",
+    blurb: "Pick a pack — hyperpop, K-pop, Afrobeats, drill — and run five back to back.",
+    accent: "var(--cluetune-amber)",
+  },
+];
+
+const differentiators = [
+  {
+    title: "No cooldown, ever.",
+    body: "Every other game in this genre taps you out after one puzzle. Cluetune opens on Unlimited — play twenty rounds before you decide whether you want a daily habit.",
+  },
+  {
+    title: "A result card, not a screenshot.",
+    body: "Finish a round and you get a rendered 9:16 image with your clip’s waveform, guess pattern and time-to-guess. It drops straight into a Story or a TikTok upload.",
+  },
+  {
+    title: "Challenge links that need no account.",
+    body: "Send a friend the exact clip you just played. They open the link, play it in the browser, and get scored against you. Nobody signs up.",
+  },
+  {
+    title: "The record is the interface.",
+    body: "No progress bar. A vinyl that spins with the clip, grooves that move with the spectrum, and a needle-skip glitch every time you miss.",
+  },
+];
 ---
 
-<Layout>
-	<Welcome />
+<Layout description={SITE.description}>
+  <section class="relative isolate">
+    <MeshGradient />
+
+    <div class="page-shell relative pb-20 pt-8 sm:pt-10">
+      <header class="mx-auto flex max-w-2xl flex-col items-center gap-3 text-center">
+        <p class="badge">
+          <span aria-hidden="true" class="size-1.5 rounded-full bg-tone-correct"></span>
+          Unlimited mode · no login, no limit
+        </p>
+
+        <h1 class="text-display-2xl text-ink">Name the track before the clip runs out.</h1>
+
+        <p class="max-w-lg text-body-md text-body">
+          One second of audio. Six attempts. Every wrong guess buys you a little more — and nothing
+          here locks you out until tomorrow.
+        </p>
+      </header>
+
+      <div class="mx-auto mt-8 max-w-2xl">
+        <GameShell client:load mode="unlimited" continuous showFilters />
+      </div>
+    </div>
+  </section>
+
+  <section class="page-shell py-20" aria-labelledby="modes-heading">
+    <div class="flex flex-col gap-3">
+      <p class="eyebrow">Other ways to play</p>
+      <h2 id="modes-heading" class="max-w-2xl text-display-lg text-ink">
+        Four more modes, all drawing from the same catalogue.
+      </h2>
+    </div>
+
+    <div class="mt-10 grid gap-4 sm:grid-cols-2 md:grid-cols-4">
+      {modes.map((mode) => <ModeCard {...mode} />)}
+    </div>
+  </section>
+
+  <section class="hairline-y bg-canvas-soft py-24" aria-labelledby="why-heading">
+    <div class="page-shell">
+      <div class="flex flex-col gap-3">
+        <p class="eyebrow">Why this one</p>
+        <h2 id="why-heading" class="max-w-2xl text-display-lg text-ink">
+          Built for the part everyone else treats as an afterthought.
+        </h2>
+      </div>
+
+      <div class="mt-12 grid gap-x-10 gap-y-12 md:grid-cols-2">
+        {
+          differentiators.map((item, index) => (
+            <article class="flex gap-5">
+              <span
+                aria-hidden="true"
+                class="tabular shrink-0 font-mono text-caption text-mute"
+              >
+                {String(index + 1).padStart(2, "0")}
+              </span>
+              <div class="flex flex-col gap-2">
+                <h3 class="text-display-sm text-ink">{item.title}</h3>
+                <p class="max-w-md text-body-md text-body">{item.body}</p>
+              </div>
+            </article>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="page-shell py-24" aria-labelledby="how-heading">
+    <div class="grid gap-12 md:grid-cols-[1fr_1.1fr] md:items-center">
+      <div class="flex flex-col gap-4">
+        <p class="eyebrow">How a round works</p>
+        <h2 id="how-heading" class="text-display-lg text-ink">Six rungs, and the clip grows on every miss.</h2>
+        <p class="max-w-md text-body-md text-body">
+          The ladder is deliberately steep at the start. One second is barely a snare hit — that is
+          the whole point. Guess wrong and the next rung hands you enough to hear the hook.
+        </p>
+        <div class="mt-2 flex flex-wrap gap-2">
+          <a href="/how-to-play" class="btn btn-secondary btn-md">Read the Rules</a>
+          <a href="/daily" class="btn btn-primary btn-md">Try Today’s Daily</a>
+        </div>
+      </div>
+
+      <ol class="flex flex-col gap-px overflow-hidden rounded-lg bg-hairline shadow-level-1">
+        {
+          [1, 2, 4, 7, 11, 16].map((seconds, index) => (
+            <li class="flex items-center gap-4 bg-canvas-soft px-5 py-4">
+              <span class="tabular w-6 shrink-0 font-mono text-caption text-mute">{index + 1}</span>
+              <span
+                aria-hidden="true"
+                class="h-2 rounded-full bg-linear-90 from-[#00dfd8] to-[#7928ca]"
+                style={`width: ${(seconds / 16) * 100}%`}
+              />
+              <span class="tabular ml-auto shrink-0 text-body-sm text-ink">{seconds}s</span>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
 </Layout>

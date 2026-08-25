@@ -1,0 +1,137 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { CLIP_LADDER_MS, MAX_ATTEMPTS } from "../lib/game";
+
+const rungs = CLIP_LADDER_MS.map((ms) => ms / 1000);
+
+const verdicts = [
+  {
+    tone: "bg-tone-correct",
+    name: "Correct",
+    body: "The title matched. You don’t have to name the artist too — knowing the song is enough.",
+  },
+  {
+    tone: "bg-tone-close",
+    name: "Right artist",
+    body: "Wrong song, right act. Worth knowing: it usually means you’re one album away.",
+  },
+  {
+    tone: "bg-tone-wrong",
+    name: "Wrong",
+    body: "No match. The clip grows and the needle skips.",
+  },
+  {
+    tone: "bg-hairline-strong",
+    name: "Skipped",
+    body: "Costs an attempt but buys the next rung of audio. Sometimes the right trade.",
+  },
+];
+
+const faqs = [
+  {
+    q: "Do I need an account?",
+    a: "No. Every mode is playable the moment the page loads. Streaks and stats are saved in your browser, so an account only becomes useful if you want them on a second device.",
+  },
+  {
+    q: "How forgiving is the guess box?",
+    a: "Very. Typos, missing punctuation, accents, “and” versus “&”, and release junk like “- 2011 Remaster” are all ignored. You can type just the title, or the artist and title in either order.",
+  },
+  {
+    q: "Where does the audio come from?",
+    a: "Preview clips are streamed directly from the rights holders’ own preview services — the same 30-second previews you hear in a store listing. Cluetune never hosts, caches or re-serves audio.",
+  },
+  {
+    q: "When does the daily reset?",
+    a: "At midnight in your timezone, not ours. If it is a new day where you are, there is a new puzzle.",
+  },
+  {
+    q: "What is a challenge link?",
+    a: "A link that pins the exact clip you just played, plus your score. Whoever opens it plays the same round and sees what they have to beat. No account on either end.",
+  },
+];
+---
+
+<Layout
+  title="How to Play"
+  description="The rules of Cluetune: six attempts, a clip that grows on every miss, and a guess box that forgives typos."
+>
+  <div class="page-shell py-12 sm:py-16">
+    <header class="flex max-w-2xl flex-col gap-3">
+      <p class="eyebrow">The rules</p>
+      <h1 class="text-display-xl text-ink">How to play</h1>
+      <p class="text-body-md text-body">
+        One clip, {MAX_ATTEMPTS} attempts, and a little more audio every time you get it wrong.
+      </p>
+    </header>
+
+    <div class="mt-14 grid max-w-5xl gap-14 md:grid-cols-2">
+      <section class="flex flex-col gap-5" aria-labelledby="ladder">
+        <h2 id="ladder" class="text-display-md text-ink">The clip ladder</h2>
+        <p class="text-body-md text-body">
+          You start with one second. That is roughly a snare hit and a breath — not enough, on
+          purpose. Each miss unlocks the next rung.
+        </p>
+
+        <ol class="flex flex-col gap-px overflow-hidden rounded-lg bg-hairline shadow-level-1">
+          {
+            rungs.map((seconds, index) => (
+              <li class="flex items-center gap-4 bg-canvas-soft px-5 py-3.5">
+                <span class="tabular w-14 shrink-0 font-mono text-caption text-mute">
+                  Try {index + 1}
+                </span>
+                <span
+                  aria-hidden="true"
+                  class="h-2 rounded-full bg-linear-90 from-[#00dfd8] to-[#7928ca]"
+                  style={`width: ${(seconds / rungs[rungs.length - 1]!) * 100}%`}
+                />
+                <span class="tabular ml-auto shrink-0 text-body-sm text-ink">{seconds}s</span>
+              </li>
+            ))
+          }
+        </ol>
+      </section>
+
+      <section class="flex flex-col gap-5" aria-labelledby="verdicts">
+        <h2 id="verdicts" class="text-display-md text-ink">Reading the tiles</h2>
+        <p class="text-body-md text-body">
+          Each attempt leaves a marker. The pattern is what gets shared, so it has to say something
+          on its own.
+        </p>
+
+        <ul class="flex flex-col gap-4">
+          {
+            verdicts.map((verdict) => (
+              <li class="flex gap-3.5">
+                <span aria-hidden="true" class:list={["mt-1.5 size-3 shrink-0 rounded-full", verdict.tone]} />
+                <div class="flex flex-col gap-1">
+                  <p class="text-body-md-strong font-medium text-ink">{verdict.name}</p>
+                  <p class="text-body-sm text-body">{verdict.body}</p>
+                </div>
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+    </div>
+
+    <section class="mt-20 max-w-3xl" aria-labelledby="faq">
+      <h2 id="faq" class="text-display-lg text-ink">Questions</h2>
+
+      <dl class="mt-8 flex flex-col">
+        {
+          faqs.map((faq) => (
+            <div class="hairline-b flex flex-col gap-2 py-6">
+              <dt class="text-display-sm text-ink">{faq.q}</dt>
+              <dd class="max-w-prose text-body-md text-body">{faq.a}</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </section>
+
+    <div class="mt-14 flex flex-wrap gap-3">
+      <a href="/" class="btn btn-primary btn-lg">Play Unlimited</a>
+      <a href="/daily" class="btn btn-secondary btn-lg">Today’s Daily</a>
+    </div>
+  </div>
+</Layout>

@@ -1,0 +1,16 @@
+/* Scoped to `src` because automatic detection also walks the Tailwind docs
+   snapshot under `.claude/skills`, which would pull class names and asset
+   paths out of unrelated MDX examples into the build. */
+@import "tailwindcss" source("../");
+
+@import "@fontsource-variable/geist/index.css";
+@import "@fontsource-variable/geist-mono/index.css";
+
+@import "./theme.css";
+@import "./base.css";
+@import "./components.css";
+@import "./utilities.css";
+
+/* Dark is the default, so the variant targets the explicit opt-out rather than
+   prefers-color-scheme. */
+@custom-variant light (&:where([data-theme="light"], [data-theme="light"] *));

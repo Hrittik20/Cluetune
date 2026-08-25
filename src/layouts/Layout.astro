@@ -1,23 +1,83 @@
-<!doctype html>
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro Basics</title>
-	</head>
-	<body>
-		<slot />
-	</body>
-</html>
+---
+import "../styles/global.css";
+import Footer from "../components/Footer.astro";
+import Nav from "../components/Nav.astro";
+import { SITE } from "../consts";
 
-<style>
-	html,
-	body {
-		margin: 0;
-		width: 100%;
-		height: 100%;
-	}
-</style>
+interface Props {
+  title?: string;
+  description?: string;
+  /** Suppresses the shared nav on immersive surfaces. */
+  bare?: boolean;
+  noindex?: boolean;
+}
+
+const {
+  title,
+  description = SITE.description,
+  bare = false,
+  noindex = false,
+} = Astro.props;
+
+const pageTitle = title ? `${title} · ${SITE.name}` : `${SITE.name} — ${SITE.tagline}`;
+const canonical = new URL(Astro.url.pathname, SITE.url);
+---
+
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {noindex ? <meta name="robots" content="noindex" /> : null}
+
+    <meta name="theme-color" content={SITE.themeColor} />
+    <meta name="generator" content={Astro.generator} />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={SITE.name} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    {/* Preview audio and album art come from these hosts on nearly every round. */}
+    <link rel="preconnect" href="https://audio-ssl.itunes.apple.com" crossorigin />
+    <link rel="preconnect" href="https://is1-ssl.mzstatic.com" crossorigin />
+    <link rel="dns-prefetch" href="https://cdns-preview-a.dzcdn.net" />
+    <link rel="dns-prefetch" href="https://i.scdn.co" />
+
+    {/* Applied before first paint so the chosen theme never flashes. */}
+    <script is:inline>
+      try {
+        const stored = localStorage.getItem("cluetune:theme");
+        if (stored === "light") {
+          document.documentElement.dataset.theme = "light";
+          document.querySelector('meta[name="theme-color"]')?.setAttribute("content", "#ffffff");
+        }
+      } catch {}
+    </script>
+  </head>
+
+  <body class="min-h-dvh bg-canvas text-ink antialiased">
+    <a
+      href="#main"
+      class="btn btn-primary btn-md sr-only focus-visible:not-sr-only focus-visible:absolute focus-visible:left-4 focus-visible:top-4 focus-visible:z-50"
+    >
+      Skip to content
+    </a>
+
+    {bare ? null : <Nav />}
+
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
+
+    {bare ? null : <Footer />}
+  </body>
+</html>

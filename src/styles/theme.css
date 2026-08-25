@@ -1,0 +1,252 @@
+/* ---------------------------------------------------------------------------
+   Cluetune design tokens
+
+   A dark-first reading of the brand language in DESIGN.md. The source system is
+   built around near-black ink on a near-white canvas; Cluetune inverts that
+   polarity so the ink IS the canvas, and the near-white becomes the primary CTA
+   fill. Every other relationship (hairline ladder, four-step surface ladder,
+   stacked elevation, mono technical layer) is preserved.
+--------------------------------------------------------------------------- */
+
+/* Raw palette. These never get consumed directly by components — semantic
+   aliases below are the public API. */
+:root {
+  /* Neutral ladder, dark end first. */
+  --cluetune-n-0: #08080a;
+  --cluetune-n-50: #0e0e11;
+  --cluetune-n-100: #141418;
+  --cluetune-n-150: #1a1a1f;
+  --cluetune-n-200: #232329;
+  --cluetune-n-300: #33333c;
+  --cluetune-n-400: #4d4d59;
+  --cluetune-n-500: #6e6e7a;
+  --cluetune-n-600: #8f8f9c;
+  --cluetune-n-700: #a1a1ac;
+  --cluetune-n-800: #d4d4d8;
+  --cluetune-n-900: #ededed;
+  --cluetune-n-1000: #fafafa;
+
+  /* Brand gradient stops. Three pairs that collapse into one mesh at hero
+     scale. Never miniaturised, never reduced to a single stop. */
+  --cluetune-develop-start: #007cf0;
+  --cluetune-develop-end: #00dfd8;
+  --cluetune-preview-start: #7928ca;
+  --cluetune-preview-end: #ff0080;
+  --cluetune-ship-start: #ff4d4d;
+  --cluetune-ship-end: #f9cb28;
+
+  /* Accents drawn from the gradient so no sixth colour enters the system. */
+  --cluetune-cyan: #50e3c2;
+  --cluetune-violet: #7928ca;
+  --cluetune-pink: #ff0080;
+  --cluetune-amber: #f9cb28;
+  --cluetune-coral: #ff4d4d;
+  --cluetune-blue: #3291ff;
+}
+
+/* Dark is the default theme, not an override. */
+:root,
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  --cluetune-canvas: var(--cluetune-n-0);
+  --cluetune-canvas-soft: var(--cluetune-n-50);
+  --cluetune-canvas-soft-2: var(--cluetune-n-100);
+  --cluetune-surface: var(--cluetune-n-100);
+  --cluetune-surface-raised: var(--cluetune-n-150);
+
+  --cluetune-hairline: var(--cluetune-n-200);
+  --cluetune-hairline-strong: var(--cluetune-n-400);
+
+  --cluetune-ink: var(--cluetune-n-1000);
+  --cluetune-body: var(--cluetune-n-700);
+  --cluetune-mute: var(--cluetune-n-500);
+
+  --cluetune-primary: var(--cluetune-n-1000);
+  --cluetune-on-primary: var(--cluetune-n-0);
+
+  --cluetune-link: var(--cluetune-blue);
+  --cluetune-selection-bg: var(--cluetune-n-1000);
+  --cluetune-selection-fg: var(--cluetune-n-0);
+
+  /* Elevation on dark cannot rely on black drop shadow alone, so every level
+     carries an inset hairline ring the way the source system does. */
+  --cluetune-shadow-1: inset 0 0 0 1px var(--cluetune-hairline);
+  --cluetune-shadow-2: 0 1px 1px rgb(0 0 0 / 0.32), 0 2px 2px rgb(0 0 0 / 0.24),
+    inset 0 0 0 1px var(--cluetune-hairline);
+  --cluetune-shadow-3: 0 2px 2px rgb(0 0 0 / 0.28), 0 8px 8px -8px rgb(0 0 0 / 0.48),
+    inset 0 0 0 1px var(--cluetune-hairline);
+  --cluetune-shadow-4: 0 2px 2px rgb(0 0 0 / 0.28), 0 8px 16px -4px rgb(0 0 0 / 0.48),
+    inset 0 0 0 1px var(--cluetune-hairline);
+  --cluetune-shadow-5: 0 1px 1px rgb(0 0 0 / 0.24), 0 8px 16px -4px rgb(0 0 0 / 0.48),
+    0 24px 32px -8px rgb(0 0 0 / 0.64), inset 0 0 0 1px var(--cluetune-hairline);
+}
+
+[data-theme="light"] {
+  color-scheme: light;
+
+  --cluetune-canvas: #ffffff;
+  --cluetune-canvas-soft: #fafafa;
+  --cluetune-canvas-soft-2: #f5f5f5;
+  --cluetune-surface: #ffffff;
+  --cluetune-surface-raised: #ffffff;
+
+  --cluetune-hairline: #ebebeb;
+  --cluetune-hairline-strong: #a1a1a1;
+
+  --cluetune-ink: #171717;
+  --cluetune-body: #4d4d4d;
+  --cluetune-mute: #888888;
+
+  --cluetune-primary: #171717;
+  --cluetune-on-primary: #ffffff;
+
+  --cluetune-link: #0070f3;
+  --cluetune-selection-bg: #171717;
+  --cluetune-selection-fg: #f2f2f2;
+
+  --cluetune-shadow-1: inset 0 0 0 1px rgb(0 0 0 / 0.08);
+  --cluetune-shadow-2: 0 1px 1px rgb(0 0 0 / 0.02), 0 2px 2px rgb(0 0 0 / 0.04),
+    inset 0 0 0 1px rgb(0 0 0 / 0.08);
+  --cluetune-shadow-3: 0 2px 2px rgb(0 0 0 / 0.04), 0 8px 8px -8px rgb(0 0 0 / 0.04),
+    inset 0 0 0 1px rgb(0 0 0 / 0.08);
+  --cluetune-shadow-4: 0 2px 2px rgb(0 0 0 / 0.04), 0 8px 16px -4px rgb(0 0 0 / 0.04),
+    inset 0 0 0 1px rgb(0 0 0 / 0.08);
+  --cluetune-shadow-5: 0 1px 1px rgb(0 0 0 / 0.02), 0 8px 16px -4px rgb(0 0 0 / 0.04),
+    0 24px 32px -8px rgb(0 0 0 / 0.06), inset 0 0 0 1px rgb(0 0 0 / 0.08);
+}
+
+/* `inline` so utilities resolve the variable at use-site and therefore follow
+   the active [data-theme] rather than baking in the dark value. */
+@theme inline {
+  --color-canvas: var(--cluetune-canvas);
+  --color-canvas-soft: var(--cluetune-canvas-soft);
+  --color-canvas-soft-2: var(--cluetune-canvas-soft-2);
+  --color-surface: var(--cluetune-surface);
+  --color-surface-raised: var(--cluetune-surface-raised);
+
+  --color-hairline: var(--cluetune-hairline);
+  --color-hairline-strong: var(--cluetune-hairline-strong);
+
+  --color-ink: var(--cluetune-ink);
+  --color-body: var(--cluetune-body);
+  --color-mute: var(--cluetune-mute);
+
+  --color-primary: var(--cluetune-primary);
+  --color-on-primary: var(--cluetune-on-primary);
+  --color-link: var(--cluetune-link);
+
+  --shadow-level-1: var(--cluetune-shadow-1);
+  --shadow-level-2: var(--cluetune-shadow-2);
+  --shadow-level-3: var(--cluetune-shadow-3);
+  --shadow-level-4: var(--cluetune-shadow-4);
+  --shadow-level-5: var(--cluetune-shadow-5);
+}
+
+@theme {
+  /* Accents are theme-invariant — the gradient reads on both polarities. */
+  --color-cyan: #50e3c2;
+  --color-violet: #7928ca;
+  --color-pink: #ff0080;
+  --color-amber: #f9cb28;
+  --color-coral: #ff4d4d;
+
+  /* Guess-tile semantics. Deliberately reuses gradient stops so the result
+     grid is legible as brand rather than as generic traffic lights. */
+  --color-tone-correct: #50e3c2;
+  --color-tone-close: #f9cb28;
+  --color-tone-wrong: #ff4d4d;
+
+  --font-sans: "Geist Variable", Inter, system-ui, -apple-system, sans-serif;
+  --font-mono: "Geist Mono Variable", ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+
+  /* Display sizes carry the aggressive negative tracking that defines the
+     voice. Weight ceiling is 600 across the whole scale. */
+  --text-display-2xl: clamp(2.5rem, 6.2vw, 4.5rem);
+  --text-display-2xl--line-height: 0.96;
+  --text-display-2xl--letter-spacing: -0.055em;
+  --text-display-2xl--font-weight: 600;
+
+  --text-display-xl: 3rem;
+  --text-display-xl--line-height: 1;
+  --text-display-xl--letter-spacing: -0.05em;
+  --text-display-xl--font-weight: 600;
+
+  --text-display-lg: 2rem;
+  --text-display-lg--line-height: 2.5rem;
+  --text-display-lg--letter-spacing: -0.04em;
+  --text-display-lg--font-weight: 600;
+
+  --text-display-md: 1.5rem;
+  --text-display-md--line-height: 2rem;
+  --text-display-md--letter-spacing: -0.04em;
+  --text-display-md--font-weight: 600;
+
+  --text-display-sm: 1.25rem;
+  --text-display-sm--line-height: 1.75rem;
+  --text-display-sm--letter-spacing: -0.03em;
+  --text-display-sm--font-weight: 600;
+
+  --text-body-lg: 1.125rem;
+  --text-body-lg--line-height: 1.75rem;
+
+  --text-body-md: 1rem;
+  --text-body-md--line-height: 1.5rem;
+
+  --text-body-sm: 0.875rem;
+  --text-body-sm--line-height: 1.25rem;
+  --text-body-sm--letter-spacing: -0.02em;
+
+  --text-caption: 0.75rem;
+  --text-caption--line-height: 1rem;
+
+  --text-code: 0.8125rem;
+  --text-code--line-height: 1.25rem;
+
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-pill-sm: 64px;
+  --radius-pill: 100px;
+
+  --breakpoint-sm: 600px;
+  --breakpoint-md: 960px;
+  --breakpoint-lg: 1200px;
+  --breakpoint-xl: 1400px;
+
+  --container-page: 1200px;
+  --container-wide: 1400px;
+
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --animate-rise: rise 0.5s var(--ease-out-quint) both;
+  --animate-tile-in: tile-in 0.34s var(--ease-out-quint) both;
+
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 12px, 0);
+    }
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+  }
+
+  @keyframes tile-in {
+    0% {
+      opacity: 0;
+      transform: scale(0.94);
+    }
+    60% {
+      transform: scale(1.02);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+}

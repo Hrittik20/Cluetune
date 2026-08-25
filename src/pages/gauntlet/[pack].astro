@@ -1,0 +1,40 @@
+---
+import GameShell from "../../components/game/GameShell";
+import MeshGradient from "../../components/MeshGradient.astro";
+import Layout from "../../layouts/Layout.astro";
+import { GENRE_PACKS, getPack } from "../../lib/catalog";
+
+export function getStaticPaths() {
+  return GENRE_PACKS.map((pack) => ({ params: { pack: pack.slug } }));
+}
+
+const pack = getPack(Astro.params.pack!);
+
+if (!pack) {
+  return Astro.redirect("/gauntlet", 302);
+}
+---
+
+<Layout title={`${pack.name} Gauntlet`} description={`${pack.blurb} Five rounds back to back.`}>
+  <section class="relative isolate">
+    <MeshGradient intensity="soft" />
+
+    <div class="page-shell relative py-12 sm:py-16">
+      <nav aria-label="Breadcrumb" class="mx-auto max-w-2xl">
+        <a href="/gauntlet" class="rounded-xs text-body-sm text-mute hover:text-ink">
+          ← All packs
+        </a>
+      </nav>
+
+      <header class="mx-auto mt-6 flex max-w-2xl flex-col items-center gap-3 text-center">
+        <p class="eyebrow">Gauntlet</p>
+        <h1 class="text-display-xl text-ink">{pack.name}</h1>
+        <p class="max-w-lg text-body-md text-body">{pack.blurb}</p>
+      </header>
+
+      <div class="mx-auto mt-10 max-w-2xl">
+        <GameShell client:load mode="gauntlet" pack={pack.slug} packName={pack.name} />
+      </div>
+    </div>
+  </section>
+</Layout>

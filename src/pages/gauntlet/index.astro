@@ -1,0 +1,45 @@
+---
+import MeshGradient from "../../components/MeshGradient.astro";
+import ModeCard from "../../components/ModeCard.astro";
+import Layout from "../../layouts/Layout.astro";
+import { GENRE_PACKS, filterCatalog } from "../../lib/catalog";
+
+const packs = GENRE_PACKS.map((pack) => ({
+  ...pack,
+  count: filterCatalog({ genres: pack.genres, decades: [], difficulty: [1, 5] }).length,
+}));
+---
+
+<Layout
+  title="Genre Gauntlet"
+  description="Pick a genre pack — hyperpop, K-pop, Afrobeats, drill and more — then run five rounds back to back."
+>
+  <section class="relative isolate">
+    <MeshGradient intensity="soft" />
+
+    <div class="page-shell relative py-12 sm:py-16">
+      <header class="mx-auto flex max-w-2xl flex-col items-center gap-3 text-center">
+        <p class="eyebrow">Genre gauntlet</p>
+        <h1 class="text-display-xl text-ink">Pick your pack. Five rounds, no breaks.</h1>
+        <p class="max-w-lg text-body-md text-body">
+          Same six-attempt ladder, but the catalogue narrows to one scene and the rounds run
+          straight through. Your accuracy across all five is what gets shared.
+        </p>
+      </header>
+
+      <div class="mt-12 grid gap-4 sm:grid-cols-2 md:grid-cols-3">
+        {
+          packs.map((pack) => (
+            <ModeCard
+              href={`/gauntlet/${pack.slug}`}
+              name={pack.name}
+              blurb={pack.blurb}
+              meta={`${pack.count} tracks`}
+              accent={pack.accent}
+            />
+          ))
+        }
+      </div>
+    </div>
+  </section>
+</Layout>
