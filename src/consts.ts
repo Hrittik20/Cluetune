@@ -2,10 +2,28 @@ export const SITE = {
   name: "Cluetune",
   domain: "cluetune.com",
   url: "https://cluetune.com",
-  tagline: "Name the track before the clip runs out.",
+  tagline: "Guess the song from 1 second.",
   description:
-    "A music guessing game with no daily limit. Hear a one-second clip, name the song, and keep playing as long as you like — no account, no cooldown.",
+    "Cluetune is a free guess song game. Name the track from 1 second — a Songless and Guessable-style daily, then unlimited rounds with no account.",
   themeColor: "#08080a",
+  ogImage: "/og.png",
+  email: "hello@cluetune.com",
+  gaId: "G-2YMYW2SK8X",
+  keywords: [
+    "Cluetune",
+    "songless",
+    "songless unlimited",
+    "songless game",
+    "songless infinite",
+    "lessgames songless",
+    "unlimited songless",
+    "songless unlimited hip hop",
+    "guessable",
+    "guessable.gg",
+    "guess song",
+    "guess song from 1 second",
+    "guess song game",
+  ],
 } as const;
 
 export interface NavItem {
@@ -16,9 +34,9 @@ export interface NavItem {
 }
 
 export const NAV_ITEMS: NavItem[] = [
-  { href: "/", label: "Unlimited" },
-  { href: "/daily", label: "Daily" },
+  { href: "/", label: "Daily" },
+  { href: "/unlimited", label: "Unlimited" },
   { href: "/sped-up", label: "Sped-Up" },
-  { href: "/lyric-flip", label: "Lyric-Flip" },
+  { href: "/lyrics", label: "Lyrics" },
   { href: "/gauntlet", label: "Gauntlet" },
 ];

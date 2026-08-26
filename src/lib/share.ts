@@ -71,7 +71,7 @@ const MODE_LABELS: Record<GameMode, string> = {
   daily: "Daily",
   unlimited: "Unlimited",
   "sped-up": "Sped-Up",
-  "lyric-flip": "Lyric-Flip",
+  "lyric-flip": "Lyrics",
   gauntlet: "Gauntlet",
 };
 

@@ -83,7 +83,7 @@ export function ShareCard({ options, shareText, shareUrl }: ShareCardProps) {
     <div className="flex flex-col items-center gap-4">
       <div
         className="overflow-hidden rounded-xl bg-canvas-soft-2 shadow-level-3"
-        style={{ width: 216, aspectRatio: `${CARD_WIDTH} / ${CARD_HEIGHT}` }}
+        style={{ width: "min(216px, 100%)", aspectRatio: `${CARD_WIDTH} / ${CARD_HEIGHT}` }}
       >
         {previewUrl ? (
           <img

@@ -49,7 +49,7 @@ export function emptyState(): PersistedState {
     sessions: {},
     prefs: {
       theme: "dark",
-      filters: { genres: [], decades: [], difficulty: [1, 5] },
+      filters: { genres: [], decades: [], difficulty: [1, 3] },
       reducedGlitch: false,
       hasPlayed: false,
     },
@@ -75,7 +75,7 @@ export function loadState(): PersistedState {
 
     // Merge against a fresh blob so fields added in later builds are present.
     const base = emptyState();
-    return {
+    const merged = {
       ...base,
       ...parsed,
       playerId: parsed.playerId || base.playerId,
@@ -83,6 +83,20 @@ export function loadState(): PersistedState {
       sessions: { ...base.sessions, ...parsed.sessions },
       prefs: { ...base.prefs, ...parsed.prefs },
     };
+
+    // Previous default was the full 1–5 window, which dealt too many deep cuts.
+    const filters = merged.prefs.filters;
+    if (
+      filters &&
+      filters.difficulty[0] === 1 &&
+      filters.difficulty[1] === 5 &&
+      !filters.genres.length &&
+      !filters.decades.length
+    ) {
+      merged.prefs.filters = { ...filters, difficulty: [1, 3] };
+    }
+
+    return merged;
   } catch {
     // Corrupt or quota-blocked storage should never break play.
     return emptyState();

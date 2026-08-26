@@ -38,7 +38,7 @@ const faqs = [
   },
   {
     q: "Where does the audio come from?",
-    a: "Preview clips are streamed directly from the rights holders’ own preview services — the same 30-second previews you hear in a store listing. Cluetune never hosts, caches or re-serves audio.",
+    a: "Preview clips are streamed directly from the rights holders’ own preview services — the same 30-second previews you hear in a store listing. Cluetune never hosts, caches or re-serves audio. Spotify is used for names, artwork and a wider Unlimited pool, not for the clip itself.",
   },
   {
     q: "When does the daily reset?",
@@ -48,20 +48,25 @@ const faqs = [
     q: "What is a challenge link?",
     a: "A link that pins the exact clip you just played, plus your score. Whoever opens it plays the same round and sees what they have to beat. No account on either end.",
   },
+  {
+    q: "How does Lyrics Guess work?",
+    a: "You see a few lines of the song and type the title. A skip or a miss reveals the next lines. The clip plays after you finish the round, so the words have to do the work.",
+  },
 ];
 ---
 
 <Layout
   title="How to Play"
-  description="The rules of Cluetune: six attempts, a clip that grows on every miss, and a guess box that forgives typos."
+  description="The rules of Cluetune: six attempts, a clip that grows on every miss, Lyrics Guess, and a guess box that forgives typos."
 >
-  <div class="page-shell py-12 sm:py-16">
+  <div class="page-shell py-8 sm:py-16">
     <header class="flex max-w-2xl flex-col gap-3">
       <p class="eyebrow">The rules</p>
       <h1 class="text-display-xl text-ink">How to play</h1>
-      <p class="text-body-md text-body">
-        One clip, {MAX_ATTEMPTS} attempts, and a little more audio every time you get it wrong.
-      </p>
+        <p class="text-body-md text-body">
+          One clip, {MAX_ATTEMPTS} attempts, and a little more audio every time you get it wrong.
+          Lyrics Guess uses the same six tries, but unlocks lines instead of seconds.
+        </p>
     </header>
 
     <div class="mt-14 grid max-w-5xl gap-14 md:grid-cols-2">
@@ -114,6 +119,15 @@ const faqs = [
       </section>
     </div>
 
+    <section class="mt-14 max-w-3xl sm:mt-20" aria-labelledby="lyrics-mode">
+      <h2 id="lyrics-mode" class="text-display-md text-ink">Lyrics Guess</h2>
+      <p class="mt-4 max-w-prose text-body-md text-body">
+        Not every song is easier in the first second than in the chorus. Lyrics Guess shows a short
+        run of lines with the title redacted. Skip or miss and the next pair of lines appears. After
+        the round resolves you can hear the clip, the same as every other mode.
+      </p>
+    </section>
+
     <section class="mt-20 max-w-3xl" aria-labelledby="faq">
       <h2 id="faq" class="text-display-lg text-ink">Questions</h2>
 
@@ -130,8 +144,8 @@ const faqs = [
     </section>
 
     <div class="mt-14 flex flex-wrap gap-3">
-      <a href="/" class="btn btn-primary btn-lg">Play Unlimited</a>
-      <a href="/daily" class="btn btn-secondary btn-lg">Today’s Daily</a>
+      <a href="/" class="btn btn-primary btn-lg">Play Today’s Daily</a>
+      <a href="/unlimited" class="btn btn-secondary btn-lg">Unlimited</a>
     </div>
   </div>
 </Layout>

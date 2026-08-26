@@ -15,8 +15,11 @@ npm run dev
 
 The site runs with **no API keys**. Autocomplete and preview clips both fall back
 to keyless public endpoints, so a fresh clone is immediately playable. Copy
-`.env.example` to `.env` only when you want Spotify metadata or a YouTube embed
-on the reveal screen.
+`.env.example` to `.env` when you want Spotify metadata (only if your Spotify
+app is allowed to call the Web API — many new apps 403 without Premium on the
+developer account), or a YouTube embed on the reveal screen. Unlimited already
+widens from iTunes and Deezer charts with no keys. Spotify still cannot supply
+audio.
 
 | Script                  | What it does                                        |
 | ----------------------- | --------------------------------------------------- |
@@ -30,10 +33,10 @@ on the reveal screen.
 
 | Mode | Route | Shape |
 | --- | --- | --- |
-| **Unlimited** | `/` | Continuous rounds, no cooldown, live session stats, genre/decade/difficulty filters. This is the landing page. |
-| **Daily** | `/daily` | One clip for everyone, resets at *your* local midnight. Streaks persist. |
+| **Daily** | `/` | One clip for everyone, resets at *your* local midnight. Streaks persist. This is the landing page. `/daily` redirects here. |
+| **Unlimited** | `/unlimited` | Continuous rounds, no cooldown, live session stats, genre/decade/difficulty filters. |
 | **Sped-Up** | `/sped-up` | Same ladder at 1.35× playback rate. |
-| **Lyric-Flip** | `/lyric-flip` | A scrambled, redacted hook shown alongside the clip. Each miss un-redacts more: word order, then vowels, then initials. |
+| **Lyrics Guess** | `/lyrics` | A few lines of the song. Guess the title. Skip or miss to reveal the next lines. `/lyric-flip` redirects here. |
 | **Genre Gauntlet** | `/gauntlet/[pack]` | Five back-to-back rounds from one scene. Six packs. |
 | **Challenge** | `/challenge/[code]` | A friend's exact round, replayed and scored against their result. No account. |
 
@@ -119,9 +122,8 @@ src/
 │  ├─ matching.ts        fuzzy guess matching (typos, features, remaster suffixes)
 │  ├─ daily.ts           deterministic daily seeding, local-midnight reset
 │  ├─ share.ts           challenge link encode/decode, share text
-│  ├─ lyricflip.ts       progressive redaction for Lyric-Flip
 │  ├─ storage.ts         localStorage schema and migrations
-│  └─ providers/         Spotify, iTunes, Deezer, YouTube + the resolver
+│  └─ providers/         Spotify, iTunes, Deezer, LRCLIB lyrics, YouTube + resolver
 ├─ pages/                one file per mode, plus the API routes
 └─ styles/
    ├─ theme.css          design tokens (@theme)
@@ -160,8 +162,7 @@ A guess that names the right artist but the wrong song returns a distinct
 
 - Full keyboard path through the combobox (`aria-activedescendant`, arrow keys, escape).
 - `prefers-reduced-motion` disables the mesh drift, the vinyl spin and the glitch.
-- Lyric-Flip redaction uses real character substitution, not a CSS blur, so it
-  survives a screen reader.
+- Lyrics Guess redacts title tokens in the snippet, so a screen reader never hears the answer.
 - Live regions announce verdicts and round transitions.
 - The share card is an image with a full text alternative describing the result.
 
@@ -179,7 +180,12 @@ Vercel dashboard if you want them. The build does not require them.
 
 ## Adding tracks
 
-Append to `CATALOG` in `src/lib/catalog.ts` and run:
+**Unlimited, Sped-Up and Lyrics Guess** merge in current iTunes and Deezer
+charts automatically, so you do not have to type every song by hand. Spotify
+editorial playlists are used too when the Web API allows it.
+
+**Daily and Genre Gauntlet** stay on the curated list so a rotating chart cannot
+change a shared puzzle. Append to `CATALOG` in `src/lib/catalog.ts` and run:
 
 ```bash
 npm run catalog:report

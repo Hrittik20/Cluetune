@@ -1,0 +1,25 @@
+---
+import GameShell from "../components/game/GameShell";
+import MeshGradient from "../components/MeshGradient.astro";
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout
+  title="Lyrics Guess"
+  description="Read a few lines, guess the song. Skip to reveal the next lyrics. A Cluetune mode for when you know the words better than the intro."
+>
+  <section class="relative isolate">
+    <MeshGradient intensity="soft" />
+
+    <div class="page-shell relative pb-10 pt-3 sm:pb-16 sm:pt-5">
+      <header class="mx-auto mb-3 flex max-w-2xl flex-col items-center gap-1.5 text-center sm:mb-4">
+        <p class="badge">Lyrics guess · read it, name it</p>
+        <h1 class="sr-only">Cluetune Lyrics Guess</h1>
+      </header>
+
+      <div class="mx-auto max-w-2xl">
+        <GameShell client:load mode="lyric-flip" continuous showFilters />
+      </div>
+    </div>
+  </section>
+</Layout>

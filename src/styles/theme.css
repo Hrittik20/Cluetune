@@ -167,13 +167,13 @@
   --text-display-2xl--letter-spacing: -0.055em;
   --text-display-2xl--font-weight: 600;
 
-  --text-display-xl: 3rem;
-  --text-display-xl--line-height: 1;
+  --text-display-xl: clamp(1.75rem, 7vw, 3rem);
+  --text-display-xl--line-height: 1.08;
   --text-display-xl--letter-spacing: -0.05em;
   --text-display-xl--font-weight: 600;
 
-  --text-display-lg: 2rem;
-  --text-display-lg--line-height: 2.5rem;
+  --text-display-lg: clamp(1.5rem, 4.6vw, 2rem);
+  --text-display-lg--line-height: 1.2;
   --text-display-lg--letter-spacing: -0.04em;
   --text-display-lg--font-weight: 600;
 

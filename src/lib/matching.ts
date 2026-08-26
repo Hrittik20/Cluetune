@@ -92,10 +92,90 @@ export function trackLabel(track: Track): string {
   return `${track.artist} — ${track.title}`;
 }
 
+const SUGGESTION_STOP = new Set([
+  "a",
+  "an",
+  "and",
+  "the",
+  "of",
+  "to",
+  "in",
+  "on",
+  "it",
+  "is",
+  "my",
+  "me",
+  "you",
+  "i",
+  "we",
+  "oh",
+  "do",
+  "does",
+  "how",
+  "what",
+  "who",
+  "can",
+  "this",
+  "that",
+  "for",
+  "with",
+  "your",
+  "im",
+  "just",
+]);
+
 /**
- * Accepts a bare title, an "Artist - Title" pair in either order, or the
- * canonical label, so players never have to learn an input format.
+ * Autocomplete ranking. Only titles and artist names that actually resemble
+ * the typed text score above zero — lyric fragments must not surface unrelated
+ * chart hits from a fuzzy remote search.
  */
+export function scoreSuggestion(query: string, track: { title: string; artist: string }): number {
+  const q = normalize(query);
+  if (!q) return 0;
+
+  const title = normalize(track.title);
+  const artist = normalize(track.artist);
+  const combined = `${artist} ${title}`;
+  const hayWords = combined.split(" ").filter(Boolean);
+
+  if (title === q || artist === q) return 1000;
+  if (title.startsWith(q)) return 900 - Math.min(200, title.length);
+  if (artist.startsWith(q)) return 800 - Math.min(200, artist.length);
+  if (q.length >= 3 && title.includes(q)) return 750;
+  if (q.length >= 3 && artist.includes(q)) return 700;
+
+  const tokens = q.split(" ").filter(Boolean);
+  const significant = tokens.filter((token) => token.length >= 2 && !SUGGESTION_STOP.has(token));
+  const required = significant.length ? significant : tokens;
+
+  const hits = required.filter((token) => tokenMatchesHaystack(token, combined, hayWords));
+
+  // Short title-like queries: every significant token must appear in the name.
+  if (required.length <= 4) {
+    if (hits.length === required.length) return 600;
+    return 0;
+  }
+
+  // Longer strings are almost always lyrics, not a title. Demand a real
+  // overlap so "how does it feel to treat me" cannot propose an unrelated hit.
+  if (hits.length >= Math.min(required.length, Math.max(2, Math.ceil(required.length * 0.6)))) {
+    return 200 + hits.length * 20;
+  }
+
+  return 0;
+}
+
+function tokenMatchesHaystack(token: string, combined: string, hayWords: string[]): boolean {
+  if (combined.includes(token)) return true;
+  if (token.length < 4) return false;
+
+  for (const word of hayWords) {
+    if (Math.abs(word.length - token.length) > 1) continue;
+    if (editDistance(token, word, 1) <= 1) return true;
+  }
+  return false;
+}
+
 export function judgeGuess(raw: string, answer: Track): GuessVerdict {
   const guess = raw.trim();
   if (!guess) return "wrong";
@@ -140,31 +220,4 @@ function splitArtistTitle(input: string): {
     artistCandidates: [first, second],
     titleCandidates: [second, first, input],
   };
-}
-
-/** Ranks catalog entries for the autocomplete. Higher score sorts first. */
-export function scoreSuggestion(query: string, track: Track): number {
-  const q = normalize(query);
-  if (!q) return 0;
-
-  const title = normalize(track.title);
-  const artist = normalize(track.artist);
-  const combined = `${artist} ${title}`;
-
-  if (title === q || artist === q) return 1000;
-  if (title.startsWith(q)) return 900 - title.length;
-  if (artist.startsWith(q)) return 800 - artist.length;
-
-  // Every query token must appear somewhere, so "weeknd blind" still resolves.
-  const tokens = q.split(" ").filter(Boolean);
-  if (tokens.every((token) => combined.includes(token))) {
-    return 600 - combined.indexOf(tokens[0]!);
-  }
-
-  if (combined.includes(q)) return 500 - combined.indexOf(q);
-
-  const budget = typoBudget(Math.max(q.length, title.length));
-  if (budget > 0 && editDistance(q, title, budget) <= budget) return 400;
-
-  return 0;
 }

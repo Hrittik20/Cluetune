@@ -10,7 +10,13 @@ export const prerender = false;
 const payload = decodeChallenge(Astro.params.code!);
 const track = payload ? getTrack(payload.t) : undefined;
 
-if (!payload || !track) {
+if (!payload) {
+  return Astro.redirect("/", 302);
+}
+
+// Chart-sourced tracks (`sp-…`) are resolved at round-fetch time, so a missing
+// catalogue row is not a dead link.
+if (!track && !payload.t.startsWith("sp-") && !payload.t.startsWith("it-") && !payload.t.startsWith("dz-")) {
   return Astro.redirect("/", 302);
 }
 
@@ -30,16 +36,13 @@ const headline = solved
   <section class="relative isolate">
     <MeshGradient intensity="soft" />
 
-    <div class="page-shell relative py-12 sm:py-16">
-      <header class="mx-auto flex max-w-2xl flex-col items-center gap-3 text-center">
+    <div class="page-shell relative pb-10 pt-3 sm:pb-16 sm:pt-5">
+      <header class="mx-auto mb-4 flex max-w-2xl flex-col items-center gap-2 text-center">
         <p class="eyebrow">{modeLabel(payload.m)} challenge</p>
-        <h1 class="text-display-xl text-ink">{headline}</h1>
-        <p class="max-w-lg text-body-md text-body">
-          Same clip, same six attempts. Nothing to install and nothing to sign up for.
-        </p>
+        <h1 class="text-display-md text-ink">{headline}</h1>
       </header>
 
-      <div class="mx-auto mt-10 max-w-2xl">
+      <div class="mx-auto max-w-2xl">
         <GameShell
           client:load
           mode={payload.m}
@@ -50,8 +53,8 @@ const headline = solved
         />
       </div>
 
-      <p class="mx-auto mt-10 max-w-md text-center text-body-sm text-mute">
-        Want more? <a href="/" class="text-link underline underline-offset-4">Unlimited mode</a> never runs
+      <p class="mx-auto mt-8 max-w-md text-center text-body-sm text-mute">
+        Want more? <a href="/unlimited" class="text-link underline underline-offset-4">Unlimited mode</a> never runs
         out.
       </p>
     </div>

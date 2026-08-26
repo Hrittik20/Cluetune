@@ -4,14 +4,16 @@ import MeshGradient from "../components/MeshGradient.astro";
 import ModeCard from "../components/ModeCard.astro";
 import Layout from "../layouts/Layout.astro";
 import { SITE } from "../consts";
+import { HOME_FAQS, faqJsonLd } from "../lib/faqs";
 
 const modes = [
   {
-    href: "/daily",
-    name: "Daily",
-    meta: "One a day",
-    blurb: "The same clip for everyone, reset at your local midnight. Build the streak.",
+    href: "/unlimited",
+    name: "Unlimited",
+    meta: "No cooldown",
+    blurb: "Keep going. Same catalogue, live streak and accuracy, filters for genre, decade and obscurity.",
     accent: "var(--cluetune-cyan)",
+    featured: true,
   },
   {
     href: "/sped-up",
@@ -21,10 +23,10 @@ const modes = [
     accent: "var(--cluetune-pink)",
   },
   {
-    href: "/lyric-flip",
-    name: "Lyric-Flip",
-    meta: "Text + audio",
-    blurb: "A scrambled, redacted hook alongside the clip. Two ways in, one answer.",
+    href: "/lyrics",
+    name: "Lyrics Guess",
+    meta: "Read it",
+    blurb: "A few lines of the song. Guess the title. Skip to reveal the next lines if you are stuck.",
     accent: "var(--cluetune-violet)",
   },
   {
@@ -38,10 +40,6 @@ const modes = [
 
 const differentiators = [
   {
-    title: "No cooldown, ever.",
-    body: "Every other game in this genre taps you out after one puzzle. Cluetune opens on Unlimited — play twenty rounds before you decide whether you want a daily habit.",
-  },
-  {
     title: "A result card, not a screenshot.",
     body: "Finish a round and you get a rendered 9:16 image with your clip’s waveform, guess pattern and time-to-guess. It drops straight into a Story or a TikTok upload.",
   },
@@ -53,35 +51,45 @@ const differentiators = [
     title: "The record is the interface.",
     body: "No progress bar. A vinyl that spins with the clip, grooves that move with the spectrum, and a needle-skip glitch every time you miss.",
   },
+  {
+    title: "No cooldown after you’re done.",
+    body: "The daily is one clip. Unlimited is right underneath it — keep playing, with filters, for as long as you like.",
+  },
+];
+
+const sitePages = [
+  { href: "/about", label: "About us" },
+  { href: "/contact", label: "Contact us" },
+  { href: "/privacy", label: "Privacy policy" },
+  { href: "/terms", label: "Terms & conditions" },
 ];
 ---
 
-<Layout description={SITE.description}>
+<Layout description={SITE.description} faqJsonLd={faqJsonLd()}>
   <section class="relative isolate">
     <MeshGradient />
 
-    <div class="page-shell relative pb-20 pt-8 sm:pt-10">
-      <header class="mx-auto flex max-w-2xl flex-col items-center gap-3 text-center">
+    <div class="page-shell relative pb-10 pt-3 sm:pb-16 sm:pt-5">
+      <header class="mx-auto mb-3 flex max-w-2xl flex-col items-center gap-1.5 text-center sm:mb-4">
         <p class="badge">
           <span aria-hidden="true" class="size-1.5 rounded-full bg-tone-correct"></span>
-          Unlimited mode · no login, no limit
+          Daily · same clip for everyone
         </p>
-
-        <h1 class="text-display-2xl text-ink">Name the track before the clip runs out.</h1>
-
-        <p class="max-w-lg text-body-md text-body">
-          One second of audio. Six attempts. Every wrong guess buys you a little more — and nothing
-          here locks you out until tomorrow.
-        </p>
+        <h1 class="sr-only">Cluetune — guess the song from 1 second</h1>
       </header>
 
-      <div class="mx-auto mt-8 max-w-2xl">
-        <GameShell client:load mode="unlimited" continuous showFilters />
+      <div class="mx-auto max-w-2xl">
+        <GameShell client:load mode="daily" />
       </div>
+
+      <p class="mx-auto mt-6 max-w-md px-2 text-center text-body-sm text-mute sm:mt-8">
+        Done for the day?{" "}
+        <a href="/unlimited" class="text-link underline underline-offset-4">Unlimited</a> has no cooldown.
+      </p>
     </div>
   </section>
 
-  <section class="page-shell py-20" aria-labelledby="modes-heading">
+  <section class="page-shell py-12 sm:py-16" aria-labelledby="modes-heading">
     <div class="flex flex-col gap-3">
       <p class="eyebrow">Other ways to play</p>
       <h2 id="modes-heading" class="max-w-2xl text-display-lg text-ink">
@@ -89,12 +97,12 @@ const differentiators = [
       </h2>
     </div>
 
-    <div class="mt-10 grid gap-4 sm:grid-cols-2 md:grid-cols-4">
+    <div class="mt-8 grid gap-4 sm:mt-10 sm:grid-cols-2 md:grid-cols-4">
       {modes.map((mode) => <ModeCard {...mode} />)}
     </div>
   </section>
 
-  <section class="hairline-y bg-canvas-soft py-24" aria-labelledby="why-heading">
+  <section class="hairline-y bg-canvas-soft py-12 sm:py-20" aria-labelledby="why-heading">
     <div class="page-shell">
       <div class="flex flex-col gap-3">
         <p class="eyebrow">Why this one</p>
@@ -103,17 +111,17 @@ const differentiators = [
         </h2>
       </div>
 
-      <div class="mt-12 grid gap-x-10 gap-y-12 md:grid-cols-2">
+      <div class="mt-10 grid gap-x-10 gap-y-10 sm:mt-12 md:grid-cols-2 md:gap-y-12">
         {
           differentiators.map((item, index) => (
-            <article class="flex gap-5">
+            <article class="flex gap-4 sm:gap-5">
               <span
                 aria-hidden="true"
                 class="tabular shrink-0 font-mono text-caption text-mute"
               >
                 {String(index + 1).padStart(2, "0")}
               </span>
-              <div class="flex flex-col gap-2">
+              <div class="flex min-w-0 flex-col gap-2">
                 <h3 class="text-display-sm text-ink">{item.title}</h3>
                 <p class="max-w-md text-body-md text-body">{item.body}</p>
               </div>
@@ -124,8 +132,8 @@ const differentiators = [
     </div>
   </section>
 
-  <section class="page-shell py-24" aria-labelledby="how-heading">
-    <div class="grid gap-12 md:grid-cols-[1fr_1.1fr] md:items-center">
+  <section class="page-shell py-12 sm:py-20" aria-labelledby="how-heading">
+    <div class="grid gap-10 md:grid-cols-[1fr_1.1fr] md:items-center md:gap-12">
       <div class="flex flex-col gap-4">
         <p class="eyebrow">How a round works</p>
         <h2 id="how-heading" class="text-display-lg text-ink">Six rungs, and the clip grows on every miss.</h2>
@@ -135,14 +143,14 @@ const differentiators = [
         </p>
         <div class="mt-2 flex flex-wrap gap-2">
           <a href="/how-to-play" class="btn btn-secondary btn-md">Read the Rules</a>
-          <a href="/daily" class="btn btn-primary btn-md">Try Today’s Daily</a>
+          <a href="/unlimited" class="btn btn-primary btn-md">Play Unlimited</a>
         </div>
       </div>
 
       <ol class="flex flex-col gap-px overflow-hidden rounded-lg bg-hairline shadow-level-1">
         {
           [1, 2, 4, 7, 11, 16].map((seconds, index) => (
-            <li class="flex items-center gap-4 bg-canvas-soft px-5 py-4">
+            <li class="flex items-center gap-3 bg-canvas-soft px-4 py-3.5 sm:gap-4 sm:px-5 sm:py-4">
               <span class="tabular w-6 shrink-0 font-mono text-caption text-mute">{index + 1}</span>
               <span
                 aria-hidden="true"
@@ -154,6 +162,119 @@ const differentiators = [
           ))
         }
       </ol>
+    </div>
+  </section>
+
+  <section class="hairline-y bg-canvas-soft py-12 sm:py-20" aria-labelledby="about-heading">
+    <div class="page-shell">
+      <article class="mx-auto flex max-w-prose flex-col gap-5 text-body-md text-body">
+        <div class="flex flex-col gap-3">
+          <p class="eyebrow">About the game</p>
+          <h2 id="about-heading" class="text-display-lg text-ink">
+            What is Cluetune?
+          </h2>
+        </div>
+
+        <p>
+          Cluetune is a free guess song game you play in the browser. Each round starts with one second
+          of a track — a kick, a breath, maybe the edge of a hook — and six attempts to name it. Guess
+          wrong, or skip, and the clip grows, from one second up to sixteen. There is no account, no
+          app store listing, and no cooldown once the daily is done. Press play, type a title, and you
+          are in.
+        </p>
+        <p>
+          That loop is what people are after when they search for a Songless game, Songless Unlimited,
+          Songless Infinite, LessGames Songless, or a Guessable.gg-style guess song from 1 second
+          challenge. Cluetune is built for it: one shared daily so friends can compare scores, then
+          unlimited rounds when you are not finished. Filters are there when you only want hip hop,
+          the 1990s, or something slightly obscure.
+        </p>
+
+        <h3 class="mt-2 text-display-sm text-ink">
+          Cluetune vs Songless, Guessable and other guess song games
+        </h3>
+        <p>
+          Songless and unlimited Songless sessions popularised the “heard it, name it” format after
+          Heardle closed. Guessable and Guessable.gg cover the same habit for players who want a guess
+          song game without a daily cap. Cluetune sits in that family, with a few choices those
+          versions often skip: a vinyl instead of a thin progress bar, a 9:16 result card sized for
+          Stories, and challenge links that do not need an account on either side.
+        </p>
+        <p>
+          If you have been bouncing between a Songless unlimited tab and another clone, the difference
+          here is the catalogue and the guess box. Titles in the real world are messy — remasters,
+          featured artists, punctuation, “and” versus “&amp;”. Cluetune treats the title alone, the
+          artist and title in either order, and a reasonable typo as the same answer. Naming the
+          artist and the wrong song is close, not a win. That is how a guess song game should feel
+          when you are playing on a phone with one thumb.
+        </p>
+
+        <h3 class="mt-2 text-display-sm text-ink">How to guess a song from 1 second</h3>
+        <p>
+          The daily Cluetune puzzle is the same clip for every player and resets at midnight in your
+          timezone. You start with one second on purpose. A skip is not a failure; it buys the next
+          rung of audio when you would rather hear more than burn a guess. By the fourth or fifth
+          attempt the hook is usually in the room. Get it in one and you have something worth sharing.
+          Miss all six and the track is revealed with links out to Spotify, Apple Music and YouTube.
+        </p>
+        <p>
+          Cluetune does not host, cache or re-serve audio. Clips stream from the rights holders’ own
+          preview services — the same 30-second previews you already hear in a store listing. Unlimited
+          also draws current hits from iTunes and Deezer charts, so those modes are not limited to a
+          handwritten list. Spotify, when the Web API allows it, adds canonical titles and artwork.
+          None of that requires you to log into a streaming account.
+        </p>
+
+        <h3 class="mt-2 text-display-sm text-ink">
+          Unlimited, Songless unlimited hip hop, and the other modes
+        </h3>
+        <p>
+          Done with the daily? Unlimited is Cluetune’s Songless unlimited mode: no cooldown, a live
+          streak, and filters for genre, decade and how obscure the cut is. Turn on hip hop if you
+          want a Songless unlimited hip hop session and nothing else. Sped-Up plays the same ladder at
+          1.35×, pitched the way a For You page would serve it. Lyrics Guess shows a few lines of the
+          song instead of the intro — skip to reveal the next lines until the title is obvious. Genre
+          Gauntlet runs five rounds inside one scene: K-pop, Afrobeats, drill, hyperpop and more.
+        </p>
+        <p>
+          You do not have to pick a mode to start. Land on Cluetune, press play, type a title. Stats
+          and streaks stay in this browser, so a second device is a fresh slate unless you export them.
+          Challenge a friend with a link that pins the exact clip you just heard. They open it, play,
+          and get scored against you. Cluetune is a guess song from 1 second game first and a daily
+          ritual second. If you want Songless Infinite with a cleaner guess box and a layout that
+          works on a phone, you are in the right place. Play today’s daily, then open Unlimited and
+          stay as long as you like.
+        </p>
+      </article>
+
+      <div class="mx-auto mt-12 max-w-prose">
+        <h2 class="text-display-md text-ink">Questions</h2>
+        <dl class="mt-6 flex flex-col">
+          {
+            HOME_FAQS.map((faq) => (
+              <div class="hairline-b flex flex-col gap-2 py-5">
+                <dt class="text-display-sm text-ink">{faq.q}</dt>
+                <dd class="text-body-md text-body">{faq.a}</dd>
+              </div>
+            ))
+          }
+        </dl>
+
+        <nav class="mt-10 flex flex-col gap-3" aria-label="About Cluetune">
+          <p class="eyebrow">Cluetune</p>
+          <ul class="flex flex-wrap gap-x-5 gap-y-2">
+            {
+              sitePages.map((page) => (
+                <li>
+                  <a href={page.href} class="text-body-sm text-link underline underline-offset-4">
+                    {page.label}
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </nav>
+      </div>
     </div>
   </section>
 </Layout>

@@ -17,6 +17,12 @@ export interface UseAudioClipResult extends AudioClipState {
   pause: () => void;
   toggle: (limitMs: number) => void;
   seek: (ms: number) => void;
+  /**
+   * Raises the stop boundary without seeking. If the clip had just hit the
+   * previous wall, playback resumes from that point into the newly unlocked
+   * audio — the Skip (+Ns) case.
+   */
+  extendLimit: (limitMs: number) => void;
   /** Latest frequency magnitudes, 0-1, or null when not reactive. */
   readLevels: () => Float32Array | null;
 }
@@ -80,7 +86,9 @@ export function useAudioClip(src: string | null, rate = 1): UseAudioClipResult {
 
     if (positionMs >= limitRef.current) {
       audio.pause();
-      audio.currentTime = 0;
+      // Hold the head at the wall instead of rewinding, so a skip that lands
+      // in this same tick can extend the window and keep going.
+      audio.currentTime = limitRef.current / 1000;
       stopLoop();
       setState((prev) => ({ ...prev, playing: false, positionMs: limitRef.current }));
       return;
@@ -248,9 +256,37 @@ export function useAudioClip(src: string | null, rate = 1): UseAudioClipResult {
     setState((prev) => ({ ...prev, positionMs: ms }));
   }, []);
 
+  const extendLimit = useCallback(
+    (limitMs: number) => {
+      const audio = audioRef.current;
+      const previous = limitRef.current;
+      limitRef.current = limitMs;
+      if (!audio || limitMs <= previous) return;
+
+      const positionMs = audio.currentTime * 1000;
+      if (!audio.paused) return;
+
+      // Resume when we were parked on (or just past) the old wall.
+      const parkedAtWall = positionMs >= previous - 80;
+      if (!parkedAtWall || positionMs >= limitMs) return;
+
+      ensureGraph();
+      void contextRef.current?.resume();
+      void audio
+        .play()
+        .then(() => {
+          setState((prev) => ({ ...prev, playing: true, error: null }));
+          stopLoop();
+          frameRef.current = requestAnimationFrame(tick);
+        })
+        .catch(() => undefined);
+    },
+    [ensureGraph, stopLoop, tick],
+  );
+
   const readLevels = useCallback(() => (analyserRef.current ? levelsRef.current : null), []);
 
   useEffect(() => () => void contextRef.current?.close(), []);
 
-  return { ...state, play, pause, toggle, seek, readLevels };
+  return { ...state, play, pause, toggle, seek, extendLimit, readLevels };
 }

@@ -5,10 +5,10 @@ const columns = [
   {
     title: "Play",
     links: [
-      { href: "/", label: "Unlimited" },
-      { href: "/daily", label: "Daily challenge" },
+      { href: "/", label: "Daily challenge" },
+      { href: "/unlimited", label: "Unlimited" },
       { href: "/sped-up", label: "Sped-Up round" },
-      { href: "/lyric-flip", label: "Lyric-Flip" },
+      { href: "/lyrics", label: "Lyrics Guess" },
       { href: "/gauntlet", label: "Genre Gauntlet" },
     ],
   },
@@ -19,13 +19,22 @@ const columns = [
       { href: "/how-to-play", label: "How to play" },
     ],
   },
+  {
+    title: "Site",
+    links: [
+      { href: "/about", label: "About us" },
+      { href: "/contact", label: "Contact us" },
+      { href: "/privacy", label: "Privacy policy" },
+      { href: "/terms", label: "Terms & conditions" },
+    ],
+  },
 ];
 
 const year = new Date().getFullYear();
 ---
 
-<footer class="hairline-t mt-24 bg-canvas-soft">
-  <div class="page-shell-wide grid gap-10 py-16 sm:grid-cols-2 md:grid-cols-4">
+<footer class="hairline-t mt-12 bg-canvas-soft pb-[calc(5.25rem+env(safe-area-inset-bottom,0px))] md:mt-24 md:pb-0">
+  <div class="page-shell-wide grid gap-8 py-10 sm:grid-cols-2 md:grid-cols-4 md:gap-10 md:py-16">
     <div class="flex flex-col gap-3">
       <p class="text-display-sm text-ink" translate="no">Cluetune</p>
       <p class="max-w-64 text-body-sm text-body">{SITE.tagline}</p>
@@ -47,18 +56,10 @@ const year = new Date().getFullYear();
         </nav>
       ))
     }
-
-    <div class="flex flex-col gap-3">
-      <p class="eyebrow">Audio</p>
-      <p class="text-caption text-mute">
-        Clips are streamed from the rights holders’ own preview services. Cluetune does not host,
-        cache or re-serve any audio.
-      </p>
-    </div>
   </div>
 
-  <div class="page-shell-wide hairline-t flex flex-wrap items-center justify-between gap-3 py-6">
+  <div class="page-shell-wide hairline-t flex flex-wrap items-center justify-between gap-3 py-5 md:py-6">
     <p class="text-caption text-mute">© {year} {SITE.domain}</p>
-    <p class="text-caption text-mute">Track metadata via Spotify · previews via Apple Music & Deezer</p>
+    <p class="text-caption text-mute">Charts via Apple Music & Deezer · metadata via Spotify when available</p>
   </div>
 </footer>

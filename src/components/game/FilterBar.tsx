@@ -1,5 +1,5 @@
 import { useEffect, useId, useState } from "react";
-import { ALL_DECADES, ALL_GENRES, DIFFICULTY_LABELS, GENRE_LABELS } from "../../lib/catalog";
+import { ALL_DECADES, ALL_GENRES, DEFAULT_FILTERS, DIFFICULTY_LABELS, GENRE_LABELS } from "../../lib/catalog";
 import type { Decade, Difficulty, Genre, ModeFilters } from "../../lib/types";
 
 export interface FilterBarProps {
@@ -25,8 +25,8 @@ export function FilterBar({ filters, onChange, matchCount }: FilterBarProps) {
 
     setParam(params, "genres", filters.genres.join(","));
     setParam(params, "decades", filters.decades.join(","));
-    setParam(params, "dmin", filters.difficulty[0] === 1 ? "" : String(filters.difficulty[0]));
-    setParam(params, "dmax", filters.difficulty[1] === 5 ? "" : String(filters.difficulty[1]));
+    setParam(params, "dmin", filters.difficulty[0] === DEFAULT_FILTERS.difficulty[0] ? "" : String(filters.difficulty[0]));
+    setParam(params, "dmax", filters.difficulty[1] === DEFAULT_FILTERS.difficulty[1] ? "" : String(filters.difficulty[1]));
 
     const query = params.toString();
     history.replaceState(null, "", query ? `${location.pathname}?${query}` : location.pathname);
@@ -35,7 +35,10 @@ export function FilterBar({ filters, onChange, matchCount }: FilterBarProps) {
   const activeCount =
     filters.genres.length +
     filters.decades.length +
-    (filters.difficulty[0] !== 1 || filters.difficulty[1] !== 5 ? 1 : 0);
+    (filters.difficulty[0] !== DEFAULT_FILTERS.difficulty[0] ||
+      filters.difficulty[1] !== DEFAULT_FILTERS.difficulty[1]
+      ? 1
+      : 0);
 
   const toggle = <T extends string>(list: T[], value: T): T[] =>
     list.includes(value) ? list.filter((item) => item !== value) : [...list, value];
@@ -62,7 +65,7 @@ export function FilterBar({ filters, onChange, matchCount }: FilterBarProps) {
           <button
             type="button"
             className="btn btn-ghost btn-sm"
-            onClick={() => onChange({ genres: [], decades: [], difficulty: [1, 5] })}
+            onClick={() => onChange(DEFAULT_FILTERS)}
           >
             Reset
           </button>
@@ -132,7 +135,7 @@ function Chip({ label, pressed, onClick }: { label: string; pressed: boolean; on
       aria-pressed={pressed}
       onClick={onClick}
       className={[
-        "rounded-full px-3.5 py-2 text-body-sm transition-colors duration-150",
+        "min-h-11 rounded-full px-3.5 py-2 text-body-sm transition-colors duration-150",
         pressed
           ? "bg-ink text-on-primary"
           : "bg-canvas-soft-2 text-body shadow-level-1 hover:text-ink",
@@ -150,7 +153,7 @@ function Chip({ label, pressed, onClick }: { label: string; pressed: boolean; on
 function expandRange([min, max]: [Difficulty, Difficulty], level: Difficulty): [Difficulty, Difficulty] {
   if (level < min) return [level, max];
   if (level > max) return [min, level];
-  if (level === min && level === max) return [1, 5];
+  if (level === min && level === max) return DEFAULT_FILTERS.difficulty;
   if (level === min) return [(min + 1) as Difficulty, max];
   if (level === max) return [min, (max - 1) as Difficulty];
   return [level, level];

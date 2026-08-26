@@ -10,6 +10,14 @@ interface Props {
   /** Suppresses the shared nav on immersive surfaces. */
   bare?: boolean;
   noindex?: boolean;
+  /** Open Graph / Twitter image path, relative to the site origin. */
+  image?: string;
+  keywords?: string;
+  ogType?: "website" | "article";
+  /** Extra JSON-LD objects merged into the graph. */
+  schema?: Record<string, unknown> | Record<string, unknown>[];
+  /** Dedicated FAQPage JSON-LD script (preferred by Google over mixing into @graph). */
+  faqJsonLd?: Record<string, unknown>;
 }
 
 const {
@@ -17,40 +25,122 @@ const {
   description = SITE.description,
   bare = false,
   noindex = false,
+  image = SITE.ogImage,
+  keywords = SITE.keywords.join(", "),
+  ogType = "website",
+  schema,
+  faqJsonLd,
 } = Astro.props;
 
 const pageTitle = title ? `${title} · ${SITE.name}` : `${SITE.name} — ${SITE.tagline}`;
 const canonical = new URL(Astro.url.pathname, SITE.url);
+const ogImage = new URL(image, SITE.url).href;
+const extraSchema = schema ? (Array.isArray(schema) ? schema : [schema]) : [];
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": `${SITE.url}/#website`,
+      name: SITE.name,
+      url: SITE.url,
+      description: SITE.description,
+      inLanguage: "en",
+    },
+    {
+      "@type": "WebApplication",
+      "@id": `${SITE.url}/#app`,
+      name: SITE.name,
+      url: SITE.url,
+      description: SITE.description,
+      applicationCategory: "GameApplication",
+      operatingSystem: "Any",
+      browserRequirements: "Requires JavaScript",
+      offers: {
+        "@type": "Offer",
+        price: "0",
+        priceCurrency: "USD",
+      },
+    },
+    {
+      "@type": "WebPage",
+      "@id": `${canonical}#webpage`,
+      url: canonical.href,
+      name: pageTitle,
+      description,
+      isPartOf: { "@id": `${SITE.url}/#website` },
+      about: { "@id": `${SITE.url}/#app` },
+    },
+    ...extraSchema,
+  ],
+};
 ---
 
 <!doctype html>
 <html lang="en" data-theme="dark">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="apple-touch-icon" href="/og.png" />
 
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
+    <meta name="keywords" content={keywords} />
+    <meta name="author" content={SITE.name} />
     <link rel="canonical" href={canonical} />
-    {noindex ? <meta name="robots" content="noindex" /> : null}
+    <link rel="sitemap" href="/sitemap.xml" />
+    <link rel="preconnect" href="https://www.googletagmanager.com" />
+    {noindex ? <meta name="robots" content="noindex, nofollow" /> : <meta name="robots" content="index, follow" />}
 
     <meta name="theme-color" content={SITE.themeColor} />
+    <meta name="color-scheme" content="dark light" />
     <meta name="generator" content={Astro.generator} />
+    <meta name="application-name" content={SITE.name} />
+    <meta name="apple-mobile-web-app-title" content={SITE.name} />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no" />
 
-    <meta property="og:type" content="website" />
+    <meta property="og:type" content={ogType} />
+    <meta property="og:locale" content="en_US" />
     <meta property="og:site_name" content={SITE.name} />
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:alt" content={`${SITE.name} — ${SITE.tagline}`} />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+    <meta name="twitter:image:alt" content={`${SITE.name} — ${SITE.tagline}`} />
+
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+    {faqJsonLd ? <script is:inline type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} /> : null}
+
+    <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${SITE.gaId}`}></script>
+    <script is:inline define:vars={{ gaId: SITE.gaId }}>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        window.dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+      gtag("config", gaId);
+    </script>
 
     {/* Preview audio and album art come from these hosts on nearly every round. */}
     <link rel="preconnect" href="https://audio-ssl.itunes.apple.com" crossorigin />
     <link rel="preconnect" href="https://is1-ssl.mzstatic.com" crossorigin />
     <link rel="dns-prefetch" href="https://cdns-preview-a.dzcdn.net" />
     <link rel="dns-prefetch" href="https://i.scdn.co" />
+    <link rel="dns-prefetch" href="https://lrclib.net" />
 
     {/* Applied before first paint so the chosen theme never flashes. */}
     <script is:inline>
@@ -64,7 +154,7 @@ const canonical = new URL(Astro.url.pathname, SITE.url);
     </script>
   </head>
 
-  <body class="min-h-dvh bg-canvas text-ink antialiased">
+  <body class="min-h-dvh overflow-x-clip bg-canvas text-ink antialiased">
     <a
       href="#main"
       class="btn btn-primary btn-md sr-only focus-visible:not-sr-only focus-visible:absolute focus-visible:left-4 focus-visible:top-4 focus-visible:z-50"
@@ -74,7 +164,7 @@ const canonical = new URL(Astro.url.pathname, SITE.url);
 
     {bare ? null : <Nav />}
 
-    <main id="main" tabindex="-1">
+    <main id="main" tabindex="-1" class={bare ? undefined : "pb-[calc(4.25rem+env(safe-area-inset-bottom,0px))] md:pb-0"}>
       <slot />
     </main>
 

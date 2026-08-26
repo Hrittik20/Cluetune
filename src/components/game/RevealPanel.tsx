@@ -13,8 +13,6 @@ export interface RevealPanelProps {
   puzzle?: number;
   /** Countdown string for daily; omitted in every other mode. */
   countdown?: string;
-  onNext?: () => void;
-  nextLabel?: string;
 }
 
 /**
@@ -28,8 +26,6 @@ export function RevealPanel({
   waveform,
   puzzle,
   countdown,
-  onNext,
-  nextLabel = "Next Round",
 }: RevealPanelProps) {
   const { track, status } = state;
   const won = status === "won";
@@ -83,7 +79,7 @@ export function RevealPanel({
     <section className="animate-rise flex flex-col gap-8" aria-live="polite">
       <header className="flex flex-col items-center gap-3 text-center">
         <p className="eyebrow">{won ? "Solved" : "Revealed"}</p>
-        <h2 className="text-display-lg text-ink">
+        <h2 className="text-display-lg text-balance text-ink">
           {won ? `Got it in ${state.guesses.length}.` : "That one got away."}
         </h2>
         <p className="text-body-md text-body">
@@ -111,7 +107,7 @@ export function RevealPanel({
         )}
 
         <div className="flex min-w-0 flex-1 flex-col gap-2 text-center sm:text-left">
-          <h3 className="text-display-md text-ink" translate="no">
+          <h3 className="text-display-md text-balance break-words text-ink" translate="no">
             {track.title}
           </h3>
           <p className="text-body-lg text-body" translate="no">
@@ -184,16 +180,10 @@ export function RevealPanel({
                 <p className="eyebrow">Next daily</p>
                 <p className="tabular mt-1 text-display-sm text-ink">{countdown}</p>
               </div>
-              <a className="btn btn-primary btn-md" href="/">
+              <a className="btn btn-primary btn-md" href="/unlimited">
                 Play Unlimited
               </a>
             </div>
-          ) : null}
-
-          {onNext ? (
-            <button type="button" className="btn btn-primary btn-lg w-full" onClick={onNext}>
-              {nextLabel}
-            </button>
           ) : null}
         </div>
       </div>

@@ -1,0 +1,80 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { SITE } from "../consts";
+
+const updated = "26 August 2026";
+---
+
+<Layout
+  title="Privacy policy"
+  description="How Cluetune handles data: no accounts, stats stay in your browser, and we do not sell personal information."
+>
+  <article class="page-shell py-8 sm:py-16">
+    <header class="flex max-w-2xl flex-col gap-3">
+      <p class="eyebrow">Privacy policy</p>
+      <h1 class="text-display-xl text-ink">Privacy policy</h1>
+      <p class="text-body-sm text-mute">Last updated {updated}</p>
+    </header>
+
+    <div class="mt-12 flex max-w-prose flex-col gap-8 text-body-md text-body">
+      <section class="flex flex-col gap-3">
+        <h2 class="text-display-sm text-ink">What this site is</h2>
+        <p>
+          Cluetune ({SITE.domain}) is a free guess-the-song game. You do not create an account. We
+          do not run a player database. If you never email us, we never receive your name.
+        </p>
+      </section>
+
+      <section class="flex flex-col gap-3">
+        <h2 class="text-display-sm text-ink">What stays on your device</h2>
+        <p>
+          Streaks, stats, theme preference and the daily result are stored in this browser’s
+          localStorage under keys prefixed <span class="font-mono text-body-sm">cluetune:</span>.
+          That data does not leave your device unless you export it from the{" "}
+          <a href="/stats" class="text-link underline underline-offset-4">Stats</a> page. Clearing
+          site data or switching phones deletes it.
+        </p>
+      </section>
+
+      <section class="flex flex-col gap-3">
+        <h2 class="text-display-sm text-ink">What the server sees</h2>
+        <p>
+          When you play, your browser requests a round and search suggestions. Those requests include
+          a typical IP address, user-agent and the query you typed in the guess box. We use that to
+          return a playable clip and autocomplete — not to build a profile. Hosting (for example
+          Vercel) and CDN logs may retain request metadata for a short period under their own terms.
+        </p>
+      </section>
+
+      <section class="flex flex-col gap-3">
+        <h2 class="text-display-sm text-ink">Third-party audio, lyrics and charts</h2>
+        <p>
+          Preview clips stream directly from Apple Music and Deezer. Lyric snippets for Lyrics Guess
+          come from LRCLIB. Chart metadata may come from those services and, when configured,
+          Spotify. Their privacy policies apply to those requests. Cluetune does not host, cache or
+          re-serve audio files.
+        </p>
+      </section>
+
+      <section class="flex flex-col gap-3">
+        <h2 class="text-display-sm text-ink">Cookies and analytics</h2>
+        <p>
+          We use Google Analytics to understand how people find and use the site (page views,
+          referrers, device type). Google may set cookies such as <span class="font-mono text-body-sm">_ga</span> for
+          that purpose. We do not use it for advertising and we do not sell that data. A theme
+          preference is stored locally, not as a tracking cookie.
+        </p>
+      </section>
+
+      <section class="flex flex-col gap-3">
+        <h2 class="text-display-sm text-ink">Contact</h2>
+        <p>
+          Privacy questions:{" "}
+          <a href={`mailto:${SITE.email}`} class="text-link underline underline-offset-4">{SITE.email}</a>
+          {" "}or the{" "}
+          <a href="/contact" class="text-link underline underline-offset-4">contact page</a>.
+        </p>
+      </section>
+    </div>
+  </article>
+</Layout>

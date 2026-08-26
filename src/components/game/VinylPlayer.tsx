@@ -140,7 +140,7 @@ export function VinylPlayer({
   return (
     <canvas
       ref={canvasRef}
-      className="aspect-square w-full max-w-[min(64vw,19rem)] touch-none select-none"
+      className="aspect-square w-[min(100%,11rem)] touch-none select-none sm:w-full sm:max-w-[min(52vw,15rem)]"
       role="img"
       aria-label={
         playing

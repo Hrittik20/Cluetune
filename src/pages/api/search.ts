@@ -11,12 +11,9 @@ export const prerender = false;
 /**
  * Autocomplete for the guess box.
  *
- * Suggestions deliberately span the whole music catalogue rather than only the
- * answerable pool — restricting the list to answerable tracks would turn the
- * dropdown into a cheat sheet.
- *
- * Local catalog hits are merged in first so the box stays responsive (and
- * useful) even when every upstream provider is down or unconfigured.
+ * Suggestions must resemble the typed title or artist. Remote catalogues
+ * happily return popular tracks for lyric-shaped queries; those are dropped
+ * unless the words actually appear in the name.
  */
 export const GET: APIRoute = async ({ url }) => {
   const query = (url.searchParams.get("q") ?? "").trim();
@@ -25,23 +22,29 @@ export const GET: APIRoute = async ({ url }) => {
     return json({ suggestions: [] });
   }
 
-  const local = CATALOG.map((track) => ({ track, score: scoreSuggestion(query, track) }))
+  const local = rank(
+    CATALOG.map((track) => ({
+      id: `catalog:${track.id}`,
+      title: track.title,
+      artist: track.artist,
+      year: track.year,
+    })),
+    query,
+  ).slice(0, 6);
+
+  const tokenCount = query.split(/\s+/).filter(Boolean).length;
+  const remote = tokenCount >= 6 ? [] : rank(await fetchRemote(query).catch(() => []), query);
+
+  return json({ suggestions: dedupe([...local, ...remote]).slice(0, 8) });
+};
+
+function rank(suggestions: SearchSuggestion[], query: string): SearchSuggestion[] {
+  return suggestions
+    .map((suggestion) => ({ suggestion, score: scoreSuggestion(query, suggestion) }))
     .filter((entry) => entry.score > 0)
     .sort((a, b) => b.score - a.score)
-    .slice(0, 5)
-    .map(
-      ({ track }): SearchSuggestion => ({
-        id: `catalog:${track.id}`,
-        title: track.title,
-        artist: track.artist,
-        year: track.year,
-      }),
-    );
-
-  const remote = await fetchRemote(query).catch(() => []);
-
-  return json({ suggestions: dedupe([...local, ...remote]).slice(0, 10) });
-};
+    .map((entry) => entry.suggestion);
+}
 
 async function fetchRemote(query: string): Promise<SearchSuggestion[]> {
   if (hasSpotifyCredentials()) {
@@ -56,7 +59,6 @@ async function fetchRemote(query: string): Promise<SearchSuggestion[]> {
     }
   }
 
-  // iTunes needs no credentials, so the box still works on a bare checkout.
   const results = await searchItunes(query, 10);
   return results.map((track) => ({
     id: `itunes:${track.trackId}`,
@@ -82,7 +84,6 @@ function json(body: unknown, status = 200): Response {
     status,
     headers: {
       "content-type": "application/json; charset=utf-8",
-      // Short shared cache: query space is huge but repeats are bursty.
       "cache-control": "public, max-age=30, s-maxage=300",
     },
   });

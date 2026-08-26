@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
+import { scoreSuggestion } from "../../lib/matching";
 import type { SearchSuggestion } from "../../lib/types";
 
 export interface GuessInputProps {
@@ -8,6 +9,8 @@ export interface GuessInputProps {
   /** Seconds the next skip or wrong guess would unlock, or null on the last attempt. */
   nextUnlockSeconds: number | null;
   attemptsLeft: number;
+  /** Overrides the default “Skip (+Ns)” / “Give Up” label (Lyrics Guess). */
+  skipLabel?: string;
 }
 
 const DEBOUNCE_MS = 160;
@@ -17,7 +20,14 @@ const DEBOUNCE_MS = 160;
  * option list can show artist, title and year together and stay keyboard
  * navigable on every browser.
  */
-export function GuessInput({ disabled, onCommit, onSkip, nextUnlockSeconds, attemptsLeft }: GuessInputProps) {
+export function GuessInput({
+  disabled,
+  onCommit,
+  onSkip,
+  nextUnlockSeconds,
+  attemptsLeft,
+  skipLabel: skipLabelProp,
+}: GuessInputProps) {
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState<SearchSuggestion[]>([]);
   const [open, setOpen] = useState(false);
@@ -59,9 +69,10 @@ export function GuessInput({ disabled, onCommit, onSkip, nextUnlockSeconds, atte
         if (!response.ok) throw new Error("search failed");
 
         const data = (await response.json()) as { suggestions?: SearchSuggestion[] };
+        const ranked = (data.suggestions ?? []).filter((suggestion) => scoreSuggestion(trimmed, suggestion) > 0);
         if (superseded) return;
 
-        setSuggestions(data.suggestions ?? []);
+        setSuggestions(ranked);
         setActiveIndex(-1);
       } catch {
         if (!superseded) setSuggestions([]);
@@ -155,9 +166,10 @@ export function GuessInput({ disabled, onCommit, onSkip, nextUnlockSeconds, atte
   );
 
   const skipLabel = useMemo(() => {
+    if (skipLabelProp) return skipLabelProp;
     if (nextUnlockSeconds == null) return "Give Up";
     return `Skip (+${nextUnlockSeconds}s)`;
-  }, [nextUnlockSeconds]);
+  }, [skipLabelProp, nextUnlockSeconds]);
 
   return (
     <div className="relative w-full">
@@ -206,13 +218,13 @@ export function GuessInput({ disabled, onCommit, onSkip, nextUnlockSeconds, atte
           ) : null}
         </div>
 
-        <div className="flex shrink-0 gap-2">
-          <button type="button" className="btn btn-secondary btn-lg flex-1 sm:flex-none" onClick={onSkip} disabled={disabled}>
+        <div className="flex min-w-0 shrink-0 gap-2 sm:shrink-0">
+          <button type="button" className="btn btn-secondary btn-lg min-w-0 flex-1 sm:flex-none" onClick={onSkip} disabled={disabled}>
             {skipLabel}
           </button>
           <button
             type="button"
-            className="btn btn-primary btn-lg flex-1 sm:flex-none"
+            className="btn btn-primary btn-lg min-w-0 flex-1 sm:flex-none"
             onClick={() => commit(suggestions[activeIndex] ? labelFor(suggestions[activeIndex]!) : query)}
             disabled={disabled || !query.trim()}
           >

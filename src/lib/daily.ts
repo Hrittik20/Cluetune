@@ -1,4 +1,4 @@
-import { CATALOG } from "./catalog";
+import { CATALOG, dailyGuessablePool, expandByPopularity } from "./catalog";
 import type { Track } from "./types";
 
 /**
@@ -48,11 +48,12 @@ export function hashString(input: string): number {
 export function dailyTrack(dateKey: string, pool: Track[] = CATALOG): Track {
   if (!pool.length) throw new Error("Cannot pick a daily track from an empty pool.");
 
+  const weighted = expandByPopularity(dailyGuessablePool(pool));
   const index = puzzleNumber(dateKey) - 1;
-  const cycle = Math.floor(index / pool.length);
-  const offset = ((index % pool.length) + pool.length) % pool.length;
+  const cycle = Math.floor(index / weighted.length);
+  const offset = ((index % weighted.length) + weighted.length) % weighted.length;
 
-  return shuffleDeterministic(pool, `cluetune-daily-cycle-${cycle}`)[offset]!;
+  return shuffleDeterministic(weighted, `cluetune-daily-cycle-${cycle}`)[offset]!;
 }
 
 /** Fisher-Yates driven by a seeded LCG so the order is reproducible. */

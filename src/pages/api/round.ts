@@ -1,8 +1,17 @@
 import type { APIRoute } from "astro";
-import { CATALOG, filterCatalog, getPack, getTrack } from "../../lib/catalog";
+import {
+  CATALOG,
+  dailyGuessablePool,
+  filterCatalog,
+  getPack,
+  getTrack as getCatalogTrack,
+  shuffleByPopularity,
+} from "../../lib/catalog";
 import { dailyTrack, isValidDateKey, localDateKey, puzzleNumber, shuffleDeterministic } from "../../lib/daily";
+import { fetchChartCatalog, lookupChartTrack } from "../../lib/providers/charts";
+import { fetchLyricSnippet } from "../../lib/providers/lyrics";
 import { resolvePlayable, resolveTrack } from "../../lib/providers/resolver";
-import type { Decade, Difficulty, GameMode, Genre, ModeFilters, Track } from "../../lib/types";
+import type { Decade, Difficulty, GameMode, Genre, ModeFilters, ResolvedTrack, Track } from "../../lib/types";
 
 export const prerender = false;
 
@@ -34,7 +43,10 @@ async function dailyRound(url: URL): Promise<Response> {
 
   // Walk forward through the deterministic order until something is playable,
   // so a provider gap never leaves the day with no puzzle at all.
-  const ordered = rotate(shuffleDeterministic(CATALOG, "cluetune-daily-fallback"), puzzleNumber(dateKey));
+  const ordered = rotate(
+    shuffleDeterministic(dailyGuessablePool(CATALOG), "cluetune-daily-fallback"),
+    puzzleNumber(dateKey),
+  );
   const primary = dailyTrack(dateKey);
   const [resolved] = await resolvePlayable([primary, ...ordered.filter((t) => t.id !== primary.id)], 1);
 
@@ -71,11 +83,17 @@ async function poolRound(url: URL, mode: GameMode): Promise<Response> {
 
   // Challenge links pin an exact track so both players hear the same clip.
   if (trackId) {
-    const track = getTrack(trackId);
+    const track = (await resolveKnownTrack(trackId)) ?? undefined;
     if (!track) return json({ error: "Unknown track." }, 404);
 
     const resolved = await resolveTrack(track);
     if (!resolved.source) return json({ error: resolved.unavailableReason ?? "Unavailable." }, 503);
+
+    if (mode === "lyric-flip") {
+      const lyrics = await fetchLyricSnippet(track).catch(() => null);
+      if (!lyrics) return json({ error: "No lyrics for this track." }, 503);
+      return json({ mode, rounds: [{ ...resolved, lyrics }] });
+    }
 
     return json({ mode, rounds: [resolved] });
   }
@@ -84,17 +102,24 @@ async function poolRound(url: URL, mode: GameMode): Promise<Response> {
   const exclude = new Set((url.searchParams.get("exclude") ?? "").split(",").filter(Boolean));
   const want = clamp(Number.parseInt(url.searchParams.get("count") ?? "3", 10) || 3, 1, 5);
 
-  let pool = filterCatalog(filters).filter((track) => !exclude.has(track.id));
+  const source = await playablePool(mode);
+  let pool = filterCatalog(filters, source).filter((track) => !exclude.has(track.id));
 
   // Rather than fail a narrow filter set, recycle the unfiltered pool once the
   // player has exhausted it. Repeats beat a dead end mid-session.
   if (pool.length < want) {
-    pool = filterCatalog(filters);
+    pool = filterCatalog(filters, source);
   }
   if (!pool.length) return json({ error: "No tracks match those filters." }, 404);
 
-  const rounds = await resolvePlayable(shuffle(pool), want);
+  const rounds = await resolvePlayable(shuffleByPopularity(pool), want);
   if (!rounds.length) return json({ error: "No playable tracks right now." }, 503);
+
+  if (mode === "lyric-flip") {
+    const withLyrics = await attachLyrics(rounds, shuffleByPopularity(pool), want);
+    if (!withLyrics.length) return json({ error: "No tracks with lyrics matched those filters." }, 503);
+    return json({ mode, rounds: withLyrics });
+  }
 
   return json({ mode, rounds });
 }
@@ -104,7 +129,7 @@ function parseFilters(url: URL): ModeFilters {
   const decades = split<Decade>(url.searchParams.get("decades"));
 
   const min = clamp(Number.parseInt(url.searchParams.get("dmin") ?? "1", 10) || 1, 1, 5) as Difficulty;
-  const max = clamp(Number.parseInt(url.searchParams.get("dmax") ?? "5", 10) || 5, 1, 5) as Difficulty;
+  const max = clamp(Number.parseInt(url.searchParams.get("dmax") ?? "3", 10) || 3, 1, 5) as Difficulty;
 
   return {
     genres,
@@ -127,13 +152,62 @@ function rotate<T>(items: T[], by: number): T[] {
   return [...items.slice(offset), ...items.slice(0, offset)];
 }
 
-function shuffle(items: Track[]): Track[] {
-  const out = [...items];
-  for (let i = out.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [out[i], out[j]] = [out[j]!, out[i]!];
+async function playablePool(mode: GameMode): Promise<Track[]> {
+  // Daily and gauntlet stay on the editorial list so a rotating Spotify
+  // playlist cannot change a shared puzzle or a named pack mid-week.
+  if (mode === "daily" || mode === "gauntlet") return CATALOG;
+
+  const charts = await fetchChartCatalog().catch(() => []);
+  if (!charts.length) return CATALOG;
+
+  const seen = new Set(CATALOG.map((track) => identityKey(track)));
+  return [...CATALOG, ...charts.filter((track) => !seen.has(identityKey(track)))];
+}
+
+function identityKey(track: Track): string {
+  return `${track.artist}::${track.title}`.toLowerCase().replace(/[^a-z0-9:]/g, "");
+}
+
+async function resolveKnownTrack(id: string): Promise<Track | undefined> {
+  return getCatalogTrack(id) ?? (await lookupChartTrack(id));
+}
+
+async function attachLyrics(
+  seed: ResolvedTrack[],
+  fallbackPool: Track[],
+  want: number,
+): Promise<ResolvedTrack[]> {
+  const found: ResolvedTrack[] = [];
+  const seen = new Set<string>();
+
+  const tryList = async (tracks: ResolvedTrack[] | Track[]) => {
+    for (let i = 0; i < tracks.length && found.length < want; i += 4) {
+      const batch = tracks.slice(i, i + 4);
+      const settled = await Promise.all(
+        batch.map(async (entry) => {
+          const resolved = "source" in entry ? (entry as ResolvedTrack) : await resolveTrack(entry as Track);
+          if (!resolved.source || seen.has(resolved.track.id)) return null;
+          const lyrics = await fetchLyricSnippet(resolved.track).catch(() => null);
+          if (!lyrics) return null;
+          seen.add(resolved.track.id);
+          return { ...resolved, lyrics };
+        }),
+      );
+
+      for (const item of settled) {
+        if (item && found.length < want) found.push(item);
+      }
+    }
+  };
+
+  await tryList(seed);
+
+  if (found.length < want) {
+    const extras = fallbackPool.filter((track) => !seen.has(track.id));
+    await tryList(extras);
   }
-  return out;
+
+  return found;
 }
 
 function json(body: unknown, status = 200, cacheControl = "no-store"): Response {

@@ -1,0 +1,31 @@
+---
+import MeshGradient from "./MeshGradient.astro";
+import Layout from "../layouts/Layout.astro";
+
+interface Props {
+  code: "404" | "500";
+  eyebrow: string;
+  title: string;
+  body: string;
+}
+
+const { code, eyebrow, title, body } = Astro.props;
+---
+
+<Layout title={title} description={body} noindex>
+  <section class="relative isolate">
+    <MeshGradient intensity="soft" />
+
+    <article class="page-shell relative py-16 sm:py-24">
+      <header class="mx-auto flex max-w-2xl flex-col items-center gap-4 text-center">
+        <p class="eyebrow">{eyebrow}</p>
+        <p class="tabular font-mono text-caption text-mute">{code}</p>
+        <h1 class="text-display-xl text-ink">{title}</h1>
+        <p class="max-w-md text-body-md text-body">{body}</p>
+        <div class="mt-4 flex flex-wrap justify-center gap-3">
+          <slot />
+        </div>
+      </header>
+    </article>
+  </section>
+</Layout>

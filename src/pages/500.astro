@@ -1,0 +1,21 @@
+---
+import ErrorPage from "../components/ErrorPage.astro";
+
+interface Props {
+  error?: unknown;
+}
+
+// Astro passes the thrown value in. We never render it — stack traces stay in the logs.
+const { error } = Astro.props;
+if (error instanceof Error) console.error(error);
+---
+
+<ErrorPage
+  code="500"
+  eyebrow="Needle skip"
+  title="Something on our side skipped."
+  body="The page failed to load. That isn’t your guess. Reload, or start a fresh round from the daily."
+>
+  <button type="button" class="btn btn-primary btn-lg" onclick="location.reload()">Try again</button>
+  <a href="/" class="btn btn-secondary btn-lg">Go home</a>
+</ErrorPage>

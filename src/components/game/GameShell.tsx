@@ -20,8 +20,8 @@ import { getDailyRecord, getSession, loadState, putSession, recordDaily } from "
 import type { GameMode, ModeFilters, ResolvedTrack } from "../../lib/types";
 import { FilterBar } from "./FilterBar";
 import { GuessInput } from "./GuessInput";
-import { GuessRows } from "./GuessRows";
-import { LyricClueBoard } from "./LyricClueBoard";
+import { ClipLadderBar, GuessRows } from "./GuessRows";
+import { LyricsBoard } from "./LyricsBoard";
 import { RevealPanel } from "./RevealPanel";
 import { SessionHud } from "./SessionHud";
 import { VinylPlayer } from "./VinylPlayer";
@@ -254,19 +254,21 @@ export default function GameShell(props: GameShellProps) {
       const verdict = judgeGuess(label, round.track);
       if (verdict !== "correct") setScratchKey((key) => key + 1);
 
-      resolveRound(
-        applyGuess(round, { label, verdict, unlockedMs: unlocked }, Date.now()),
-      );
+      const next = applyGuess(round, { label, verdict, unlockedMs: unlocked }, Date.now());
+      resolveRound(next);
+      if (next.status === "playing") audio.extendLimit(unlockedMs(next));
     },
-    [round, unlocked, resolveRound],
+    [round, unlocked, resolveRound, audio],
   );
 
   const skip = useCallback(() => {
     if (!round || round.status !== "playing") return;
 
     setScratchKey((key) => key + 1);
-    resolveRound(applyGuess(round, { label: "Skipped", verdict: "skip", unlockedMs: unlocked }, Date.now()));
-  }, [round, unlocked, resolveRound]);
+    const next = applyGuess(round, { label: "Skipped", verdict: "skip", unlockedMs: unlocked }, Date.now());
+    resolveRound(next);
+    if (next.status === "playing") audio.extendLimit(unlockedMs(next));
+  }, [round, unlocked, resolveRound, audio]);
 
   const advance = useCallback(async () => {
     const [next, ...rest] = queue;
@@ -318,11 +320,32 @@ export default function GameShell(props: GameShellProps) {
   if (!round || !current) return <LoadingState />;
 
   const attemptIndex = round.guesses.length;
+  const lyricsMode = mode === "lyric-flip";
   const nextUnlockSeconds =
     attemptIndex + 1 < ladder.length ? Math.round(ladder[attemptIndex + 1]! / 1000) : null;
 
+  const lyrics = current.lyrics;
+  const shownLyricLines = lyrics
+    ? Math.min(lyrics.lines.length, (attemptIndex + 1) * lyrics.linesPerReveal)
+    : 0;
+  const remainingLyricLines = lyrics ? lyrics.lines.length - shownLyricLines : 0;
+  const nextLyricBatch = lyrics ? Math.min(lyrics.linesPerReveal, remainingLyricLines) : 0;
+
+  const skipLabel = lyricsMode
+    ? nextUnlockSeconds == null
+      ? "Give Up"
+      : nextLyricBatch > 0
+        ? `Skip (+${nextLyricBatch} line${nextLyricBatch === 1 ? "" : "s"})`
+        : "Skip"
+    : undefined;
+
+  const showPlayer = Boolean(current.source) && (!lyricsMode || finished);
+  const nextCtaLabel =
+    mode === "gauntlet" ? `Round ${completedRounds + 1} of ${GAUNTLET_LENGTH}` : "Next Round";
+  const showNextCta = finished && !gauntletComplete;
+
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-3 sm:gap-5">
       {challengerAttempt != null ? (
         <ChallengeBanner
           name={challengerName}
@@ -335,10 +358,28 @@ export default function GameShell(props: GameShellProps) {
         <GauntletProgress completed={completedRounds} total={GAUNTLET_LENGTH} packName={packName} />
       ) : null}
 
-      {continuous ? <SessionHud session={session} /> : null}
+      {showPlayer ? (
+        <div className="flex flex-col items-center gap-3 sm:gap-4">
+          {showNextCta ? (
+            <div className="flex justify-center">
+              {mode === "daily" ? (
+                <a className="btn btn-primary btn-md h-11 px-6 shadow-level-2" href="/unlimited">
+                  Play Unlimited
+                  <ArrowIcon />
+                </a>
+              ) : (
+                <button
+                  type="button"
+                  className="btn btn-primary btn-md h-11 px-6 shadow-level-2"
+                  onClick={() => void advance()}
+                >
+                  {nextCtaLabel}
+                  <ArrowIcon />
+                </button>
+              )}
+            </div>
+          ) : null}
 
-      {current.source ? (
-        <div className="flex flex-col items-center gap-6">
           <VinylPlayer
             playing={audio.playing}
             positionMs={audio.positionMs}
@@ -346,73 +387,124 @@ export default function GameShell(props: GameShellProps) {
             totalMs={totalMs}
             readLevels={audio.readLevels}
             scratchKey={scratchKey}
-            artworkUrl={current.source.artworkUrl}
+            artworkUrl={current.source?.artworkUrl}
             revealArtwork={finished}
             reducedGlitch={reducedGlitch}
           />
 
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              className="btn btn-primary btn-lg min-w-40"
-              onClick={() => audio.toggle(finished ? totalMs : unlocked)}
-              disabled={!audio.ready && !audio.error}
-            >
-              {audio.playing ? "Pause" : finished ? "Replay Full Clip" : `Play ${(unlocked / 1000).toFixed(0)}s`}
-            </button>
-
-            <button
-              type="button"
-              className="btn btn-secondary btn-icon"
-              aria-label="Restart the clip from the beginning"
-              onClick={() => audio.play(finished ? totalMs : unlocked, 0)}
-            >
-              <RestartIcon />
-            </button>
-          </div>
+          {showNextCta ? (
+            <div className="flex items-center justify-center gap-2">
+              <button
+                type="button"
+                className="btn btn-secondary btn-icon"
+                aria-label={audio.playing ? "Pause the clip" : "Replay the full clip"}
+                onClick={() => audio.toggle(totalMs)}
+                disabled={!audio.ready && !audio.error}
+              >
+                {audio.playing ? <PauseIcon /> : <PlayIcon />}
+              </button>
+              <button
+                type="button"
+                className="btn btn-secondary btn-icon"
+                aria-label="Restart the clip from the beginning"
+                onClick={() => audio.play(totalMs, 0)}
+              >
+                <RestartIcon />
+              </button>
+            </div>
+          ) : (
+            <div className="flex w-full max-w-md items-center justify-center gap-2 sm:gap-3">
+              <button
+                type="button"
+                className="btn btn-primary btn-lg min-w-0 flex-1 sm:min-w-40 sm:flex-none"
+                onClick={() => audio.toggle(unlocked)}
+                disabled={!audio.ready && !audio.error}
+              >
+                {audio.playing ? "Pause" : `Play ${(unlocked / 1000).toFixed(0)}s`}
+              </button>
+              <button
+                type="button"
+                className="btn btn-secondary btn-icon"
+                aria-label="Restart the clip from the beginning"
+                onClick={() => audio.play(unlocked, 0)}
+              >
+                <RestartIcon />
+              </button>
+            </div>
+          )}
 
           {audio.error ? (
             <p role="status" className="text-body-sm text-tone-wrong">
               {audio.error}
             </p>
           ) : null}
+
+          {lyricsMode ? null : (
+            <div className="w-full">
+              <ClipLadderBar
+                ladder={ladder}
+                total={totalMs}
+                unlockedMs={finished ? totalMs : unlocked}
+                positionMs={audio.positionMs}
+                attempt={Math.min(attemptIndex + 1, ladder.length)}
+              />
+            </div>
+          )}
         </div>
+      ) : current.source && lyricsMode ? (
+        lyrics ? (
+          <LyricsBoard lyrics={lyrics} attempt={attemptIndex} />
+        ) : (
+          <UnavailableState reason="No lyrics for this track." onSkip={advance} />
+        )
       ) : (
         <UnavailableState reason={current.unavailableReason} onSkip={advance} />
       )}
 
-      {mode === "lyric-flip" ? (
-        <LyricClueBoard track={current.track} attempt={attemptIndex} />
+      {lyricsMode && showPlayer && lyrics && finished ? (
+        <LyricsBoard lyrics={lyrics} attempt={ladder.length - 1} />
       ) : null}
 
       {!finished ? (
         <>
-          <GuessRows guesses={round.guesses} ladder={ladder} activeIndex={attemptIndex} />
           <GuessInput
             onCommit={commitGuess}
             onSkip={skip}
             nextUnlockSeconds={nextUnlockSeconds}
             attemptsLeft={ladder.length - attemptIndex}
+            skipLabel={skipLabel}
+          />
+          <GuessRows
+            guesses={round.guesses}
+            ladder={ladder}
+            activeIndex={attemptIndex}
+            showBar={false}
+            activeHint={lyricsMode ? "Reading the lyrics…" : undefined}
           />
         </>
       ) : (
         <>
-          <GuessRows guesses={round.guesses} ladder={ladder} activeIndex={-1} />
+          <GuessRows
+            guesses={round.guesses}
+            ladder={ladder}
+            activeIndex={-1}
+            showBar={false}
+            activeHint={lyricsMode ? "Reading the lyrics…" : undefined}
+          />
           <RevealPanel
             state={round}
             source={current.source}
             waveform={waveformRef.current}
             puzzle={puzzle}
             countdown={mode === "daily" ? countdown : undefined}
-            onNext={mode === "daily" || gauntletComplete ? undefined : advance}
-            nextLabel={mode === "gauntlet" ? `Round ${completedRounds + 1} of ${GAUNTLET_LENGTH}` : "Next Round"}
           />
         </>
       )}
 
       {gauntletComplete ? <GauntletSummary session={session} packName={packName} /> : null}
 
-      {/* Configuration sits after the loop — the point is to play, not to tune. */}
+      {continuous ? <SessionHud session={session} /> : null}
+
       {showFilters ? (
         <FilterBar
           filters={filters}
@@ -440,15 +532,15 @@ function readFilters(params: URLSearchParams): ModeFilters | null {
     decades: decades as ModeFilters["decades"],
     difficulty: [
       (Number.isNaN(min) ? 1 : Math.min(5, Math.max(1, min))) as ModeFilters["difficulty"][0],
-      (Number.isNaN(max) ? 5 : Math.min(5, Math.max(1, max))) as ModeFilters["difficulty"][1],
+      (Number.isNaN(max) ? 3 : Math.min(5, Math.max(1, max))) as ModeFilters["difficulty"][1],
     ],
   };
 }
 
 function LoadingState() {
   return (
-    <div className="flex flex-col items-center gap-6 py-16" role="status" aria-live="polite">
-      <div className="size-40 animate-pulse rounded-full bg-canvas-soft-2 sm:size-56" />
+    <div className="flex flex-col items-center gap-4 py-8" role="status" aria-live="polite">
+      <div className="size-28 animate-pulse rounded-full bg-canvas-soft-2 sm:size-36" />
       <p className="text-body-sm text-mute">Cueing up a track…</p>
     </div>
   );
@@ -516,7 +608,7 @@ function GauntletProgress({
   packName?: string;
 }) {
   return (
-    <div className="flex items-center justify-between gap-4">
+    <div className="flex flex-wrap items-center justify-between gap-3 sm:gap-4">
       <p className="eyebrow">{packName ? `${packName} gauntlet` : "Gauntlet"}</p>
       <ol className="flex gap-1.5" aria-label={`Round ${Math.min(completed + 1, total)} of ${total}`}>
         {Array.from({ length: total }, (_, index) => (
@@ -547,11 +639,41 @@ function GauntletSummary({ session, packName }: { session: SessionStats; packNam
         <a className="btn btn-primary btn-md" href="/gauntlet">
           Pick Another Pack
         </a>
-        <a className="btn btn-secondary btn-md" href="/">
+        <a className="btn btn-secondary btn-md" href="/unlimited">
           Play Unlimited
         </a>
       </div>
     </div>
+  );
+}
+
+function ArrowIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M5 12h14M13 6l6 6-6 6"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function PlayIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M8 5.5v13L19 12 8 5.5Z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function PauseIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M7 5h3v14H7V5Zm7 0h3v14h-3V5Z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+    </svg>
   );
 }
 

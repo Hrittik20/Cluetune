@@ -1,0 +1,77 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { SITE } from "../consts";
+---
+
+<Layout
+  title="Contact us"
+  description={`Contact Cluetune at ${SITE.email}. Questions about the guess song game, privacy, or a challenge link — we read every message.`}
+  schema={{
+    "@type": "ContactPage",
+    "@id": `${SITE.url}/contact#contact`,
+    url: `${SITE.url}/contact`,
+    name: "Contact Cluetune",
+    description: `Email ${SITE.email} about the guess song game.`,
+  }}
+>
+  <article class="page-shell py-8 sm:py-16">
+    <header class="flex max-w-2xl flex-col gap-3">
+      <p class="eyebrow">Contact us</p>
+      <h1 class="text-display-xl text-ink">Write to Cluetune.</h1>
+      <p class="text-body-md text-body">
+        For the game, privacy, or anything that is not a song title. Email is the fastest path.
+      </p>
+    </header>
+
+    <div class="mt-12 grid max-w-3xl gap-10 md:grid-cols-2">
+      <div class="flex flex-col gap-3">
+        <h2 class="text-display-sm text-ink">Email</h2>
+        <p class="text-body-md text-body">
+          <a href={`mailto:${SITE.email}`} class="text-link underline underline-offset-4">{SITE.email}</a>
+        </p>
+        <p class="text-body-sm text-mute">
+          We are a small project. Expect a reply within a few days, not a few minutes.
+        </p>
+        <p class="mt-4 text-body-sm text-body">
+          Looking for how to play?{" "}
+          <a href="/how-to-play" class="text-link underline underline-offset-4">Read the rules</a>
+          {" "}or start on the{" "}
+          <a href="/" class="text-link underline underline-offset-4">daily</a>.
+        </p>
+      </div>
+
+      <form id="contact-form" class="card-soft flex flex-col gap-4 p-5 sm:p-6" data-email={SITE.email}>
+        <label class="flex flex-col gap-1.5">
+          <span class="text-caption text-mute">Name</span>
+          <input class="field h-11 px-4" name="name" type="text" autocomplete="name" required />
+        </label>
+        <label class="flex flex-col gap-1.5">
+          <span class="text-caption text-mute">Email</span>
+          <input class="field h-11 px-4" name="email" type="email" autocomplete="email" required />
+        </label>
+        <label class="flex flex-col gap-1.5">
+          <span class="text-caption text-mute">Message</span>
+          <textarea class="field min-h-32 rounded-lg px-4 py-3" name="message" required></textarea>
+        </label>
+        <button type="submit" class="btn btn-primary btn-lg">Open email draft</button>
+        <p class="text-caption text-mute">
+          Submitting opens your mail app addressed to {SITE.email}. Nothing is stored on this site.
+        </p>
+      </form>
+    </div>
+  </article>
+</Layout>
+
+<script>
+  document.getElementById("contact-form")?.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const form = event.currentTarget as HTMLFormElement;
+    const data = new FormData(form);
+    const name = String(data.get("name") ?? "").trim();
+    const email = String(data.get("email") ?? "").trim();
+    const message = String(data.get("message") ?? "").trim();
+    const subject = encodeURIComponent(`Cluetune — ${name || "message"}`);
+    const body = encodeURIComponent(`From: ${name} <${email}>\n\n${message}`);
+    window.location.href = `mailto:${form.dataset.email}?subject=${subject}&body=${body}`;
+  });
+</script>

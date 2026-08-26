@@ -1,0 +1,58 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { SITE } from "../consts";
+---
+
+<Layout
+  title="About us"
+  description="Cluetune is a free guess-the-song game in the browser. No account, no app — a Songless-style daily plus unlimited rounds."
+  schema={{
+    "@type": "AboutPage",
+    "@id": `${SITE.url}/about#about`,
+    url: `${SITE.url}/about`,
+    name: "About Cluetune",
+    description: "Cluetune is a free guess-the-song game in the browser.",
+  }}
+>
+  <article class="page-shell py-8 sm:py-16">
+    <header class="flex max-w-2xl flex-col gap-3">
+      <p class="eyebrow">About us</p>
+      <h1 class="text-display-xl text-ink">Cluetune is a website where you guess the song.</h1>
+      <p class="text-body-md text-body">
+        A one-second clip, six tries, and no login. Built for people who searched for Songless,
+        Guessable, or any game where you guess the song from a fragment of audio.
+      </p>
+    </header>
+
+    <div class="mt-12 flex max-w-prose flex-col gap-5 text-body-md text-body">
+      <p>
+        Cluetune runs entirely in your browser at {SITE.domain}. The daily puzzle is the same clip
+        for everyone and resets at midnight where you are. When that one is done,{" "}
+        <a href="/unlimited" class="text-link underline underline-offset-4">Unlimited</a> keeps the
+        same ladder going — that is how you play more than once, or play a Songless unlimited
+        session, without waiting for tomorrow.
+      </p>
+      <p>
+        Other modes sit next to it:{" "}
+        <a href="/sped-up" class="text-link underline underline-offset-4">Sped-Up</a> at 1.35×,{" "}
+        <a href="/lyrics" class="text-link underline underline-offset-4">Lyrics Guess</a> if you
+        know the words better than the intro, and{" "}
+        <a href="/gauntlet" class="text-link underline underline-offset-4">Genre Gauntlet</a> for
+        five rounds in one scene.
+      </p>
+      <p>
+        There is no company login wall and no native app. Stats stay on your device. Audio is
+        streamed from the rights holders’ own preview services; Cluetune does not host or re-serve
+        files. Read the{" "}
+        <a href="/how-to-play" class="text-link underline underline-offset-4">rules</a>, the{" "}
+        <a href="/privacy" class="text-link underline underline-offset-4">privacy policy</a>, or{" "}
+        <a href="/contact" class="text-link underline underline-offset-4">get in touch</a>.
+      </p>
+    </div>
+
+    <div class="mt-12 flex flex-wrap gap-3">
+      <a href="/" class="btn btn-primary btn-lg">Play today’s daily</a>
+      <a href="/unlimited" class="btn btn-secondary btn-lg">Unlimited</a>
+    </div>
+  </article>
+</Layout>

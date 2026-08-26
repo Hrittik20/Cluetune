@@ -69,9 +69,18 @@ export interface AudioSource {
   attribution: string;
 }
 
+export interface LyricSnippet {
+  /** Redacted lines shown progressively across attempts. */
+  lines: string[];
+  linesPerReveal: number;
+  attribution: string;
+}
+
 export interface ResolvedTrack {
   track: Track;
   source: AudioSource | null;
+  /** Present in Lyrics Guess when a snippet could be built. */
+  lyrics?: LyricSnippet | null;
   /** Populated when every provider in the chain declined. */
   unavailableReason?: string;
 }

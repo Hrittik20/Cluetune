@@ -1,0 +1,13 @@
+---
+import ErrorPage from "../components/ErrorPage.astro";
+---
+
+<ErrorPage
+  code="404"
+  eyebrow="Wrong track"
+  title="This page isn’t on the setlist."
+  body="The URL doesn’t match a Cluetune mode, pack, or page. Head home for today’s daily, or keep guessing in Unlimited."
+>
+  <a href="/" class="btn btn-primary btn-lg">Play today’s daily</a>
+  <a href="/unlimited" class="btn btn-secondary btn-lg">Unlimited</a>
+</ErrorPage>

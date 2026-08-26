@@ -1,0 +1,78 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { SITE } from "../consts";
+
+const updated = "26 August 2026";
+---
+
+<Layout
+  title="Terms & conditions"
+  description="Terms for using Cluetune, the free browser game where you guess the song from a short clip."
+>
+  <article class="page-shell py-8 sm:py-16">
+    <header class="flex max-w-2xl flex-col gap-3">
+      <p class="eyebrow">Terms & conditions</p>
+      <h1 class="text-display-xl text-ink">Terms & conditions</h1>
+      <p class="text-body-sm text-mute">Last updated {updated}</p>
+    </header>
+
+    <div class="mt-12 flex max-w-prose flex-col gap-8 text-body-md text-body">
+      <section class="flex flex-col gap-3">
+        <h2 class="text-display-sm text-ink">Using Cluetune</h2>
+        <p>
+          By opening {SITE.domain} you agree to these terms. Cluetune is a free, no-account game.
+          We may change modes, catalogues or these terms; the date above is the current version.
+        </p>
+      </section>
+
+      <section class="flex flex-col gap-3">
+        <h2 class="text-display-sm text-ink">The game, not a streaming service</h2>
+        <p>
+          Cluetune lets you guess a song from a short licensed preview or a lyric snippet. It is not
+          a substitute for Spotify, Apple Music or YouTube. Full tracks, downloads and offline
+          playback are not offered. Previews play from the rights holders’ own services.
+        </p>
+      </section>
+
+      <section class="flex flex-col gap-3">
+        <h2 class="text-display-sm text-ink">Your conduct</h2>
+        <p>
+          Don’t abuse the APIs behind the game, scrape the catalogue at scale, or use the site to
+          distribute malware. Challenge links share a round identifier — don’t use them to harass
+          anyone. Stats on this device are yours to export or delete.
+        </p>
+      </section>
+
+      <section class="flex flex-col gap-3">
+        <h2 class="text-display-sm text-ink">Availability</h2>
+        <p>
+          The site is provided as-is. A provider outage (previews, lyrics, charts) can skip a track
+          or delay a round. We are not liable for lost streaks, downtime, or guesses that did not
+          feel fair. The matching rules are described on{" "}
+          <a href="/how-to-play" class="text-link underline underline-offset-4">How to play</a>.
+        </p>
+      </section>
+
+      <section class="flex flex-col gap-3">
+        <h2 class="text-display-sm text-ink">Intellectual property</h2>
+        <p>
+          Cluetune’s name, layout and original copy are ours. Song titles, artwork, lyrics and
+          recordings belong to their respective owners. Lyric snippets are shown only as a short
+          clue in Lyrics Guess.
+        </p>
+      </section>
+
+      <section class="flex flex-col gap-3">
+        <h2 class="text-display-sm text-ink">Contact</h2>
+        <p>
+          Questions about these terms:{" "}
+          <a href={`mailto:${SITE.email}`} class="text-link underline underline-offset-4">{SITE.email}</a>
+          {" "}·{" "}
+          <a href="/privacy" class="text-link underline underline-offset-4">Privacy policy</a>
+          {" "}·{" "}
+          <a href="/about" class="text-link underline underline-offset-4">About us</a>.
+        </p>
+      </section>
+    </div>
+  </article>
+</Layout>

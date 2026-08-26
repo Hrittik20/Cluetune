@@ -79,12 +79,14 @@ export interface SpotifyTrackMeta {
   isrc?: string;
   durationMs?: number;
   externalUrl?: string;
+  popularity?: number;
 }
 
 interface SpotifyApiTrack {
   id: string;
   name: string;
   duration_ms: number;
+  popularity?: number;
   artists: { name: string }[];
   album: { name: string; release_date?: string; images?: { url: string; width: number }[] };
   external_ids?: { isrc?: string };
@@ -105,6 +107,7 @@ function mapTrack(track: SpotifyApiTrack): SpotifyTrackMeta {
     isrc: track.external_ids?.isrc,
     durationMs: track.duration_ms,
     externalUrl: track.external_urls?.spotify,
+    popularity: track.popularity,
   };
 }
 
@@ -141,5 +144,43 @@ export async function lookupSpotifyTrack(
     // Field-scoped search misses on punctuation-heavy titles; retry loosely.
     const [loose] = await searchSpotify(`${artist} ${title}`, 1);
     return loose ?? null;
+  });
+}
+
+export async function lookupSpotifyById(id: string): Promise<SpotifyTrackMeta | null> {
+  const token = await getToken();
+  if (!token || !id) return null;
+
+  return trackCache.wrap(`id:${id}`, async () => {
+    const response = await fetchWithTimeout(`${API_BASE}/tracks/${encodeURIComponent(id)}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!response.ok) return null;
+
+    const data = (await response.json()) as SpotifyApiTrack;
+    return data?.id ? mapTrack(data) : null;
+  });
+}
+
+/**
+ * Pulls the head of an editorial playlist. Used to widen Unlimited beyond the
+ * handwritten catalogue when credentials are present — still metadata only.
+ */
+export async function fetchPlaylistTracks(playlistId: string, limit = 50): Promise<SpotifyTrackMeta[]> {
+  const token = await getToken();
+  if (!token) return [];
+
+  return searchCache.wrap(`playlist:${playlistId}:${limit}`, async () => {
+    const fields =
+      "items(track(id,name,duration_ms,popularity,artists(name),album(name,release_date,images),external_ids,external_urls))";
+    const url = `${API_BASE}/playlists/${playlistId}/tracks?limit=${limit}&fields=${encodeURIComponent(fields)}`;
+    const response = await fetchWithTimeout(url, { headers: { Authorization: `Bearer ${token}` } });
+    if (!response.ok) return [];
+
+    const data = (await response.json()) as { items?: { track?: SpotifyApiTrack | null }[] };
+    return (data.items ?? [])
+      .map((item) => item.track)
+      .filter((track): track is SpotifyApiTrack => Boolean(track?.id && track.name))
+      .map(mapTrack);
   });
 }

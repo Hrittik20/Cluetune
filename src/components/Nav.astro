@@ -2,10 +2,18 @@
 import { NAV_ITEMS, SITE } from "../consts";
 
 const path = Astro.url.pathname.replace(/\/$/, "") || "/";
+
+const ICONS: Record<string, string> = {
+  "/": "M12 3 4 9v12h5v-7h6v7h5V9L12 3Z",
+  "/unlimited": "M18.6 6.4a7 7 0 0 0-9.9 0L7 8.1m-1.6 9.5a7 7 0 0 0 9.9 0L17 15.9M4 8.1h4V4M20 15.9h-4V20",
+  "/sped-up": "m13 3-9 11h8l-1 7 9-11h-8l1-7Z",
+  "/lyrics": "M7 4h10M7 9h10M7 14h6M5 20h14a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1Z",
+  "/gauntlet": "M8 21V8m4 13V3m4 18v-9",
+};
 ---
 
 <header class="sticky top-0 z-40 hairline-b bg-canvas/85 backdrop-blur-md">
-  <div class="page-shell-wide flex h-16 items-center justify-between gap-4">
+  <div class="page-shell-wide flex h-14 items-center justify-between gap-3 md:h-16 md:gap-4">
     <a
       href="/"
       class="flex shrink-0 items-center gap-2 rounded-md text-display-sm text-ink"
@@ -19,8 +27,8 @@ const path = Astro.url.pathname.replace(/\/$/, "") || "/";
       <span translate="no">Cluetune</span>
     </a>
 
-    <nav aria-label="Game modes" class="min-w-0 flex-1">
-      <ul class="flex items-center gap-1 overflow-x-auto [scrollbar-width:none] sm:justify-center">
+    <nav aria-label="Game modes" class="hidden min-w-0 flex-1 md:block">
+      <ul class="flex items-center justify-center gap-1">
         {
           NAV_ITEMS.map((item) => {
             const active = item.href === "/" ? path === "/" : path.startsWith(item.href);
@@ -43,8 +51,8 @@ const path = Astro.url.pathname.replace(/\/$/, "") || "/";
       </ul>
     </nav>
 
-    <div class="flex shrink-0 items-center gap-2">
-      <a href="/stats" class="btn btn-ghost btn-sm hidden sm:inline-flex">Stats</a>
+    <div class="flex shrink-0 items-center gap-1.5 sm:gap-2">
+      <a href="/stats" class="btn btn-ghost btn-sm">Stats</a>
       <button
         type="button"
         id="theme-toggle"
@@ -85,6 +93,43 @@ const path = Astro.url.pathname.replace(/\/$/, "") || "/";
     </div>
   </div>
 </header>
+
+<nav
+  aria-label="Game modes"
+  class="fixed inset-x-0 bottom-0 z-40 hairline-t bg-canvas/92 backdrop-blur-md md:hidden"
+  style="padding-bottom: env(safe-area-inset-bottom, 0px)"
+>
+  <ul class="grid grid-cols-5">
+    {
+      NAV_ITEMS.map((item) => {
+        const active = item.href === "/" ? path === "/" : path.startsWith(item.href);
+        const icon = ICONS[item.href] ?? ICONS["/"]!;
+        return (
+          <li>
+            <a
+              href={item.href}
+              aria-current={active ? "page" : undefined}
+              class:list={[
+                "flex min-h-12 flex-col items-center justify-center gap-0.5 px-1 py-1.5 text-[11px] leading-none",
+                active ? "text-ink" : "text-mute",
+              ]}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path
+                  d={icon}
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"></path>
+              </svg>
+              {item.label}
+            </a>
+          </li>
+        );
+      })
+    }
+  </ul>
+</nav>
 
 <script>
   const toggle = document.getElementById("theme-toggle");

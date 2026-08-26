@@ -1,9 +1,13 @@
 import type { Decade, Difficulty, Genre, ModeFilters, Track } from "./types";
 
 /**
- * The seed pool. Every mode (Daily, Unlimited, Sped-Up, Lyric-Flip, Gauntlet)
+ * The seed pool. Every mode (Daily, Unlimited, Sped-Up, Lyrics Guess, Gauntlet)
  * draws from this single catalog so difficulty and coverage stay consistent
  * across the product.
+ *
+ * Unlimited, Sped-Up and Lyrics Guess also merge in Spotify editorial playlists
+ * at request time when API credentials are present. Daily and Gauntlet stay on
+ * this list so a rotating chart cannot change a shared puzzle.
  *
  * Entries carry metadata only — no audio. Playable clips are resolved at
  * request time through the provider chain in `src/lib/providers`, which is why
@@ -227,6 +231,86 @@ export const CATALOG: Track[] = [
   t("my-favorite-things", "My Favorite Things", "John Coltrane", "My Favorite Things", 1961, ["jazz"], 3),
   t("chameleon", "Chameleon", "Herbie Hancock", "Head Hunters", 1973, ["jazz"], 3),
   t("birdland", "Birdland", "Weather Report", "Heavy Weather", 1977, ["jazz"], 4),
+
+  // ── extra chart hits (kept guessable; daily draws from difficulty 1–3) ──
+  t("shape-of-you", "Shape of You", "Ed Sheeran", "÷", 2017, ["pop"], 1),
+  t("perfect", "Perfect", "Ed Sheeran", "÷", 2017, ["pop"], 1),
+  t("thinking-out-loud", "Thinking Out Loud", "Ed Sheeran", "x", 2014, ["pop"], 1),
+  t("stay", "STAY", "The Kid LAROI", "F*CK LOVE 3: OVER YOU", 2021, ["pop"], 1),
+  t("drivers-license", "drivers license", "Olivia Rodrigo", "SOUR", 2021, ["pop"], 1),
+  t("good-4-u", "good 4 u", "Olivia Rodrigo", "SOUR", 2021, ["pop", "rock"], 1),
+  t("vampire", "vampire", "Olivia Rodrigo", "GUTS", 2023, ["pop"], 1),
+  t("anti-hero", "Anti-Hero", "Taylor Swift", "Midnights", 2022, ["pop"], 1),
+  t("blank-space", "Blank Space", "Taylor Swift", "1989", 2014, ["pop"], 1),
+  t("love-story", "Love Story", "Taylor Swift", "Fearless", 2008, ["pop", "country"], 1),
+  t("watermelon-sugar", "Watermelon Sugar", "Harry Styles", "Fine Line", 2019, ["pop"], 1),
+  t("dont-start-now", "Don't Start Now", "Dua Lipa", "Future Nostalgia", 2019, ["pop"], 1),
+  t("heat-waves", "Heat Waves", "Glass Animals", "Dreamland", 2020, ["indie", "pop"], 1),
+  t("stay-with-me", "Stay With Me", "Sam Smith", "In the Lonely Hour", 2014, ["pop", "rnb"], 1),
+  t("hello", "Hello", "Adele", "25", 2015, ["pop"], 1),
+  t("someone-like-you", "Someone Like You", "Adele", "21", 2011, ["pop"], 1),
+  t("poker-face", "Poker Face", "Lady Gaga", "The Fame", 2008, ["pop"], 1),
+  t("bad-romance", "Bad Romance", "Lady Gaga", "The Fame Monster", 2009, ["pop"], 1),
+  t("umbrella", "Umbrella", "Rihanna", "Good Girl Gone Bad", 2007, ["pop", "rnb"], 1),
+  t("single-ladies", "Single Ladies (Put a Ring on It)", "Beyoncé", "I Am... Sasha Fierce", 2008, ["pop", "rnb"], 1),
+  t("crazy-in-love", "Crazy in Love", "Beyoncé", "Dangerously in Love", 2003, ["pop", "rnb"], 1),
+  t("hey-ya", "Hey Ya!", "OutKast", "Speakerboxxx/The Love Below", 2003, ["hip-hop", "pop"], 1),
+  t("yeah", "Yeah!", "Usher", "Confessions", 2004, ["rnb", "pop"], 1),
+  t("i-gotta-feeling", "I Gotta Feeling", "The Black Eyed Peas", "The E.N.D.", 2009, ["pop"], 1),
+  t("party-in-the-usa", "Party in the U.S.A.", "Miley Cyrus", "The Time of Our Lives", 2009, ["pop"], 1),
+  t("call-me-maybe", "Call Me Maybe", "Carly Rae Jepsen", "Kiss", 2012, ["pop"], 1),
+  t("happy", "Happy", "Pharrell Williams", "GIRL", 2013, ["pop"], 1),
+  t("get-lucky", "Get Lucky", "Daft Punk", "Random Access Memories", 2013, ["electronic", "pop"], 1),
+  t("senorita", "Señorita", "Shawn Mendes", "Shawn Mendes", 2019, ["pop"], 1),
+  t("old-town-road", "Old Town Road", "Lil Nas X", "7", 2019, ["hip-hop", "country"], 1),
+  t("peaches", "Peaches", "Justin Bieber", "Justice", 2021, ["pop", "rnb"], 1),
+  t("sorry", "Sorry", "Justin Bieber", "Purpose", 2015, ["pop"], 1),
+  t("birds-of-a-feather", "BIRDS OF A FEATHER", "Billie Eilish", "HIT ME HARD AND SOFT", 2024, ["pop"], 1),
+  t("beautiful-things", "Beautiful Things", "Benson Boone", "Fireworks & Rollerblades", 2024, ["pop"], 1),
+  t("lose-control", "Lose Control", "Teddy Swims", "I've Tried Everything but Therapy (Part 1)", 2023, ["pop", "rnb"], 1),
+  t("die-with-a-smile", "Die With A Smile", "Lady Gaga", "MAYHEM", 2024, ["pop"], 1),
+  t("apt", "APT.", "ROSÉ", "rosie", 2024, ["pop", "kpop"], 1),
+  t("starboy", "Starboy", "The Weeknd", "Starboy", 2016, ["pop", "rnb"], 1),
+  t("save-your-tears", "Save Your Tears", "The Weeknd", "After Hours", 2020, ["pop"], 1),
+  t("one-dance", "One Dance", "Drake", "Views", 2016, ["hip-hop", "afrobeats"], 1),
+  t("gods-plan", "God's Plan", "Drake", "Scorpion", 2018, ["hip-hop"], 1),
+  t("hotline-bling", "Hotline Bling", "Drake", "Hotline Bling", 2015, ["hip-hop"], 1),
+  t("in-da-club", "In Da Club", "50 Cent", "Get Rich or Die Tryin'", 2003, ["hip-hop"], 1),
+  t("sunflower", "Sunflower", "Post Malone", "Spider-Man: Into the Spider-Verse", 2018, ["hip-hop", "pop"], 1),
+  t("circles", "Circles", "Post Malone", "Hollywood's Bleeding", 2019, ["pop"], 1),
+  t("rockstar", "rockstar", "Post Malone", "Beerbongs & Bentleys", 2017, ["hip-hop"], 1),
+  t("closer", "Closer", "The Chainsmokers", "Collage", 2016, ["electronic", "pop"], 1),
+  t("something-just-like-this", "Something Just Like This", "The Chainsmokers", "Memories...Do Not Open", 2017, ["electronic", "pop"], 1),
+  t("wake-me-up", "Wake Me Up", "Avicii", "True", 2013, ["electronic", "pop"], 1),
+  t("rather-be", "Rather Be", "Clean Bandit", "New Eyes", 2014, ["electronic", "pop"], 2),
+  t("cheap-thrills", "Cheap Thrills", "Sia", "This Is Acting", 2016, ["pop"], 1),
+  t("havana", "Havana", "Camila Cabello", "Camila", 2017, ["pop", "latin"], 1),
+  t("dont-stop-believin", "Don't Stop Believin'", "Journey", "Escape", 1981, ["rock"], 1),
+  t("hotel-california", "Hotel California", "Eagles", "Hotel California", 1977, ["rock"], 1),
+  t("livin-on-a-prayer", "Livin' on a Prayer", "Bon Jovi", "Slippery When Wet", 1986, ["rock"], 1),
+  t("eye-of-the-tiger", "Eye of the Tiger", "Survivor", "Eye of the Tiger", 1982, ["rock"], 1),
+  t("imagine", "Imagine", "John Lennon", "Imagine", 1971, ["rock", "pop"], 1),
+  t("hey-jude", "Hey Jude", "The Beatles", "Hey Jude", 1968, ["rock", "pop"], 1),
+  t("let-it-be", "Let It Be", "The Beatles", "Let It Be", 1970, ["rock", "pop"], 1),
+  t("come-together", "Come Together", "The Beatles", "Abbey Road", 1969, ["rock"], 1),
+  t("yellow", "Yellow", "Coldplay", "Parachutes", 2000, ["rock", "pop"], 1),
+  t("viva-la-vida", "Viva La Vida", "Coldplay", "Viva la Vida or Death and All His Friends", 2008, ["rock", "pop"], 1),
+  t("clocks", "Clocks", "Coldplay", "A Rush of Blood to the Head", 2002, ["rock"], 2),
+  t("somebody-that-i-used-to-know", "Somebody That I Used to Know", "Gotye", "Making Mirrors", 2011, ["pop", "indie"], 1),
+  t("radioactive", "Radioactive", "Imagine Dragons", "Night Visions", 2012, ["rock", "pop"], 1),
+  t("demons", "Demons", "Imagine Dragons", "Night Visions", 2012, ["rock", "pop"], 1),
+  t("believer", "Believer", "Imagine Dragons", "Evolve", 2017, ["rock", "pop"], 1),
+  t("counting-stars", "Counting Stars", "OneRepublic", "Native", 2013, ["pop", "rock"], 1),
+  t("shut-up-and-dance", "Shut Up and Dance", "WALK THE MOON", "TALKING IS HARD", 2014, ["pop", "rock"], 1),
+  t("all-of-me", "All of Me", "John Legend", "Love in the Future", 2013, ["rnb", "pop"], 1),
+  t("what-makes-you-beautiful", "What Makes You Beautiful", "One Direction", "Up All Night", 2011, ["pop"], 1),
+  t("night-changes", "Night Changes", "One Direction", "FOUR", 2014, ["pop"], 2),
+  t("stitches", "Stitches", "Shawn Mendes", "Handwritten", 2015, ["pop"], 2),
+  t("let-it-go", "Let It Go", "Idina Menzel", "Frozen", 2013, ["pop"], 1),
+  t("super-bass", "Super Bass", "Nicki Minaj", "Pink Friday", 2010, ["hip-hop", "pop"], 1),
+  t("industry-baby", "INDUSTRY BABY", "Lil Nas X", "MONTERO", 2021, ["hip-hop"], 1),
+  t("about-damn-time", "About Damn Time", "Lizzo", "Special", 2022, ["pop"], 1),
+  t("stayin-alive", "Stayin' Alive", "Bee Gees", "Saturday Night Fever", 1977, ["pop"], 1),
 ];
 
 function t(
@@ -308,7 +392,20 @@ export const DIFFICULTY_LABELS: Record<Difficulty, string> = {
 export const DEFAULT_FILTERS: ModeFilters = {
   genres: [],
   decades: [],
-  difficulty: [1, 5],
+  difficulty: [1, 3],
+};
+
+/**
+ * How often a track is drawn, by obscurity. Level 1 songs show up an order of
+ * magnitude more than crate-digger cuts, so a random session still feels
+ * guessable without making deep cuts impossible to ever see.
+ */
+const POPULARITY_WEIGHT: Record<Difficulty, number> = {
+  1: 12,
+  2: 7,
+  3: 2,
+  4: 0.35,
+  5: 0.1,
 };
 
 /** Empty genre/decade arrays mean "no constraint" rather than "match nothing". */
@@ -321,6 +418,57 @@ export function filterCatalog(filters: ModeFilters, pool: Track[] = CATALOG): Tr
     if (filters.decades.length && !filters.decades.includes(decadeOf(track.year))) return false;
     return true;
   });
+}
+
+/**
+ * Shuffle that still prefers well-known tracks. Without replacement, so a
+ * session does not immediately re-deal the same hit.
+ */
+export function shuffleByPopularity(items: Track[]): Track[] {
+  const remaining = items.map((item) => ({ item, weight: POPULARITY_WEIGHT[item.difficulty] }));
+  const out: Track[] = [];
+
+  while (remaining.length) {
+    const total = remaining.reduce((sum, entry) => sum + entry.weight, 0);
+    let roll = Math.random() * total;
+    let index = remaining.length - 1;
+
+    for (let i = 0; i < remaining.length; i++) {
+      roll -= remaining[i]!.weight;
+      if (roll <= 0) {
+        index = i;
+        break;
+      }
+    }
+
+    out.push(remaining[index]!.item);
+    remaining.splice(index, 1);
+  }
+
+  return out;
+}
+
+/** Daily only: skip crate-digger cuts so the shared puzzle stays guessable. */
+export function dailyGuessablePool(pool: Track[] = CATALOG): Track[] {
+  const guessable = pool.filter((track) => track.difficulty <= 3);
+  return guessable.length ? guessable : pool;
+}
+
+/**
+ * Repeats better-known tracks in the daily cycle so a random date is more
+ * likely to land on something people actually know, while still walking the
+ * whole guessable pool over time.
+ */
+export function expandByPopularity(pool: Track[]): Track[] {
+  const copies: Record<Difficulty, number> = { 1: 4, 2: 2, 3: 1, 4: 0, 5: 0 };
+  const out: Track[] = [];
+
+  for (const track of pool) {
+    const n = copies[track.difficulty] ?? 0;
+    for (let i = 0; i < n; i++) out.push(track);
+  }
+
+  return out.length ? out : pool;
 }
 
 /** Curated Gauntlet packs. Each resolves to a filter over the same catalog. */

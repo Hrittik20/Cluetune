@@ -1,0 +1,112 @@
+---
+import { SITE } from "../consts";
+
+export const prerender = true;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="robots" content="noindex" />
+    <meta name="viewport" content="width=1200" />
+    <title>Cluetune OG</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        width: 1200px;
+        height: 630px;
+        overflow: hidden;
+        background: #08080a;
+        color: #fafafa;
+        font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+      }
+      .frame {
+        position: relative;
+        width: 1200px;
+        height: 630px;
+        overflow: hidden;
+      }
+      .blob {
+        position: absolute;
+        border-radius: 999px;
+        filter: blur(80px);
+        mix-blend-mode: screen;
+        opacity: 0.55;
+      }
+      .copy {
+        position: relative;
+        z-index: 1;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 72px 88px;
+        box-sizing: border-box;
+      }
+      .mark {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        font-size: 28px;
+        font-weight: 600;
+        letter-spacing: -0.04em;
+      }
+      .disc {
+        width: 36px;
+        height: 36px;
+        border-radius: 999px;
+        background: conic-gradient(from 210deg, #007cf0, #00dfd8, #7928ca, #ff0080, #f9cb28, #007cf0);
+        position: relative;
+      }
+      .disc::after {
+        content: "";
+        position: absolute;
+        inset: 11px;
+        border-radius: 999px;
+        background: #08080a;
+      }
+      h1 {
+        margin: 36px 0 0;
+        font-size: 72px;
+        line-height: 0.95;
+        letter-spacing: -0.055em;
+        font-weight: 600;
+        max-width: 16ch;
+      }
+      p {
+        margin: 22px 0 0;
+        font-size: 26px;
+        line-height: 1.35;
+        color: #a1a1ac;
+        max-width: 32ch;
+      }
+      .url {
+        margin-top: auto;
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 16px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: #6e6e7a;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="frame">
+      <span class="blob" style="width:520px;height:520px;left:-80px;top:-120px;background:#007cf0"></span>
+      <span class="blob" style="width:480px;height:480px;right:-60px;top:-40px;background:#00dfd8"></span>
+      <span class="blob" style="width:560px;height:560px;left:180px;bottom:-180px;background:#7928ca"></span>
+      <span class="blob" style="width:420px;height:420px;right:40px;bottom:-80px;background:#ff0080"></span>
+      <div class="copy">
+        <div class="mark">
+          <span class="disc"></span>
+          <span>Cluetune</span>
+        </div>
+        <h1>Guess the song from 1 second.</h1>
+        <p>A free guess song game. Daily puzzle, then unlimited rounds. No account.</p>
+        <p class="url">{SITE.domain}</p>
+      </div>
+    </div>
+  </body>
+</html>
