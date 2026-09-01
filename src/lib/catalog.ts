@@ -428,7 +428,7 @@ export const CATALOG_BY_ID = new Map(CATALOG.map((track) => [track.id, track]));
 // A duplicate id silently shadows a track and skews every deterministic draw
 // (the daily seed indexes into CATALOG, but lookups go through the map). Cheap
 // to catch here; near-impossible to spot later.
-if (import.meta.env.DEV && CATALOG_BY_ID.size !== CATALOG.length) {
+if (import.meta.env?.DEV && CATALOG_BY_ID.size !== CATALOG.length) {
   const seen = new Set<string>();
   const duplicates = CATALOG.map((track) => track.id).filter((id) => !seen.add(id));
   throw new Error(`Duplicate track ids in catalog: ${[...new Set(duplicates)].join(", ")}`);
