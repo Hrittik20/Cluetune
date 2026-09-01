@@ -96,9 +96,13 @@ for (const track of CATALOG) {
   await sleep(RATE_LIMIT_MS);
 }
 
-const outputPath = new URL("./deezer-id-patch.json", import.meta.url).pathname;
+import { fileURLToPath } from "node:url";
+import { dirname, resolve } from "node:path";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const outputPath = resolve(__dirname, "deezer-id-patch.json");
 const fs = await import("node:fs/promises");
-await fs.writeFile(outputPath.slice(1), JSON.stringify(patch, null, 2) + "\n");
+await fs.writeFile(outputPath, JSON.stringify(patch, null, 2) + "\n");
 
 console.log(
   `\nDone. ${found} found, ${missing} missing.\nPatch written to scripts/deezer-id-patch.json\n`,
