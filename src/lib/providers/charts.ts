@@ -74,6 +74,15 @@ export async function fetchChartCatalog(): Promise<Track[]> {
   return tracks;
 }
 
+/**
+ * Returns chart extras when they are already warm in the isolate cache.
+ * Never blocks on a cold fetch — chart hydration can take 10+ seconds and
+ * must not sit on the critical path for /api/round.
+ */
+export function getCachedChartCatalog(): Track[] {
+  return chartCache.get("charts") ?? [];
+}
+
 export async function lookupChartTrack(id: string): Promise<Track | undefined> {
   const cached = extrasById.get(id);
   if (cached) return cached;

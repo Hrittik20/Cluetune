@@ -128,11 +128,25 @@ export default function GameShell(props: GameShellProps) {
       const exclude = [...seenIdsRef.current].slice(-30);
       if (exclude.length && !lockedTrackId) params.set("exclude", exclude.join(","));
 
-      const response = await fetch(`/api/round?${params}`, { signal });
-      const data = (await response.json()) as { rounds?: ResolvedTrack[]; error?: string };
+      const controller = new AbortController();
+      const timeout = window.setTimeout(() => controller.abort(), 20_000);
+      if (signal) signal.addEventListener("abort", () => controller.abort(), { once: true });
 
-      if (!response.ok) throw new Error(data.error ?? "Could not load a round.");
-      return data.rounds ?? [];
+      try {
+        const response = await fetch(`/api/round?${params}`, { signal: controller.signal });
+        const data = (await response.json()) as { rounds?: ResolvedTrack[]; error?: string };
+
+        if (!response.ok) throw new Error(data.error ?? "Could not load a round.");
+        return data.rounds ?? [];
+      } catch (error) {
+        if ((error as Error).name === "AbortError") {
+          if (signal?.aborted) throw error;
+          throw new Error("Loading took too long. Check your connection and try again.");
+        }
+        throw error;
+      } finally {
+        window.clearTimeout(timeout);
+      }
     },
     [mode, dateKey, pack, lockedTrackId, showFilters, filters],
   );

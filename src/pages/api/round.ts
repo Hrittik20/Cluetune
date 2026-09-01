@@ -8,8 +8,9 @@ import {
   shuffleByPopularity,
 } from "../../lib/catalog";
 import { dailyTrack, isValidDateKey, localDateKey, puzzleNumber, shuffleDeterministic } from "../../lib/daily";
-import { fetchChartCatalog, lookupChartTrack } from "../../lib/providers/charts";
+import { getCachedChartCatalog, fetchChartCatalog, lookupChartTrack } from "../../lib/providers/charts";
 import { fetchLyricSnippet } from "../../lib/providers/lyrics";
+import { proxyAudioForClient } from "../../lib/providers/proxy";
 import { resolvePlayable, resolveTrack } from "../../lib/providers/resolver";
 import type { Decade, Difficulty, GameMode, Genre, ModeFilters, ResolvedTrack, Track } from "../../lib/types";
 
@@ -25,19 +26,24 @@ export const prerender = false;
  * makes, and moving matching server-side would cost a round-trip per keystroke
  * for a guarantee that only matters to someone cheating themselves.
  */
-export const GET: APIRoute = async ({ url }) => {
+export const GET: APIRoute = async ({ url, request }) => {
   const mode = (url.searchParams.get("mode") ?? "unlimited") as GameMode;
 
+  // Warm the chart cache in the background; never block the response on it.
+  if (mode !== "daily" && mode !== "gauntlet") {
+    void fetchChartCatalog().catch(() => undefined);
+  }
+
   try {
-    if (mode === "daily") return await dailyRound(url);
-    if (mode === "gauntlet") return await gauntletRound(url);
-    return await poolRound(url, mode);
+    if (mode === "daily") return await dailyRound(url, request);
+    if (mode === "gauntlet") return await gauntletRound(url, request);
+    return await poolRound(url, mode, request);
   } catch {
     return json({ error: "Could not build a round. Try again." }, 500);
   }
 };
 
-async function dailyRound(url: URL): Promise<Response> {
+async function dailyRound(url: URL, request: Request): Promise<Response> {
   const requested = url.searchParams.get("date") ?? "";
   const dateKey = isValidDateKey(requested) ? requested : localDateKey();
 
@@ -48,11 +54,15 @@ async function dailyRound(url: URL): Promise<Response> {
     puzzleNumber(dateKey),
   );
   const primary = dailyTrack(dateKey);
-  const [resolved] = await resolvePlayable([primary, ...ordered.filter((t) => t.id !== primary.id)], 1);
+  // Cap fallbacks: Cloudflare Workers Free allows 50 subrequests per invoke,
+  // and each failed resolve burns several provider fetches.
+  const fallback = ordered.filter((t) => t.id !== primary.id).slice(0, 8);
+  const [resolved] = await resolvePlayable([primary, ...fallback], 1);
 
   if (!resolved) return json({ error: "No playable track for today." }, 503);
 
-  return json(
+  return respond(
+    request,
     {
       mode: "daily",
       dateKey,
@@ -60,12 +70,11 @@ async function dailyRound(url: URL): Promise<Response> {
       rounds: [resolved],
     },
     200,
-    // Everyone on a given local date shares a puzzle, so it caches well.
     "public, max-age=300, s-maxage=3600",
   );
 }
 
-async function gauntletRound(url: URL): Promise<Response> {
+async function gauntletRound(url: URL, request: Request): Promise<Response> {
   const pack = getPack(url.searchParams.get("pack") ?? "");
   if (!pack) return json({ error: "Unknown genre pack." }, 400);
 
@@ -75,10 +84,10 @@ async function gauntletRound(url: URL): Promise<Response> {
 
   if (rounds.length < 2) return json({ error: "Not enough playable tracks in this pack." }, 503);
 
-  return json({ mode: "gauntlet", pack: pack.slug, seed, rounds });
+  return respond(request, { mode: "gauntlet", pack: pack.slug, seed, rounds });
 }
 
-async function poolRound(url: URL, mode: GameMode): Promise<Response> {
+async function poolRound(url: URL, mode: GameMode, request: Request): Promise<Response> {
   const trackId = url.searchParams.get("track");
 
   // Challenge links pin an exact track so both players hear the same clip.
@@ -92,17 +101,17 @@ async function poolRound(url: URL, mode: GameMode): Promise<Response> {
     if (mode === "lyric-flip") {
       const lyrics = await fetchLyricSnippet(track).catch(() => null);
       if (!lyrics) return json({ error: "No lyrics for this track." }, 503);
-      return json({ mode, rounds: [{ ...resolved, lyrics }] });
+      return respond(request, { mode, rounds: [{ ...resolved, lyrics }] });
     }
 
-    return json({ mode, rounds: [resolved] });
+    return respond(request, { mode, rounds: [resolved] });
   }
 
   const filters = parseFilters(url);
   const exclude = new Set((url.searchParams.get("exclude") ?? "").split(",").filter(Boolean));
   const want = clamp(Number.parseInt(url.searchParams.get("count") ?? "3", 10) || 3, 1, 5);
 
-  const source = await playablePool(mode);
+  const source = playablePool(mode);
   let pool = filterCatalog(filters, source).filter((track) => !exclude.has(track.id));
 
   // Rather than fail a narrow filter set, recycle the unfiltered pool once the
@@ -118,10 +127,10 @@ async function poolRound(url: URL, mode: GameMode): Promise<Response> {
   if (mode === "lyric-flip") {
     const withLyrics = await attachLyrics(rounds, shuffleByPopularity(pool), want);
     if (!withLyrics.length) return json({ error: "No tracks with lyrics matched those filters." }, 503);
-    return json({ mode, rounds: withLyrics });
+    return respond(request, { mode, rounds: withLyrics });
   }
 
-  return json({ mode, rounds });
+  return respond(request, { mode, rounds });
 }
 
 function parseFilters(url: URL): ModeFilters {
@@ -152,12 +161,12 @@ function rotate<T>(items: T[], by: number): T[] {
   return [...items.slice(offset), ...items.slice(0, offset)];
 }
 
-async function playablePool(mode: GameMode): Promise<Track[]> {
+function playablePool(mode: GameMode): Track[] {
   // Daily and gauntlet stay on the editorial list so a rotating Spotify
   // playlist cannot change a shared puzzle or a named pack mid-week.
   if (mode === "daily" || mode === "gauntlet") return CATALOG;
 
-  const charts = await fetchChartCatalog().catch(() => []);
+  const charts = getCachedChartCatalog();
   if (!charts.length) return CATALOG;
 
   const seen = new Set(CATALOG.map((track) => identityKey(track)));
@@ -208,6 +217,16 @@ async function attachLyrics(
   }
 
   return found;
+}
+
+function respond(
+  request: Request,
+  body: Record<string, unknown> & { rounds?: ResolvedTrack[] },
+  status = 200,
+  cacheControl = "no-store",
+): Response {
+  if (body.rounds) body.rounds = proxyAudioForClient(body.rounds, request);
+  return json(body, status, cacheControl);
 }
 
 function json(body: unknown, status = 200, cacheControl = "no-store"): Response {

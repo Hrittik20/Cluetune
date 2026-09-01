@@ -38,6 +38,24 @@ export async function resolveTrack(track: Track): Promise<ResolvedTrack> {
 }
 
 async function resolveUncached(track: Track): Promise<ResolvedTrack> {
+  // Fast path: a pre-stored Deezer ID skips iTunes/Deezer search entirely.
+  // Those search endpoints are blocked from Cloudflare IPs and each miss costs
+  // 3.5 s — on a cold Worker that alone blows the 30 s wall clock.
+  if (track.deezerId) {
+    const deezerDirect = await lookupDeezerById(track.deezerId).catch(() => null);
+    if (deezerDirect?.previewUrl) {
+      const spotify = await lookupSpotifyTrack(track.title, track.artist).catch(() => null);
+      return {
+        track,
+        source: audioSource(deezerDirect.previewUrl, "deezer", {
+          artworkUrl: spotify?.artworkUrl ?? deezerDirect.artworkUrl,
+          durationMs: deezerDirect.durationMs,
+          attribution: "Preview via Deezer",
+        }),
+      };
+    }
+  }
+
   // Metadata is best-effort; a Spotify outage must not block playback.
   const spotify = await lookupSpotifyTrack(track.title, track.artist).catch(() => null);
   const isrc = track.isrc ?? spotify?.isrc;
@@ -66,22 +84,6 @@ async function resolveUncached(track: Track): Promise<ResolvedTrack> {
         artworkUrl: artworkUrl ?? itunes.artworkUrl,
         durationMs: itunes.durationMs,
         attribution: "Preview via Apple Music",
-      }),
-    };
-  }
-
-  // When the catalog carries a pre-stored Deezer ID, use direct lookup — it
-  // bypasses the search rate-limit that Deezer applies to serverless IPs.
-  const deezerDirect = track.deezerId
-    ? await lookupDeezerById(track.deezerId).catch(() => null)
-    : null;
-  if (deezerDirect?.previewUrl) {
-    return {
-      track,
-      source: audioSource(deezerDirect.previewUrl, "deezer", {
-        artworkUrl: artworkUrl ?? deezerDirect.artworkUrl,
-        durationMs: deezerDirect.durationMs,
-        attribution: "Preview via Deezer",
       }),
     };
   }
@@ -156,13 +158,24 @@ export async function resolvePlayable(
   maxAttempts = Math.min(tracks.length, want + 3),
 ): Promise<ResolvedTrack[]> {
   const playable: ResolvedTrack[] = [];
-  const limit = Math.min(tracks.length, maxAttempts);
+  const ordered = preferResolvable(tracks);
+  const limit = Math.min(ordered.length, maxAttempts);
 
   // One at a time so a miss does not fan out past Workers' 6 outbound sockets.
   for (let i = 0; i < limit && playable.length < want; i++) {
-    const resolved = await resolveTrack(tracks[i]!).catch(() => null);
+    const resolved = await resolveTrack(ordered[i]!).catch(() => null);
     if (resolved?.source) playable.push(resolved);
   }
 
   return playable;
+}
+
+/** Tracks with a baked-in Deezer ID resolve in one hop; try them first. */
+function preferResolvable(tracks: Track[]): Track[] {
+  const fast: Track[] = [];
+  const slow: Track[] = [];
+  for (const track of tracks) {
+    (track.deezerId ? fast : slow).push(track);
+  }
+  return [...fast, ...slow];
 }
