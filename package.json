@@ -9,13 +9,16 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
+    "deploy": "astro build && wrangler deploy",
     "check": "astro check",
     "catalog:report": "node scripts/catalog-report.mjs",
+    "deezer:fetch": "npx tsx scripts/fetch-deezer-ids.mts",
+    "deezer:apply": "npx tsx scripts/apply-deezer-patch.mts",
     "astro": "astro"
   },
   "dependencies": {
+    "@astrojs/cloudflare": "^14.2.5",
     "@astrojs/react": "^6.0.4",
-    "@astrojs/vercel": "^11.0.8",
     "@fontsource-variable/geist": "^5.3.0",
     "@fontsource-variable/geist-mono": "^5.3.0",
     "@tailwindcss/vite": "^4.3.3",
@@ -32,6 +35,8 @@
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
     "@types/node": "^26.3.0",
-    "typescript": "^6.0.3"
+    "tsx": "^4.23.13",
+    "typescript": "^6.0.3",
+    "wrangler": "^4.126.0"
   }
 }

@@ -41,6 +41,26 @@ export const CATALOG: Track[] = [
   t("cruel-summer", "Cruel Summer", "Taylor Swift", "Lover", 2019, ["pop"], 1),
   t("uptown-funk", "Uptown Funk", "Mark Ronson", "Uptown Special", 2014, ["pop"], 1),
   t("dancing-on-my-own", "Dancing On My Own", "Robyn", "Body Talk Pt. 1", 2010, ["pop", "electronic"], 2),
+  t("just-the-way-you-are", "Just the Way You Are", "Bruno Mars", "Doo-Wops & Hooligans", 2010, ["pop"], 1),
+  t("treasure", "Treasure", "Bruno Mars", "Unorthodox Jukebox", 2012, ["pop"], 1),
+  t("24k-magic", "24K Magic", "Bruno Mars", "24K Magic", 2016, ["pop"], 1),
+  t("thats-what-i-like", "That's What I Like", "Bruno Mars", "24K Magic", 2017, ["pop", "rnb"], 1),
+  t("grenade", "Grenade", "Bruno Mars", "Doo-Wops & Hooligans", 2010, ["pop"], 1),
+  t("leave-the-door-open", "Leave the Door Open", "Silk Sonic", "An Evening with Silk Sonic", 2021, ["pop", "rnb"], 1),
+  t("firework", "Firework", "Katy Perry", "Teenage Dream", 2010, ["pop"], 1),
+  t("roar", "Roar", "Katy Perry", "Prism", 2013, ["pop"], 1),
+  t("teenage-dream", "Teenage Dream", "Katy Perry", "Teenage Dream", 2010, ["pop"], 1),
+  t("dark-horse", "Dark Horse", "Katy Perry", "Prism", 2013, ["pop"], 2),
+  t("thank-u-next", "thank u, next", "Ariana Grande", "thank u, next", 2019, ["pop"], 1),
+  t("7-rings", "7 rings", "Ariana Grande", "thank u, next", 2019, ["pop"], 1),
+  t("problem", "Problem", "Ariana Grande", "My Everything", 2014, ["pop"], 1),
+  t("positions", "positions", "Ariana Grande", "Positions", 2020, ["pop", "rnb"], 1),
+  t("royals", "Royals", "Lorde", "Pure Heroine", 2013, ["pop", "indie"], 1),
+  t("green-light", "Green Light", "Lorde", "Melodrama", 2017, ["pop", "electronic"], 2),
+  t("we-found-love", "We Found Love", "Rihanna", "Talk That Talk", 2011, ["pop", "electronic"], 1),
+  t("diamonds", "Diamonds", "Rihanna", "Unapologetic", 2012, ["pop"], 1),
+  t("work", "Work", "Rihanna", "Anti", 2016, ["pop", "rnb"], 1),
+  t("halo", "Halo", "Beyoncé", "I Am... Sasha Fierce", 2008, ["pop", "rnb"], 1),
 
   // ── hip-hop ──────────────────────────────────────────────────────────────
   t("sicko-mode", "SICKO MODE", "Travis Scott", "Astroworld", 2018, ["hip-hop"], 2),
@@ -56,6 +76,13 @@ export const CATALOG: Track[] = [
   t("lose-yourself", "Lose Yourself", "Eminem", "8 Mile", 2002, ["hip-hop"], 1),
   t("gold-digger", "Gold Digger", "Kanye West", "Late Registration", 2005, ["hip-hop"], 1),
   t("shook-ones-pt-ii", "Shook Ones, Pt. II", "Mobb Deep", "The Infamous", 1995, ["hip-hop"], 3),
+  t("99-problems", "99 Problems", "Jay-Z", "The Black Album", 2003, ["hip-hop"], 2),
+  t("empire-state-of-mind", "Empire State of Mind", "Jay-Z", "The Blueprint 3", 2009, ["hip-hop", "pop"], 1),
+  t("bodak-yellow", "Bodak Yellow", "Cardi B", "Invasion of Privacy", 2017, ["hip-hop"], 1),
+  t("this-is-america", "This Is America", "Childish Gambino", "This Is America", 2018, ["hip-hop"], 1),
+  t("earfquake", "EARFQUAKE", "Tyler, the Creator", "IGOR", 2019, ["hip-hop"], 2),
+  t("mask-off", "Mask Off", "Future", "Future", 2017, ["hip-hop"], 2),
+  t("sexyback", "SexyBack", "Justin Timberlake", "FutureSex/LoveSounds", 2006, ["pop", "rnb"], 1),
 
   // ── r&b ──────────────────────────────────────────────────────────────────
   t("cranes-in-the-sky", "Cranes in the Sky", "Solange", "A Seat at the Table", 2016, ["rnb"], 3),
@@ -69,6 +96,17 @@ export const CATALOG: Track[] = [
   t("bad-habit", "Bad Habit", "Steve Lacy", "Gemini Rights", 2022, ["rnb"], 2),
   t("thinkin-bout-you", "Thinkin Bout You", "Frank Ocean", "Channel Orange", 2012, ["rnb"], 2),
   t("adorn", "Adorn", "Miguel", "Kaleidoscope Dream", 2012, ["rnb"], 3),
+  t("lets-get-it-on", "Let's Get It On", "Marvin Gaye", "Let's Get It On", 1973, ["rnb"], 1),
+  t("sexual-healing", "Sexual Healing", "Marvin Gaye", "Midnight Love", 1982, ["rnb"], 1),
+  t("superstition", "Superstition", "Stevie Wonder", "Talking Book", 1972, ["rnb"], 1),
+  t("isnt-she-lovely", "Isn't She Lovely", "Stevie Wonder", "Songs in the Key of Life", 1976, ["rnb"], 1),
+  t("respect", "Respect", "Aretha Franklin", "I Never Loved a Man the Way I Love You", 1967, ["rnb"], 1),
+  t("i-will-always-love-you", "I Will Always Love You", "Whitney Houston", "The Bodyguard", 1992, ["pop", "rnb"], 1),
+  t("cant-stop-the-feeling", "Can't Stop the Feeling!", "Justin Timberlake", "Trolls", 2016, ["pop"], 1),
+  t("mirrors-timberlake", "Mirrors", "Justin Timberlake", "The 20/20 Experience", 2013, ["pop", "rnb"], 1),
+  t("cry-me-a-river", "Cry Me a River", "Justin Timberlake", "Justified", 2002, ["pop", "rnb"], 2),
+  t("hold-up", "Hold Up", "Beyoncé", "Lemonade", 2016, ["pop", "rnb"], 2),
+  t("freedom", "Freedom", "Beyoncé", "Lemonade", 2016, ["hip-hop", "rnb"], 2),
 
   // ── rock ─────────────────────────────────────────────────────────────────
   t("bohemian-rhapsody", "Bohemian Rhapsody", "Queen", "A Night at the Opera", 1975, ["rock"], 1),
@@ -85,6 +123,25 @@ export const CATALOG: Track[] = [
   t("sweet-child-o-mine", "Sweet Child O' Mine", "Guns N' Roses", "Appetite for Destruction", 1987, ["rock"], 1),
   t("under-the-bridge", "Under the Bridge", "Red Hot Chili Peppers", "Blood Sugar Sex Magik", 1991, ["rock"], 2),
   t("come-as-you-are", "Come as You Are", "Nirvana", "Nevermind", 1991, ["rock"], 2),
+  t("stairway-to-heaven", "Stairway to Heaven", "Led Zeppelin", "Led Zeppelin IV", 1971, ["rock"], 1),
+  t("whole-lotta-love", "Whole Lotta Love", "Led Zeppelin", "Led Zeppelin II", 1969, ["rock"], 2),
+  t("paint-it-black", "Paint It Black", "The Rolling Stones", "Aftermath", 1966, ["rock"], 1),
+  t("satisfaction", "(I Can't Get No) Satisfaction", "The Rolling Stones", "Out of Our Heads", 1965, ["rock"], 1),
+  t("sympathy-for-the-devil", "Sympathy for the Devil", "The Rolling Stones", "Beggars Banquet", 1968, ["rock"], 2),
+  t("with-or-without-you", "With or Without You", "U2", "The Joshua Tree", 1987, ["rock"], 1),
+  t("one-u2", "One", "U2", "Achtung Baby", 1991, ["rock"], 2),
+  t("heroes", "Heroes", "David Bowie", "\"Heroes\"", 1977, ["rock"], 1),
+  t("space-oddity", "Space Oddity", "David Bowie", "Space Oddity", 1969, ["rock"], 1),
+  t("lets-dance", "Let's Dance", "David Bowie", "Let's Dance", 1983, ["rock", "pop"], 2),
+  t("purple-rain", "Purple Rain", "Prince", "Purple Rain", 1984, ["pop", "rock"], 1),
+  t("kiss-prince", "Kiss", "Prince", "Parade", 1986, ["pop", "rock"], 2),
+  t("born-to-run", "Born to Run", "Bruce Springsteen", "Born to Run", 1975, ["rock"], 2),
+  t("born-in-the-usa", "Born in the U.S.A.", "Bruce Springsteen", "Born in the U.S.A.", 1984, ["rock", "pop"], 2),
+  t("black-hole-sun", "Black Hole Sun", "Soundgarden", "Superunknown", 1994, ["rock"], 2),
+  t("alive-pearl-jam", "Alive", "Pearl Jam", "Ten", 1991, ["rock"], 2),
+  t("losing-my-religion", "Losing My Religion", "R.E.M.", "Out of Time", 1991, ["rock", "indie"], 2),
+  t("take-me-to-church", "Take Me to Church", "Hozier", "Hozier", 2013, ["rock", "indie"], 1),
+  t("killing-in-the-name", "Killing in the Name", "Rage Against the Machine", "Rage Against the Machine", 1992, ["metal", "rock"], 2),
 
   // ── indie ────────────────────────────────────────────────────────────────
   t("two-weeks", "Two Weeks", "Grizzly Bear", "Veckatimest", 2009, ["indie"], 4),
@@ -98,6 +155,17 @@ export const CATALOG: Track[] = [
   t("kids", "Kids", "MGMT", "Oracular Spectacular", 2007, ["indie"], 2),
   t("float-on", "Float On", "Modest Mouse", "Good News for People Who Love Bad News", 2004, ["indie"], 3),
   t("young-folks", "Young Folks", "Peter Bjorn and John", "Writer's Block", 2006, ["indie"], 3),
+  t("last-nite", "Last Nite", "The Strokes", "Is This It", 2001, ["indie", "rock"], 2),
+  t("reptilia", "Reptilia", "The Strokes", "Room on Fire", 2003, ["indie", "rock"], 2),
+  t("a-punk", "A-Punk", "Vampire Weekend", "Vampire Weekend", 2008, ["indie"], 2),
+  t("harmony-hall", "Harmony Hall", "Vampire Weekend", "Father of the Bride", 2019, ["indie"], 2),
+  t("feel-good-inc", "Feel Good Inc.", "Gorillaz", "Demon Days", 2005, ["indie", "electronic"], 1),
+  t("clint-eastwood", "Clint Eastwood", "Gorillaz", "Gorillaz", 2001, ["indie", "hip-hop"], 2),
+  t("all-my-friends", "All My Friends", "LCD Soundsystem", "Sound of Silver", 2007, ["indie", "electronic"], 3),
+  t("wake-up-arcade-fire", "Wake Up", "Arcade Fire", "Funeral", 2004, ["indie", "rock"], 2),
+  t("rebellion-lies", "Rebellion (Lies)", "Arcade Fire", "Funeral", 2004, ["indie", "rock"], 3),
+  t("nobody-mitski", "Nobody", "Mitski", "Be the Cowboy", 2018, ["indie"], 3),
+  t("tennis-court", "Tennis Court", "Lorde", "Pure Heroine", 2013, ["pop", "indie"], 2),
 
   // ── electronic ───────────────────────────────────────────────────────────
   t("one-more-time", "One More Time", "Daft Punk", "Discovery", 2000, ["electronic"], 1),
@@ -115,6 +183,15 @@ export const CATALOG: Track[] = [
   t("blue-monday", "Blue Monday", "New Order", "Power, Corruption & Lies", 1983, ["electronic", "rock"], 2),
   t("galvanize", "Galvanize", "The Chemical Brothers", "Push the Button", 2005, ["electronic"], 3),
   t("strobe", "Strobe", "deadmau5", "For Lack of a Better Name", 2009, ["electronic"], 4),
+  t("summer-calvin", "Summer", "Calvin Harris", "Motion", 2014, ["electronic", "pop"], 1),
+  t("this-is-what-you-came-for", "This Is What You Came For", "Calvin Harris", "This Is What You Came For", 2016, ["electronic", "pop"], 1),
+  t("feel-so-close", "Feel So Close", "Calvin Harris", "18 Months", 2011, ["electronic", "pop"], 2),
+  t("firestarter", "Firestarter", "The Prodigy", "The Fat of the Land", 1996, ["electronic"], 2),
+  t("breathe-prodigy", "Breathe", "The Prodigy", "The Fat of the Land", 1997, ["electronic"], 2),
+  t("lean-on", "Lean On", "Major Lazer", "Peace Is the Mission", 2015, ["electronic", "pop"], 1),
+  t("dont-you-worry-child", "Don't You Worry Child", "Swedish House Mafia", "Until Now", 2012, ["electronic", "pop"], 1),
+  t("clarity", "Clarity", "Zedd", "Clarity", 2012, ["electronic", "pop"], 1),
+  t("happier-marshmello", "Happier", "Marshmello", "Joytime III", 2018, ["electronic", "pop"], 1),
 
   // ── k-pop ────────────────────────────────────────────────────────────────
   t("dynamite", "Dynamite", "BTS", "BE", 2020, ["kpop", "pop"], 1),
@@ -209,6 +286,14 @@ export const CATALOG: Track[] = [
   t("before-he-cheats", "Before He Cheats", "Carrie Underwood", "Some Hearts", 2005, ["country"], 2),
   t("texas-hold-em", "TEXAS HOLD 'EM", "Beyoncé", "COWBOY CARTER", 2024, ["country", "pop"], 1),
   t("cruise", "Cruise", "Florida Georgia Line", "Here's to the Good Times", 2012, ["country"], 3),
+  t("friends-in-low-places", "Friends in Low Places", "Garth Brooks", "No Fences", 1990, ["country"], 1),
+  t("the-dance", "The Dance", "Garth Brooks", "Garth Brooks", 1990, ["country"], 2),
+  t("last-night-wallen", "Last Night", "Morgan Wallen", "One Thing at a Time", 2023, ["country"], 1),
+  t("whiskey-glasses", "Whiskey Glasses", "Morgan Wallen", "If I Know Me", 2018, ["country"], 2),
+  t("live-like-you-were-dying", "Live Like You Were Dying", "Tim McGraw", "Live Like You Were Dying", 2004, ["country"], 2),
+  t("amarillo-by-morning", "Amarillo by Morning", "George Strait", "Easy Come Easy Go", 1982, ["country"], 2),
+  t("country-girl-shake-it", "Country Girl (Shake It for Me)", "Luke Bryan", "Tailgates & Tanlines", 2011, ["country"], 2),
+  t("god-s-country", "God's Country", "Blake Shelton", "God's Country", 2019, ["country"], 2),
 
   // ── metal ────────────────────────────────────────────────────────────────
   t("enter-sandman", "Enter Sandman", "Metallica", "Metallica", 1991, ["metal", "rock"], 1),
@@ -220,6 +305,13 @@ export const CATALOG: Track[] = [
   t("ace-of-spades", "Ace of Spades", "Motörhead", "Ace of Spades", 1980, ["metal", "rock"], 2),
   t("duality", "Duality", "Slipknot", "Vol. 3: The Subliminal Verses", 2004, ["metal"], 2),
   t("raining-blood", "Raining Blood", "Slayer", "Reign in Blood", 1986, ["metal"], 3),
+  t("numb", "Numb", "Linkin Park", "Meteora", 2003, ["metal", "rock"], 1),
+  t("crawling", "Crawling", "Linkin Park", "Hybrid Theory", 2000, ["metal", "rock"], 2),
+  t("walk-pantera", "Walk", "Pantera", "Vulgar Display of Power", 1992, ["metal"], 2),
+  t("down-with-the-sickness", "Down with the Sickness", "Disturbed", "The Sickness", 2000, ["metal", "rock"], 2),
+  t("schism", "Schism", "Tool", "Lateralus", 2001, ["metal"], 3),
+  t("run-to-the-hills", "Run to the Hills", "Iron Maiden", "The Number of the Beast", 1982, ["metal", "rock"], 2),
+  t("war-pigs", "War Pigs", "Black Sabbath", "Paranoid", 1970, ["metal", "rock"], 2),
 
   // ── jazz ─────────────────────────────────────────────────────────────────
   t("feeling-good", "Feeling Good", "Nina Simone", "I Put a Spell on You", 1965, ["jazz"], 2),
@@ -231,6 +323,11 @@ export const CATALOG: Track[] = [
   t("my-favorite-things", "My Favorite Things", "John Coltrane", "My Favorite Things", 1961, ["jazz"], 3),
   t("chameleon", "Chameleon", "Herbie Hancock", "Head Hunters", 1973, ["jazz"], 3),
   t("birdland", "Birdland", "Weather Report", "Heavy Weather", 1977, ["jazz"], 4),
+  t("what-a-wonderful-world", "What a Wonderful World", "Louis Armstrong", "What a Wonderful World", 1967, ["jazz"], 1),
+  t("summertime-fitzgerald", "Summertime", "Ella Fitzgerald", "Ella and Louis", 1957, ["jazz"], 2),
+  t("my-funny-valentine", "My Funny Valentine", "Chet Baker", "Chet Baker Sings", 1954, ["jazz"], 3),
+  t("round-midnight", "Round Midnight", "Thelonious Monk", "Genius of Modern Music Vol. 1", 1947, ["jazz"], 4),
+  t("a-love-supreme", "A Love Supreme, Pt. I – Acknowledgement", "John Coltrane", "A Love Supreme", 1965, ["jazz"], 4),
 
   // ── extra chart hits (kept guessable; daily draws from difficulty 1–3) ──
   t("shape-of-you", "Shape of You", "Ed Sheeran", "÷", 2017, ["pop"], 1),
@@ -321,8 +418,9 @@ function t(
   year: number,
   genres: Genre[],
   difficulty: Difficulty,
+  deezerId?: number,
 ): Track {
-  return { id, title, artist, album, year, genres, difficulty };
+  return { id, title, artist, album, year, genres, difficulty, ...(deezerId ? { deezerId } : {}) };
 }
 
 export const CATALOG_BY_ID = new Map(CATALOG.map((track) => [track.id, track]));

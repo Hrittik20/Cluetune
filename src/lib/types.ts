@@ -31,6 +31,12 @@ export interface Track {
   /** Optional provider hints that let the resolver skip a search round-trip. */
   isrc?: string;
   spotifyId?: string;
+  /**
+   * Pre-stored Deezer track ID. When present the resolver uses the direct
+   * `/track/{id}` endpoint (which remains available even when Deezer's search
+   * endpoint is IP-restricted) instead of falling through to a search.
+   */
+  deezerId?: number;
 }
 
 export type GameMode = "daily" | "unlimited" | "sped-up" | "lyric-flip" | "gauntlet";

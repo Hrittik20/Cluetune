@@ -1,6 +1,6 @@
 import type { AudioSource, ResolvedTrack, Track } from "../types";
 import { TtlCache } from "./cache";
-import { findDeezerPreview } from "./deezer";
+import { findDeezerPreview, lookupDeezerById } from "./deezer";
 import { findItunesPreview, lookupByIsrc } from "./itunes";
 import { lookupSpotifyTrack } from "./spotify";
 import { findYouTubeVideo, youtubeClipFallbackEnabled } from "./youtube";
@@ -27,7 +27,14 @@ import { findYouTubeVideo, youtubeClipFallbackEnabled } from "./youtube";
 const cache = new TtlCache<ResolvedTrack>(6 * 60 * 60_000);
 
 export async function resolveTrack(track: Track): Promise<ResolvedTrack> {
-  return cache.wrap(track.id, () => resolveUncached(track));
+  const hit = cache.get(track.id);
+  if (hit !== undefined) return hit;
+
+  const resolved = await resolveUncached(track);
+  // Don't pin a provider miss for six hours — Workers in particular see
+  // intermittent Apple/Deezer failures that would otherwise poison the isolate.
+  if (resolved.source) cache.set(track.id, resolved);
+  return resolved;
 }
 
 async function resolveUncached(track: Track): Promise<ResolvedTrack> {
@@ -59,6 +66,22 @@ async function resolveUncached(track: Track): Promise<ResolvedTrack> {
         artworkUrl: artworkUrl ?? itunes.artworkUrl,
         durationMs: itunes.durationMs,
         attribution: "Preview via Apple Music",
+      }),
+    };
+  }
+
+  // When the catalog carries a pre-stored Deezer ID, use direct lookup — it
+  // bypasses the search rate-limit that Deezer applies to serverless IPs.
+  const deezerDirect = track.deezerId
+    ? await lookupDeezerById(track.deezerId).catch(() => null)
+    : null;
+  if (deezerDirect?.previewUrl) {
+    return {
+      track,
+      source: audioSource(deezerDirect.previewUrl, "deezer", {
+        artworkUrl: artworkUrl ?? deezerDirect.artworkUrl,
+        durationMs: deezerDirect.durationMs,
+        attribution: "Preview via Deezer",
       }),
     };
   }
@@ -118,20 +141,27 @@ function audioSource(url: string, provider: AudioSource["provider"], extras: Sou
 }
 
 /**
- * Resolves a shortlist concurrently and returns only playable entries. Used to
- * pre-warm an Unlimited session so the next round never waits on a lookup.
+ * Resolves a shortlist and returns only playable entries.
+ *
+ * `maxAttempts` caps the number of tracks tried regardless of how many are
+ * in the pool. On Cloudflare Workers the wall-clock limit is ~30 s; when
+ * audio providers are rate-limited each attempt can take 3–4 s, so we keep
+ * the cap tight (want + 3) to ensure a quick failure rather than a hang.
+ * The caller can pass a larger cap for offline / local environments where
+ * latency isn't a concern.
  */
-export async function resolvePlayable(tracks: Track[], want: number): Promise<ResolvedTrack[]> {
+export async function resolvePlayable(
+  tracks: Track[],
+  want: number,
+  maxAttempts = Math.min(tracks.length, want + 3),
+): Promise<ResolvedTrack[]> {
   const playable: ResolvedTrack[] = [];
+  const limit = Math.min(tracks.length, maxAttempts);
 
-  // Small batches keep us inside iTunes' informal per-minute rate limit.
-  for (let i = 0; i < tracks.length && playable.length < want; i += 4) {
-    const batch = tracks.slice(i, i + 4);
-    const settled = await Promise.all(batch.map((track) => resolveTrack(track).catch(() => null)));
-
-    for (const resolved of settled) {
-      if (resolved?.source && playable.length < want) playable.push(resolved);
-    }
+  // One at a time so a miss does not fan out past Workers' 6 outbound sockets.
+  for (let i = 0; i < limit && playable.length < want; i++) {
+    const resolved = await resolveTrack(tracks[i]!).catch(() => null);
+    if (resolved?.source) playable.push(resolved);
   }
 
   return playable;

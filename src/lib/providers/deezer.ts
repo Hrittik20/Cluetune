@@ -12,6 +12,20 @@ import { TtlCache, fetchWithTimeout } from "./cache";
 
 const SEARCH_URL = "https://api.deezer.com/search";
 
+// Circuit breaker: Deezer's public search endpoint silently returns data:[]
+// when the requesting IP is rate-limited (Cloudflare edge IPs in particular).
+// After one empty response, we skip all search calls for 10 minutes so the
+// Worker doesn't burn 3+ seconds per attempt before resolving the track.
+let searchDisabledUntil = 0;
+
+export function deezerSearchDisabled(): boolean {
+  return Date.now() < searchDisabledUntil;
+}
+
+function tripDeezerSearch(): void {
+  searchDisabledUntil = Date.now() + 10 * 60_000;
+}
+
 export interface DeezerResult {
   id: number;
   title: string;
@@ -35,29 +49,80 @@ interface DeezerApiTrack {
 const cache = new TtlCache<DeezerResult[]>(60 * 60_000);
 
 export async function searchDeezer(query: string, limit = 10): Promise<DeezerResult[]> {
-  if (!query.trim()) return [];
+  if (!query.trim() || deezerSearchDisabled()) return [];
 
-  return cache.wrap(`${limit}:${query.toLowerCase()}`, async () => {
-    const url = `${SEARCH_URL}?limit=${limit}&q=${encodeURIComponent(query)}`;
+  return cache.wrapIf(
+    `${limit}:${query.toLowerCase()}`,
+    async () => {
+      const url = `${SEARCH_URL}?limit=${limit}&q=${encodeURIComponent(query)}`;
 
-    try {
-      const response = await fetchWithTimeout(url);
-      if (!response.ok) return [];
+      try {
+        const response = await fetchWithTimeout(url);
+        if (!response.ok) {
+          tripDeezerSearch();
+          return [];
+        }
 
-      const data = (await response.json()) as { data?: DeezerApiTrack[] };
-      return (data.data ?? []).map((item) => ({
-        id: item.id,
-        title: item.title_short ?? item.title,
-        artist: item.artist?.name ?? "",
-        album: item.album?.title ?? "",
-        previewUrl: item.preview || undefined,
-        artworkUrl: item.album?.cover_big ?? item.album?.cover_medium,
-        durationMs: item.duration ? item.duration * 1000 : undefined,
-      }));
-    } catch {
-      return [];
-    }
-  });
+        const data = (await response.json()) as { data?: DeezerApiTrack[] };
+        const results = (data.data ?? []).map((item) => ({
+          id: item.id,
+          title: item.title_short ?? item.title,
+          artist: item.artist?.name ?? "",
+          album: item.album?.title ?? "",
+          previewUrl: item.preview || undefined,
+          artworkUrl: item.album?.cover_big ?? item.album?.cover_medium,
+          durationMs: item.duration ? item.duration * 1000 : undefined,
+        }));
+
+        // Empty data array on a 200 means the IP is silently rate-limited.
+        // Trip the breaker so subsequent calls return immediately.
+        if (!results.length) tripDeezerSearch();
+
+        return results;
+      } catch {
+        tripDeezerSearch();
+        return [];
+      }
+    },
+    (results) => results.length > 0,
+  );
+}
+
+/**
+ * Direct lookup by a known Deezer track ID.
+ *
+ * The search endpoint is IP-blocked by Deezer from Cloudflare Workers and
+ * some regions. The `/track/{id}` endpoint is NOT subject to the same
+ * restriction and reliably returns a preview URL when the track has one.
+ * Use this when the catalog entry carries a pre-stored `deezerId`.
+ */
+export async function lookupDeezerById(id: number): Promise<DeezerResult | null> {
+  const cacheKey = `id:${id}`;
+  const hit = cache.get(cacheKey);
+  if (hit !== undefined) return hit.length ? hit[0]! : null;
+
+  try {
+    const response = await fetchWithTimeout(`https://api.deezer.com/track/${id}`);
+    if (!response.ok) return null;
+
+    const item = (await response.json()) as DeezerApiTrack & { error?: unknown };
+    if (item.error || !item.id) return null;
+
+    const result: DeezerResult = {
+      id: item.id,
+      title: item.title_short ?? item.title,
+      artist: item.artist?.name ?? "",
+      album: item.album?.title ?? "",
+      previewUrl: item.preview || undefined,
+      artworkUrl: item.album?.cover_big ?? item.album?.cover_medium,
+      durationMs: item.duration ? item.duration * 1000 : undefined,
+    };
+
+    cache.set(cacheKey, result.previewUrl ? [result] : []);
+    return result.previewUrl ? result : null;
+  } catch {
+    return null;
+  }
 }
 
 export async function findDeezerPreview(title: string, artist: string): Promise<DeezerResult | null> {

@@ -6,6 +6,7 @@ import {
   lookupSpotifyById,
   type SpotifyTrackMeta,
 } from "./spotify";
+import { deezerSearchDisabled } from "./deezer";
 
 /**
  * Extra pool for Unlimited / Sped-Up / Lyrics Guess.
@@ -33,13 +34,12 @@ const ITUNES_CHARTS = [
   "https://rss.applemarketingtools.com/api/v2/gb/music/most-played/50/songs.json",
 ];
 
+// Three endpoints instead of six so chart fetching stays within Cloudflare
+// Workers' 50-subrequest-per-invocation budget (2 iTunes + 3 here = 5 upfront).
 const DEEZER_CHARTS: { url: string; genres: Genre[] }[] = [
   { url: "https://api.deezer.com/chart/0/tracks?limit=50", genres: ["pop"] },
   { url: "https://api.deezer.com/chart/116/tracks?limit=40", genres: ["hip-hop"] },
-  { url: "https://api.deezer.com/chart/132/tracks?limit=30", genres: ["pop"] },
-  { url: "https://api.deezer.com/chart/152/tracks?limit=30", genres: ["rock"] },
   { url: "https://api.deezer.com/chart/165/tracks?limit=30", genres: ["rnb"] },
-  { url: "https://api.deezer.com/chart/106/tracks?limit=30", genres: ["electronic"] },
 ];
 
 const chartCache = new TtlCache<Track[]>(6 * 60 * 60_000, 8);
@@ -54,15 +54,21 @@ export function getExtraTrack(id: string): Track | undefined {
 }
 
 export async function fetchChartCatalog(): Promise<Track[]> {
-  const tracks = await chartCache.wrap("charts", async () => {
-    const [spotify, itunes, deezer] = await Promise.all([
-      fetchSpotifyCharts().catch(() => [] as Track[]),
-      fetchItunesCharts().catch(() => [] as Track[]),
-      fetchDeezerCharts().catch(() => [] as Track[]),
-    ]);
+  const tracks = await chartCache.wrapIf(
+    "charts",
+    async () => {
+      // Serial groups stay inside Workers' 6 simultaneous outbound connections.
+      const itunes = await fetchItunesCharts().catch(() => [] as Track[]);
+      // Deezer's public search API returns data:[] when the requesting IP is
+      // rate-limited. Skip chart fetching if the breaker is already tripped so
+      // we don't burn 3+ seconds × 3 chart calls on an already-blocked endpoint.
+      const deezer = deezerSearchDisabled() ? [] : await fetchDeezerCharts().catch(() => [] as Track[]);
+      const spotify = await fetchSpotifyCharts().catch(() => [] as Track[]);
 
-    return dedupe([...spotify, ...itunes, ...deezer]);
-  });
+      return dedupe([...spotify, ...itunes, ...deezer]);
+    },
+    (list) => list.length > 0,
+  );
 
   remember(tracks);
   return tracks;
@@ -98,14 +104,14 @@ export async function lookupChartTrack(id: string): Promise<Track | undefined> {
 async function fetchSpotifyCharts(): Promise<Track[]> {
   if (!hasSpotifyCredentials()) return [];
 
-  const batches = await Promise.all(
-    SPOTIFY_PLAYLISTS.map(async (playlist) => {
-      const items = await fetchPlaylistTracks(playlist.id, 50).catch(() => []);
-      return items
-        .map((item) => fromSpotify(item, playlist.genres))
-        .filter((track): track is Track => Boolean(track));
-    }),
-  );
+  const batches: Track[][] = [];
+  for (const playlist of SPOTIFY_PLAYLISTS) {
+    const items = await fetchPlaylistTracks(playlist.id, 50).catch(() => []);
+    if (!items.length) break;
+    batches.push(
+      items.map((item) => fromSpotify(item, playlist.genres)).filter((track): track is Track => Boolean(track)),
+    );
+  }
 
   return batches.flat();
 }
@@ -139,28 +145,30 @@ async function fetchItunesCharts(): Promise<Track[]> {
 }
 
 async function fetchDeezerCharts(): Promise<Track[]> {
-  const batches = await Promise.all(
-    DEEZER_CHARTS.map(async (chart) => {
-      const response = await fetchWithTimeout(chart.url);
-      if (!response.ok) return [] as Track[];
+  const out: Track[] = [];
 
-      const data = (await response.json()) as {
-        data?: {
-          id?: number;
-          title?: string;
-          artist?: { name?: string };
-          album?: { title?: string };
-          release_date?: string;
-        }[];
-      };
+  for (const chart of DEEZER_CHARTS) {
+    const response = await fetchWithTimeout(chart.url);
+    if (!response.ok) continue;
 
-      return (data.data ?? [])
+    const data = (await response.json()) as {
+      data?: {
+        id?: number;
+        title?: string;
+        artist?: { name?: string };
+        album?: { title?: string };
+        release_date?: string;
+      }[];
+    };
+
+    out.push(
+      ...(data.data ?? [])
         .map((item) => fromDeezer(item, chart.genres))
-        .filter((track): track is Track => Boolean(track));
-    }),
-  );
+        .filter((track): track is Track => Boolean(track)),
+    );
+  }
 
-  return batches.flat();
+  return out;
 }
 
 function fromSpotify(meta: SpotifyTrackMeta, genres: Genre[]): Track | null {
