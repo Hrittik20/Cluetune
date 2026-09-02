@@ -1,0 +1,16 @@
+---
+import LocalizedHome from "../../components/LocalizedHome.astro";
+import { LOCALE_CODES, type LocaleCode, isValidLocale } from "../../i18n/config";
+
+export function getStaticPaths() {
+  return LOCALE_CODES.filter((code) => code !== "en").map((lang) => ({ params: { lang } }));
+}
+
+const { lang } = Astro.params;
+
+if (!isValidLocale(lang) || lang === "en") {
+  return Astro.redirect("/");
+}
+---
+
+<LocalizedHome locale={lang as LocaleCode} />

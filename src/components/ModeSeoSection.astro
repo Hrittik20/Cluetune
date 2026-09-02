@@ -1,0 +1,37 @@
+---
+import type { LocaleCode } from "../i18n/config";
+import type { ModeSlug } from "../i18n/mode-pages";
+import { getModePageCopy } from "../i18n/mode-pages";
+
+interface Props {
+  locale: LocaleCode;
+  slug: ModeSlug;
+}
+
+const { locale, slug } = Astro.props;
+const copy = getModePageCopy(locale, slug);
+---
+
+<section class="page-shell py-12 sm:py-16" aria-labelledby="mode-seo-heading">
+  <article class="mx-auto flex max-w-prose flex-col gap-5 text-body-md text-body">
+    <h2 id="mode-seo-heading" class="text-display-lg text-ink">
+      {copy.seoHeading}
+    </h2>
+
+    <p>{copy.seoParagraphs[0]}</p>
+    <p>{copy.seoParagraphs[1]}</p>
+
+    {
+      copy.seoSubheadings.map((heading, index) => {
+        const paragraph = copy.seoParagraphs[index + 2];
+        if (!paragraph) return null;
+        return (
+          <div class="flex flex-col gap-2">
+            <h3 class="mt-2 text-display-sm text-ink">{heading}</h3>
+            <p>{paragraph}</p>
+          </div>
+        );
+      })
+    }
+  </article>
+</section>

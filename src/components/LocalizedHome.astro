@@ -1,0 +1,205 @@
+---
+import GamePrefetch from "./GamePrefetch.astro";
+import GameShellFrame from "./GameShellFrame.astro";
+import GameShell from "./game/GameShell";
+import MeshGradient from "../components/MeshGradient.astro";
+import ModeCard from "../components/ModeCard.astro";
+import Layout from "../layouts/Layout.astro";
+import { LOCALES, type LocaleCode, getHomeHreflangs, localizedPath } from "../i18n/config";
+import { faqJsonLdForLocale, getTranslation } from "../i18n/translations";
+
+interface Props {
+  locale: LocaleCode;
+}
+
+const { locale } = Astro.props;
+const t = getTranslation(locale);
+const localeConfig = LOCALES[locale];
+const hreflangs = getHomeHreflangs();
+---
+
+<Layout
+  title={t.meta.title}
+  description={t.meta.description}
+  keywords={t.meta.keywords}
+  lang={localeConfig.hreflang}
+  ogLocale={localeConfig.ogLocale}
+  hreflangs={hreflangs}
+  faqJsonLd={faqJsonLdForLocale(locale)}
+>
+  <GamePrefetch />
+
+  <section class="relative isolate">
+    <MeshGradient />
+
+    <div class="page-shell relative pb-10 pt-3 sm:pb-16 sm:pt-5">
+      <header class="mx-auto mb-3 flex max-w-2xl flex-col items-center gap-1.5 text-center sm:mb-4">
+        <p class="badge">
+          <span aria-hidden="true" class="size-1.5 rounded-full bg-tone-correct"></span>
+          {t.hero.badge}
+        </p>
+        <h1 class="sr-only">{t.meta.h1}</h1>
+      </header>
+
+      <GameShellFrame>
+        <GameShell client:load mode="daily" />
+      </GameShellFrame>
+
+      <p class="mx-auto mt-6 max-w-md px-2 text-center text-body-sm text-mute sm:mt-8">
+        {t.hero.donePrompt}{" "}
+        <a href={localizedPath(locale, "/unlimited")} class="text-link underline underline-offset-4">{t.hero.unlimitedLink}</a>{" "}
+        {t.hero.doneSuffix}
+      </p>
+    </div>
+  </section>
+
+  <section class="page-shell py-12 sm:py-16" aria-labelledby="modes-heading">
+    <div class="flex flex-col gap-3">
+      <p class="eyebrow">{t.modes.eyebrow}</p>
+      <h2 id="modes-heading" class="max-w-2xl text-display-lg text-ink">
+        {t.modes.heading}
+      </h2>
+    </div>
+
+    <div class="mt-8 grid gap-4 sm:mt-10 sm:grid-cols-2 md:grid-cols-4">
+      {t.modes.items.map((mode) => <ModeCard {...mode} href={localizedPath(locale, mode.href)} />)}
+    </div>
+  </section>
+
+  <section class="hairline-y bg-canvas-soft py-12 sm:py-20" aria-labelledby="why-heading">
+    <div class="page-shell">
+      <div class="flex flex-col gap-3">
+        <p class="eyebrow">{t.why.eyebrow}</p>
+        <h2 id="why-heading" class="max-w-2xl text-display-lg text-ink">
+          {t.why.heading}
+        </h2>
+      </div>
+
+      <div class="mt-10 grid gap-x-10 gap-y-10 sm:mt-12 md:grid-cols-2 md:gap-y-12">
+        {
+          t.why.items.map((item, index) => (
+            <article class="flex gap-4 sm:gap-5">
+              <span aria-hidden="true" class="tabular shrink-0 font-mono text-caption text-mute">
+                {String(index + 1).padStart(2, "0")}
+              </span>
+              <div class="flex min-w-0 flex-col gap-2">
+                <h3 class="text-display-sm text-ink">{item.title}</h3>
+                <p class="max-w-md text-body-md text-body">{item.body}</p>
+              </div>
+            </article>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="page-shell py-12 sm:py-20" aria-labelledby="how-heading">
+    <div class="grid gap-10 md:grid-cols-[1fr_1.1fr] md:items-center md:gap-12">
+      <div class="flex flex-col gap-4">
+        <p class="eyebrow">{t.how.eyebrow}</p>
+        <h2 id="how-heading" class="text-display-lg text-ink">{t.how.heading}</h2>
+        <p class="max-w-md text-body-md text-body">{t.how.body}</p>
+        <div class="mt-2 flex flex-wrap gap-2">
+          <a href={localizedPath(locale, "/how-to-play")} class="btn btn-secondary btn-md">{t.how.rulesLink}</a>
+          <a href={localizedPath(locale, "/unlimited")} class="btn btn-primary btn-md">{t.how.playLink}</a>
+        </div>
+      </div>
+
+      <ol class="flex flex-col gap-px overflow-hidden rounded-lg bg-hairline shadow-level-1">
+        {
+          [1, 2, 4, 7, 11, 16].map((seconds, index) => (
+            <li class="flex items-center gap-3 bg-canvas-soft px-4 py-3.5 sm:gap-4 sm:px-5 sm:py-4">
+              <span class="tabular w-6 shrink-0 font-mono text-caption text-mute">{index + 1}</span>
+              <span
+                aria-hidden="true"
+                class="h-2 rounded-full bg-linear-90 from-[#00dfd8] to-[#7928ca]"
+                style={`width: ${(seconds / 16) * 100}%`}
+              />
+              <span class="tabular ml-auto shrink-0 text-body-sm text-ink">{seconds}s</span>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <section class="hairline-y bg-canvas-soft py-12 sm:py-20" aria-labelledby="about-heading">
+    <div class="page-shell">
+      <article class="mx-auto flex max-w-prose flex-col gap-5 text-body-md text-body">
+        <div class="flex flex-col gap-3">
+          <p class="eyebrow">{t.about.eyebrow}</p>
+          <h2 id="about-heading" class="text-display-lg text-ink">
+            {t.about.heading}
+          </h2>
+        </div>
+
+        <p>{t.about.paragraphs[0]}</p>
+        <p>{t.about.paragraphs[1]}</p>
+
+        <h3 class="mt-2 text-display-sm text-ink">{t.about.subheadings[0]}</h3>
+        <p>{t.about.paragraphs[2]}</p>
+        <p>{t.about.paragraphs[3]}</p>
+
+        <h3 class="mt-2 text-display-sm text-ink">{t.about.subheadings[1]}</h3>
+        <p>{t.about.paragraphs[4]}</p>
+        <p>{t.about.paragraphs[5]}</p>
+
+        <h3 class="mt-2 text-display-sm text-ink">{t.about.subheadings[2]}</h3>
+        <p>{t.about.paragraphs[6]}</p>
+        <p>{t.about.paragraphs[7]}</p>
+      </article>
+
+      <div class="mx-auto mt-12 max-w-prose">
+        <h2 class="text-display-md text-ink">{t.about.questionsHeading}</h2>
+        <dl class="mt-6 flex flex-col">
+          {
+            t.faqs.map((faq) => (
+              <div class="hairline-b flex flex-col gap-2 py-5">
+                <dt class="text-display-sm text-ink">{faq.q}</dt>
+                <dd class="text-body-md text-body">{faq.a}</dd>
+              </div>
+            ))
+          }
+        </dl>
+
+        <nav class="mt-10 flex flex-col gap-3" aria-label={t.about.siteNavLabel}>
+          <p class="eyebrow">{t.about.siteNavLabel}</p>
+          <ul class="flex flex-wrap gap-x-5 gap-y-2">
+            {
+              t.about.sitePages.map((page) => (
+                <li>
+                  <a href={page.href} class="text-body-sm text-link underline underline-offset-4">
+                    {page.label}
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </nav>
+
+        <nav class="mt-10 flex flex-col gap-3" aria-label="Language">
+          <p class="eyebrow">Language</p>
+          <ul class="flex flex-wrap gap-x-5 gap-y-2">
+            {
+              Object.values(LOCALES).map((entry) => (
+                <li>
+                  <a
+                    href={entry.pathPrefix || "/"}
+                    hreflang={entry.hreflang}
+                    class:list={[
+                      "text-body-sm underline underline-offset-4",
+                      entry.code === locale ? "text-ink" : "text-link",
+                    ]}
+                    aria-current={entry.code === locale ? "page" : undefined}
+                  >
+                    {entry.label}
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </section>
+</Layout>

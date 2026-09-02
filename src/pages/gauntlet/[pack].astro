@@ -1,4 +1,5 @@
 ---
+import GameShellFrame from "../../components/GameShellFrame.astro";
 import GameShell from "../../components/game/GameShell";
 import MeshGradient from "../../components/MeshGradient.astro";
 import Layout from "../../layouts/Layout.astro";
@@ -31,9 +32,9 @@ if (!pack) {
         <h1 class="sr-only">{pack.name} gauntlet</h1>
       </header>
 
-      <div class="mx-auto max-w-2xl">
+      <GameShellFrame>
         <GameShell client:load mode="gauntlet" pack={pack.slug} packName={pack.name} />
-      </div>
+      </GameShellFrame>
     </div>
   </section>
 </Layout>

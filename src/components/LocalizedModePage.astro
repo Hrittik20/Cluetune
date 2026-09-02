@@ -1,0 +1,74 @@
+---
+import GameShellFrame from "./GameShellFrame.astro";
+import MeshGradient from "./MeshGradient.astro";
+import ModeSeoSection from "./ModeSeoSection.astro";
+import GameShell from "./game/GameShell";
+import Layout from "../layouts/Layout.astro";
+import { LOCALES, type LocaleCode, getModeHreflangs, localizedPath } from "../i18n/config";
+import { type ModeSlug, getModePageCopy } from "../i18n/mode-pages";
+
+interface Props {
+  locale: LocaleCode;
+  slug: ModeSlug;
+}
+
+const { locale, slug } = Astro.props;
+const copy = getModePageCopy(locale, slug);
+const localeConfig = LOCALES[locale];
+const gameMode = slug === "lyrics" ? "lyric-flip" : slug;
+const showFilters = true;
+const continuous = true;
+---
+
+<Layout
+  title={copy.title}
+  description={copy.description}
+  lang={localeConfig.hreflang}
+  ogLocale={localeConfig.ogLocale}
+  hreflangs={getModeHreflangs(`/${slug}`)}
+>
+  <section class="relative isolate">
+    <MeshGradient intensity="soft" />
+
+    <div class="page-shell relative pb-10 pt-3 sm:pb-16 sm:pt-5">
+      <header class="mx-auto mb-3 flex max-w-2xl flex-col items-center gap-1.5 text-center sm:mb-4">
+        <p class="badge">{copy.badge}</p>
+        <h1 class="sr-only">{copy.h1}</h1>
+      </header>
+
+      <GameShellFrame>
+        <GameShell
+          client:load
+          mode={gameMode}
+          continuous={continuous}
+          showFilters={showFilters}
+        />
+      </GameShellFrame>
+    </div>
+  </section>
+
+  <ModeSeoSection locale={locale} slug={slug} />
+
+  <nav class="page-shell pb-12" aria-label="Language">
+        <p class="eyebrow mb-3">Language</p>
+        <ul class="flex flex-wrap gap-x-5 gap-y-2">
+          {
+            Object.values(LOCALES).map((entry) => (
+              <li>
+                <a
+                  href={localizedPath(entry.code, `/${slug}`)}
+                  hreflang={entry.hreflang}
+                  class:list={[
+                    "text-body-sm underline underline-offset-4",
+                    entry.code === locale ? "text-ink" : "text-link",
+                  ]}
+                  aria-current={entry.code === locale ? "page" : undefined}
+                >
+                  {entry.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+</Layout>

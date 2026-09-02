@@ -1,0 +1,21 @@
+---
+/** Prefetch today's daily round before React hydrates (mobile LCP). */
+---
+
+<script is:inline>
+  (function () {
+    var d = new Date();
+    var key =
+      d.getFullYear() +
+      "-" +
+      String(d.getMonth() + 1).padStart(2, "0") +
+      "-" +
+      String(d.getDate()).padStart(2, "0");
+    window.__CLUETUNE_DATE__ = key;
+    var link = document.createElement("link");
+    link.rel = "prefetch";
+    link.as = "fetch";
+    link.href = "/api/round?mode=daily&count=1&date=" + encodeURIComponent(key);
+    document.head.appendChild(link);
+  })();
+</script>

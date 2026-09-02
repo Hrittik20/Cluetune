@@ -5,6 +5,7 @@ import { searchItunes } from "../../lib/providers/itunes";
 import { hasSpotifyCredentials } from "../../lib/providers/env";
 import { searchSpotify } from "../../lib/providers/spotify";
 import type { SearchSuggestion } from "../../lib/types";
+import { EXTRA_SUGGESTIONS } from "../../lib/extra-suggestions";
 
 export const prerender = false;
 
@@ -14,6 +15,9 @@ export const prerender = false;
  * Suggestions must resemble the typed title or artist. Remote catalogues
  * happily return popular tracks for lyric-shaped queries; those are dropped
  * unless the words actually appear in the name.
+ *
+ * Priority order: catalog tracks (playable) → extra suggestions (popular songs
+ * not in the catalog, for user guidance) → remote API results.
  */
 export const GET: APIRoute = async ({ url }) => {
   const query = (url.searchParams.get("q") ?? "").trim();
@@ -22,20 +26,19 @@ export const GET: APIRoute = async ({ url }) => {
     return json({ suggestions: [] });
   }
 
-  const local = rank(
-    CATALOG.map((track) => ({
-      id: `catalog:${track.id}`,
-      title: track.title,
-      artist: track.artist,
-      year: track.year,
-    })),
-    query,
-  ).slice(0, 6);
+  const catalogSuggestions: SearchSuggestion[] = CATALOG.map((track) => ({
+    id: `catalog:${track.id}`,
+    title: track.title,
+    artist: track.artist,
+    year: track.year,
+  }));
+
+  const local = rank([...catalogSuggestions, ...EXTRA_SUGGESTIONS], query).slice(0, 8);
 
   const tokenCount = query.split(/\s+/).filter(Boolean).length;
   const remote = tokenCount >= 6 ? [] : rank(await fetchRemote(query).catch(() => []), query);
 
-  return json({ suggestions: dedupe([...local, ...remote]).slice(0, 8) });
+  return json({ suggestions: dedupe([...local, ...remote]).slice(0, 10) });
 };
 
 function rank(suggestions: SearchSuggestion[], query: string): SearchSuggestion[] {

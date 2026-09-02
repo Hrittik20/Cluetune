@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { DEFAULT_FILTERS, filterCatalog } from "../../lib/catalog";
 import { formatCountdown, localDateKey, msUntilLocalMidnight, puzzleNumber } from "../../lib/daily";
 import {
@@ -18,14 +18,24 @@ import {
 import { judgeGuess } from "../../lib/matching";
 import { getDailyRecord, getSession, loadState, putSession, recordDaily } from "../../lib/storage";
 import type { GameMode, ModeFilters, ResolvedTrack } from "../../lib/types";
-import { FilterBar } from "./FilterBar";
+import { GameShellSkeleton } from "./GameShellSkeleton";
 import { GuessInput } from "./GuessInput";
 import { ClipLadderBar, GuessRows } from "./GuessRows";
 import { LyricsBoard } from "./LyricsBoard";
-import { RevealPanel } from "./RevealPanel";
 import { SessionHud } from "./SessionHud";
 import { VinylPlayer } from "./VinylPlayer";
 import { useAudioClip } from "./useAudioClip";
+
+const FilterBar = lazy(() => import("./FilterBar").then((module) => ({ default: module.FilterBar })));
+const RevealPanel = lazy(() =>
+  import("./RevealPanel").then((module) => ({ default: module.RevealPanel })),
+);
+
+function readPrefetchDateKey(): string | null {
+  if (typeof window === "undefined") return null;
+  const value = (window as Window & { __CLUETUNE_DATE__?: string }).__CLUETUNE_DATE__;
+  return typeof value === "string" && value.length > 0 ? value : null;
+}
 
 export interface GameShellProps {
   mode: GameMode;
@@ -75,7 +85,7 @@ export default function GameShell(props: GameShellProps) {
   const [countdown, setCountdown] = useState("");
   const [completedRounds, setCompletedRounds] = useState(0);
   const [reducedGlitch, setReducedGlitch] = useState(false);
-  const [dateKey, setDateKey] = useState<string | null>(dateKeyProp ?? null);
+  const [dateKey, setDateKey] = useState<string | null>(dateKeyProp ?? readPrefetchDateKey());
 
   const puzzle = dateKey ? puzzleNumber(dateKey) : undefined;
 
@@ -91,8 +101,8 @@ export default function GameShell(props: GameShellProps) {
 
   // Resolve the puzzle date from the browser's calendar, not the server's.
   useEffect(() => {
-    if (mode === "daily" && !dateKeyProp) setDateKey(localDateKey());
-  }, [mode, dateKeyProp]);
+    if (mode === "daily" && !dateKeyProp && !dateKey) setDateKey(localDateKey());
+  }, [mode, dateKeyProp, dateKey]);
 
   // Restore per-mode session stats, preferences and saved filters on mount.
   useEffect(() => {
@@ -324,14 +334,20 @@ export default function GameShell(props: GameShellProps) {
   const gauntletComplete = mode === "gauntlet" && completedRounds >= GAUNTLET_LENGTH;
 
   if (status === "loading" && !current) {
-    return <LoadingState />;
+    return (
+      <GameShellSkeleton showFilters={showFilters} lyricsMode={mode === "lyric-flip"} />
+    );
   }
 
   if (status === "error" && !current) {
     return <ErrorState message={errorMessage} onRetry={() => setFilters({ ...filters })} />;
   }
 
-  if (!round || !current) return <LoadingState />;
+  if (!round || !current) {
+    return (
+      <GameShellSkeleton showFilters={showFilters} lyricsMode={mode === "lyric-flip"} />
+    );
+  }
 
   const attemptIndex = round.guesses.length;
   const lyricsMode = mode === "lyric-flip";
@@ -505,13 +521,15 @@ export default function GameShell(props: GameShellProps) {
             showBar={false}
             activeHint={lyricsMode ? "Reading the lyrics…" : undefined}
           />
-          <RevealPanel
-            state={round}
-            source={current.source}
-            waveform={waveformRef.current}
-            puzzle={puzzle}
-            countdown={mode === "daily" ? countdown : undefined}
-          />
+          <Suspense fallback={null}>
+            <RevealPanel
+              state={round}
+              source={current.source}
+              waveform={waveformRef.current}
+              puzzle={puzzle}
+              countdown={mode === "daily" ? countdown : undefined}
+            />
+          </Suspense>
         </>
       )}
 
@@ -520,14 +538,16 @@ export default function GameShell(props: GameShellProps) {
       {continuous ? <SessionHud session={session} /> : null}
 
       {showFilters ? (
-        <FilterBar
-          filters={filters}
-          matchCount={poolCount}
-          onChange={(next) => {
-            setFilters(next);
-            seenIdsRef.current = new Set();
-          }}
-        />
+        <Suspense fallback={null}>
+          <FilterBar
+            filters={filters}
+            matchCount={poolCount}
+            onChange={(next) => {
+              setFilters(next);
+              seenIdsRef.current = new Set();
+            }}
+          />
+        </Suspense>
       ) : null}
     </div>
   );
@@ -549,15 +569,6 @@ function readFilters(params: URLSearchParams): ModeFilters | null {
       (Number.isNaN(max) ? 3 : Math.min(5, Math.max(1, max))) as ModeFilters["difficulty"][1],
     ],
   };
-}
-
-function LoadingState() {
-  return (
-    <div className="flex flex-col items-center gap-4 py-8" role="status" aria-live="polite">
-      <div className="size-28 animate-pulse rounded-full bg-canvas-soft-2 sm:size-36" />
-      <p className="text-body-sm text-mute">Cueing up a track…</p>
-    </div>
-  );
 }
 
 function ErrorState({ message, onRetry }: { message: string; onRetry: () => void }) {

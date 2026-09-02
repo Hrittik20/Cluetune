@@ -1,6 +1,8 @@
 import type { APIRoute } from "astro";
 import { SITE } from "../consts";
 import { GENRE_PACKS } from "../lib/catalog";
+import { LOCALE_CODES, localePath, localizedPath } from "../i18n/config";
+import { MODE_SLUGS } from "../i18n/mode-pages";
 
 export const prerender = true;
 
@@ -8,7 +10,7 @@ export const prerender = true;
  * Public, indexable routes only. Redirects, challenge links, API and error
  * pages stay out so crawlers spend budget on playable URLs.
  */
-const PAGES: { path: string; changefreq: string; priority: string }[] = [
+const BASE_PAGES: { path: string; changefreq: string; priority: string }[] = [
   { path: "/", changefreq: "daily", priority: "1.0" },
   { path: "/unlimited", changefreq: "weekly", priority: "0.9" },
   { path: "/sped-up", changefreq: "weekly", priority: "0.8" },
@@ -21,11 +23,28 @@ const PAGES: { path: string; changefreq: string; priority: string }[] = [
   })),
   { path: "/how-to-play", changefreq: "monthly", priority: "0.7" },
   { path: "/about", changefreq: "monthly", priority: "0.6" },
-  { path: "/contact", changefreq: "monthly", priority: "0.5" },
+  { path: "/contact", changefreq: "monthly", priority: "0.6" },
   { path: "/privacy", changefreq: "yearly", priority: "0.4" },
   { path: "/terms", changefreq: "yearly", priority: "0.4" },
   { path: "/stats", changefreq: "monthly", priority: "0.3" },
 ];
+
+const LOCALIZED_HOME_PAGES = LOCALE_CODES.filter((code) => code !== "en").map((code) => ({
+  path: localePath(code),
+  changefreq: "daily",
+  priority: "0.95",
+}));
+
+/** Localized unlimited, lyrics and sped-up pages. */
+const LOCALIZED_MODE_PAGES = LOCALE_CODES.filter((code) => code !== "en").flatMap((code) =>
+  MODE_SLUGS.map((slug) => ({
+    path: localizedPath(code, `/${slug}`),
+    changefreq: "weekly",
+    priority: "0.85",
+  })),
+);
+
+const PAGES = [...LOCALIZED_HOME_PAGES, ...LOCALIZED_MODE_PAGES, ...BASE_PAGES];
 
 export const GET: APIRoute = () => {
   const lastmod = new Date().toISOString().slice(0, 10);

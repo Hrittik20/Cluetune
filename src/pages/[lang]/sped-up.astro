@@ -1,0 +1,16 @@
+---
+import LocalizedModePage from "../../components/LocalizedModePage.astro";
+import { LOCALE_CODES, type LocaleCode, isValidLocale } from "../../i18n/config";
+
+export function getStaticPaths() {
+  return LOCALE_CODES.filter((code) => code !== "en").map((lang) => ({ params: { lang } }));
+}
+
+const { lang } = Astro.params;
+
+if (!isValidLocale(lang)) {
+  return Astro.redirect("/sped-up");
+}
+---
+
+<LocalizedModePage locale={lang as LocaleCode} slug="sped-up" />

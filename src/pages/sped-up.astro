@@ -1,25 +1,5 @@
 ---
-import GameShell from "../components/game/GameShell";
-import MeshGradient from "../components/MeshGradient.astro";
-import Layout from "../layouts/Layout.astro";
+import LocalizedModePage from "../components/LocalizedModePage.astro";
 ---
 
-<Layout
-  title="Sped-Up Round"
-  description="Every clip pitched and tempo-shifted up 1.35×, the way it sounds on your For You page. Harder than it looks."
->
-  <section class="relative isolate">
-    <MeshGradient intensity="soft" />
-
-    <div class="page-shell relative pb-10 pt-3 sm:pb-16 sm:pt-5">
-      <header class="mx-auto mb-4 flex max-w-2xl flex-col items-center gap-1.5 text-center">
-        <p class="badge">Sped-up · 1.35× pitch and tempo</p>
-        <h1 class="sr-only">Sped-Up round</h1>
-      </header>
-
-      <div class="mx-auto max-w-2xl">
-        <GameShell client:load mode="sped-up" continuous showFilters />
-      </div>
-    </div>
-  </section>
-</Layout>
+<LocalizedModePage locale="en" slug="sped-up" />

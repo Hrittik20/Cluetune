@@ -3,8 +3,8 @@
 A music-guessing game. You get one second of a song and six attempts; every wrong
 guess buys you a little more audio. [cluetune.com](https://cluetune.com)
 
-Built with [Astro](https://astro.build) 7, React islands, Tailwind CSS v4 and the
-Vercel adapter.
+Built with [Astro](https://astro.build) 7, React islands, Tailwind CSS v4 and
+Cloudflare Workers.
 
 ## Quick start
 
@@ -24,8 +24,9 @@ audio.
 | Script                  | What it does                                        |
 | ----------------------- | --------------------------------------------------- |
 | `npm run dev`           | Dev server on `localhost:4321`                       |
-| `npm run build`         | Production build into `.vercel/output`               |
+| `npm run build`         | Production build for Cloudflare Workers              |
 | `npm run preview`       | Serve the production build locally                   |
+| `npm run deploy`        | Build and deploy to Cloudflare Workers               |
 | `npm run check`         | `astro check` — types across `.astro`, `.ts`, `.tsx` |
 | `npm run catalog:report`| Catalogue coverage per genre, decade and pack        |
 
@@ -168,15 +169,15 @@ A guess that names the right artist but the wrong song returns a distinct
 
 ## Deployment
 
-Configured for Vercel via `@astrojs/vercel`. Marketing and rules pages prerender;
-the API routes and `/challenge/[code]` run on the server.
+Configured for Cloudflare Workers via `@astrojs/cloudflare`. Marketing and rules
+pages prerender; the API routes and `/challenge/[code]` run on the Worker.
 
 ```bash
-npm run build   # → .vercel/output
+npm run deploy
 ```
 
-Set `SPOTIFY_CLIENT_ID`, `SPOTIFY_CLIENT_SECRET` and `YOUTUBE_API_KEY` in the
-Vercel dashboard if you want them. The build does not require them.
+Set `SPOTIFY_CLIENT_ID`, `SPOTIFY_CLIENT_SECRET` and `YOUTUBE_API_KEY` with
+`npx wrangler secret put <KEY>` if you want them. The build does not require them.
 
 ## Adding tracks
 

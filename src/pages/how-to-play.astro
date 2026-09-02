@@ -1,6 +1,7 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import { CLIP_LADDER_MS, MAX_ATTEMPTS } from "../lib/game";
+import { faqJsonLd } from "../lib/faqs";
 
 const rungs = CLIP_LADDER_MS.map((ms) => ms / 1000);
 
@@ -58,6 +59,7 @@ const faqs = [
 <Layout
   title="How to Play"
   description="The rules of Cluetune: six attempts, a clip that grows on every miss, Lyrics Guess, and a guess box that forgives typos."
+  faqJsonLd={faqJsonLd(faqs)}
 >
   <div class="page-shell py-8 sm:py-16">
     <header class="flex max-w-2xl flex-col gap-3">

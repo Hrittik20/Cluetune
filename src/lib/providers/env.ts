@@ -1,7 +1,7 @@
 /**
- * Reads server-only configuration. Checks `process.env` first because Vercel
- * injects runtime environment variables there, then falls back to Vite's
- * build-time `import.meta.env` for local `astro dev`.
+ * Reads server-only configuration. Checks `process.env` first because
+ * Cloudflare Workers (nodejs_compat) injects secrets there, then falls back
+ * to Vite's build-time `import.meta.env` for local `astro dev`.
  *
  * Never import this from a client component — none of these values are
  * prefixed `PUBLIC_`, so referencing them in browser code would fail the build

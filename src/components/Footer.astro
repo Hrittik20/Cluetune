@@ -1,5 +1,8 @@
 ---
 import { SITE } from "../consts";
+import { localeFromPath, localizedPath } from "../i18n/config";
+
+const locale = localeFromPath(Astro.url.pathname);
 
 const columns = [
   {
@@ -47,7 +50,10 @@ const year = new Date().getFullYear();
           <ul class="flex flex-col gap-2">
             {column.links.map((link) => (
               <li>
-                <a href={link.href} class="rounded-xs text-body-sm text-body hover:text-ink">
+                <a
+                  href={localizedPath(locale, link.href)}
+                  class="rounded-xs text-body-sm text-body hover:text-ink"
+                >
                   {link.label}
                 </a>
               </li>

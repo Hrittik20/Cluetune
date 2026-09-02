@@ -1,28 +1,5 @@
 ---
-import GameShell from "../components/game/GameShell";
-import MeshGradient from "../components/MeshGradient.astro";
-import Layout from "../layouts/Layout.astro";
+import LocalizedModePage from "../components/LocalizedModePage.astro";
 ---
 
-<Layout
-  title="Unlimited"
-  description="Keep guessing with no daily limit — a Songless unlimited-style guess song game. Filter by genre, decade and obscurity. No account needed."
->
-  <section class="relative isolate">
-    <MeshGradient intensity="soft" />
-
-    <div class="page-shell relative pb-10 pt-3 sm:pb-16 sm:pt-5">
-      <header class="mx-auto mb-4 flex max-w-2xl flex-col items-center gap-1.5 text-center">
-        <p class="badge">
-          <span aria-hidden="true" class="size-1.5 rounded-full bg-tone-correct"></span>
-          Unlimited · no login, no limit
-        </p>
-        <h1 class="sr-only">Unlimited mode</h1>
-      </header>
-
-      <div class="mx-auto max-w-2xl">
-        <GameShell client:load mode="unlimited" continuous showFilters />
-      </div>
-    </div>
-  </section>
-</Layout>
+<LocalizedModePage locale="en" slug="unlimited" />

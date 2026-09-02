@@ -4,13 +4,24 @@ export const SITE = {
   url: "https://cluetune.com",
   tagline: "Guess the song from 1 second.",
   description:
-    "Cluetune is a free guess song game. Name the track from 1 second — a Songless and Guessable-style daily, then unlimited rounds with no account.",
+    "Cluetune is a free song guess game. Name the track from 1 second — a Songless and Guessable-style daily, then unlimited rounds with no account.",
   themeColor: "#08080a",
   ogImage: "/og.png",
   email: "hello@cluetune.com",
-  gaId: "G-2YMYW2SK8X",
+  gaId: "G-L34VGBLWGK",
   keywords: [
     "Cluetune",
+    // Core game phrases
+    "song guess game",
+    "song guessing game",
+    "song guessing game online",
+    "guess the song game",
+    "guess song game",
+    "guess song from 1 second",
+    "guess the song from 1 second",
+    "music guessing game",
+    "music quiz game",
+    // Songless cluster
     "songless",
     "songless unlimited",
     "songless game",
@@ -18,11 +29,21 @@ export const SITE = {
     "lessgames songless",
     "unlimited songless",
     "songless unlimited hip hop",
+    // Guessable cluster
     "guessable",
     "guessable.gg",
-    "guess song",
-    "guess song from 1 second",
-    "guess song game",
+    // Heardle / genre cluster
+    "heardle",
+    "heardle unlimited",
+    "music heardle",
+    "song heardle",
+    // Generic
+    "name that tune",
+    "name that tune game online",
+    "guess the song",
+    "guess the music",
+    "identify the song",
+    "what song is this",
   ],
 } as const;
 

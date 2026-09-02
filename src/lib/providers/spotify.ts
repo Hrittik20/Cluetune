@@ -20,6 +20,21 @@ import { hasSpotifyCredentials, serverEnv } from "./env";
 const TOKEN_URL = "https://accounts.spotify.com/api/token";
 const API_BASE = "https://api.spotify.com/v1";
 
+/** After a 401/403, stop calling Spotify for a while — token exchange can
+ *  succeed while search/playlists still reject the app, and each retry burns
+ *  a Cloudflare Worker subrequest. */
+let disabledUntil = 0;
+
+function spotifyDisabled(): boolean {
+  return Date.now() < disabledUntil;
+}
+
+function tripSpotify(status: number): void {
+  if (status === 401 || status === 403) {
+    disabledUntil = Date.now() + 15 * 60_000;
+  }
+}
+
 interface CachedToken {
   token: string;
   expiresAt: number;
@@ -28,6 +43,7 @@ interface CachedToken {
 let tokenPromise: Promise<CachedToken | null> | null = null;
 
 async function requestToken(): Promise<CachedToken | null> {
+  if (spotifyDisabled()) return null;
   const id = serverEnv("SPOTIFY_CLIENT_ID");
   const secret = serverEnv("SPOTIFY_CLIENT_SECRET");
   if (!id || !secret) return null;
@@ -46,7 +62,10 @@ async function requestToken(): Promise<CachedToken | null> {
     body: "grant_type=client_credentials",
   });
 
-  if (!response.ok) return null;
+  if (!response.ok) {
+    tripSpotify(response.status);
+    return null;
+  }
 
   const data = (await response.json()) as { access_token?: string; expires_in?: number };
   if (!data.access_token) return null;
@@ -59,7 +78,7 @@ async function requestToken(): Promise<CachedToken | null> {
 }
 
 async function getToken(): Promise<string | null> {
-  if (!hasSpotifyCredentials()) return null;
+  if (spotifyDisabled() || !hasSpotifyCredentials()) return null;
 
   const cached = await tokenPromise;
   if (cached && cached.expiresAt > Date.now()) return cached.token;
@@ -114,17 +133,25 @@ function mapTrack(track: SpotifyApiTrack): SpotifyTrackMeta {
 const searchCache = new TtlCache<SpotifyTrackMeta[]>(10 * 60_000);
 
 export async function searchSpotify(query: string, limit = 8): Promise<SpotifyTrackMeta[]> {
+  if (spotifyDisabled()) return [];
   const token = await getToken();
   if (!token || !query.trim()) return [];
 
-  return searchCache.wrap(`${limit}:${query.toLowerCase()}`, async () => {
-    const url = `${API_BASE}/search?type=track&limit=${limit}&q=${encodeURIComponent(query)}`;
-    const response = await fetchWithTimeout(url, { headers: { Authorization: `Bearer ${token}` } });
-    if (!response.ok) return [];
+  return searchCache.wrapIf(
+    `${limit}:${query.toLowerCase()}`,
+    async () => {
+      const url = `${API_BASE}/search?type=track&limit=${limit}&q=${encodeURIComponent(query)}`;
+      const response = await fetchWithTimeout(url, { headers: { Authorization: `Bearer ${token}` } });
+      if (!response.ok) {
+        tripSpotify(response.status);
+        return [];
+      }
 
-    const data = (await response.json()) as { tracks?: { items?: SpotifyApiTrack[] } };
-    return (data.tracks?.items ?? []).map(mapTrack);
-  });
+      const data = (await response.json()) as { tracks?: { items?: SpotifyApiTrack[] } };
+      return (data.tracks?.items ?? []).map(mapTrack);
+    },
+    (results) => results.length > 0,
+  );
 }
 
 const trackCache = new TtlCache<SpotifyTrackMeta | null>(60 * 60_000);
@@ -134,6 +161,7 @@ export async function lookupSpotifyTrack(
   title: string,
   artist: string,
 ): Promise<SpotifyTrackMeta | null> {
+  if (spotifyDisabled()) return null;
   const key = `${artist}::${title}`.toLowerCase();
 
   return trackCache.wrap(key, async () => {
@@ -155,7 +183,10 @@ export async function lookupSpotifyById(id: string): Promise<SpotifyTrackMeta | 
     const response = await fetchWithTimeout(`${API_BASE}/tracks/${encodeURIComponent(id)}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
-    if (!response.ok) return null;
+    if (!response.ok) {
+      tripSpotify(response.status);
+      return null;
+    }
 
     const data = (await response.json()) as SpotifyApiTrack;
     return data?.id ? mapTrack(data) : null;
@@ -167,20 +198,22 @@ export async function lookupSpotifyById(id: string): Promise<SpotifyTrackMeta | 
  * handwritten catalogue when credentials are present — still metadata only.
  */
 export async function fetchPlaylistTracks(playlistId: string, limit = 50): Promise<SpotifyTrackMeta[]> {
+  if (spotifyDisabled()) return [];
   const token = await getToken();
   if (!token) return [];
 
-  return searchCache.wrap(`playlist:${playlistId}:${limit}`, async () => {
-    const fields =
-      "items(track(id,name,duration_ms,popularity,artists(name),album(name,release_date,images),external_ids,external_urls))";
-    const url = `${API_BASE}/playlists/${playlistId}/tracks?limit=${limit}&fields=${encodeURIComponent(fields)}`;
-    const response = await fetchWithTimeout(url, { headers: { Authorization: `Bearer ${token}` } });
-    if (!response.ok) return [];
+  const fields =
+    "items(track(id,name,duration_ms,popularity,artists(name),album(name,release_date,images),external_ids,external_urls))";
+  const url = `${API_BASE}/playlists/${playlistId}/tracks?limit=${limit}&fields=${encodeURIComponent(fields)}`;
+  const response = await fetchWithTimeout(url, { headers: { Authorization: `Bearer ${token}` } });
+  if (!response.ok) {
+    tripSpotify(response.status);
+    return [];
+  }
 
-    const data = (await response.json()) as { items?: { track?: SpotifyApiTrack | null }[] };
-    return (data.items ?? [])
-      .map((item) => item.track)
-      .filter((track): track is SpotifyApiTrack => Boolean(track?.id && track.name))
-      .map(mapTrack);
-  });
+  const data = (await response.json()) as { items?: { track?: SpotifyApiTrack | null }[] };
+  return (data.items ?? [])
+    .map((item) => item.track)
+    .filter((track): track is SpotifyApiTrack => Boolean(track?.id && track.name))
+    .map(mapTrack);
 }

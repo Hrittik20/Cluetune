@@ -16,6 +16,18 @@ import { TtlCache, fetchWithTimeout } from "./cache";
 const SEARCH_URL = "https://itunes.apple.com/search";
 const LOOKUP_URL = "https://itunes.apple.com/lookup";
 
+let disabledUntil = 0;
+
+function itunesDisabled(): boolean {
+  return Date.now() < disabledUntil;
+}
+
+function tripItunes(status: number): void {
+  if (status === 403 || status === 429) {
+    disabledUntil = Date.now() + 2 * 60_000;
+  }
+}
+
 export interface ItunesResult {
   trackId: number;
   title: string;
@@ -55,35 +67,50 @@ function mapResult(item: ItunesApiTrack): ItunesResult {
 const cache = new TtlCache<ItunesResult[]>(60 * 60_000);
 
 export async function searchItunes(term: string, limit = 8): Promise<ItunesResult[]> {
-  if (!term.trim()) return [];
+  if (!term.trim() || itunesDisabled()) return [];
 
-  return cache.wrap(`search:${limit}:${term.toLowerCase()}`, async () => {
-    const url = `${SEARCH_URL}?media=music&entity=song&limit=${limit}&term=${encodeURIComponent(term)}`;
+  return cache.wrapIf(
+    `search:${limit}:${term.toLowerCase()}`,
+    async () => {
+      const url = `${SEARCH_URL}?media=music&entity=song&limit=${limit}&term=${encodeURIComponent(term)}`;
 
-    try {
-      const response = await fetchWithTimeout(url);
-      if (!response.ok) return [];
+      try {
+        const response = await fetchWithTimeout(url);
+        if (!response.ok) {
+          tripItunes(response.status);
+          return [];
+        }
 
-      const data = (await response.json()) as { results?: ItunesApiTrack[] };
-      return (data.results ?? []).map(mapResult);
-    } catch {
-      return [];
-    }
-  });
+        const data = (await response.json()) as { results?: ItunesApiTrack[] };
+        return (data.results ?? []).map(mapResult);
+      } catch {
+        return [];
+      }
+    },
+    (results) => results.length > 0,
+  );
 }
 
 export async function lookupByIsrc(isrc: string): Promise<ItunesResult | null> {
-  const results = await cache.wrap(`isrc:${isrc}`, async () => {
-    try {
-      const response = await fetchWithTimeout(`${LOOKUP_URL}?isrc=${encodeURIComponent(isrc)}&entity=song`);
-      if (!response.ok) return [];
+  if (itunesDisabled()) return null;
+  const results = await cache.wrapIf(
+    `isrc:${isrc}`,
+    async () => {
+      try {
+        const response = await fetchWithTimeout(`${LOOKUP_URL}?isrc=${encodeURIComponent(isrc)}&entity=song`);
+        if (!response.ok) {
+          tripItunes(response.status);
+          return [];
+        }
 
-      const data = (await response.json()) as { results?: ItunesApiTrack[] };
-      return (data.results ?? []).map(mapResult);
-    } catch {
-      return [];
-    }
-  });
+        const data = (await response.json()) as { results?: ItunesApiTrack[] };
+        return (data.results ?? []).map(mapResult);
+      } catch {
+        return [];
+      }
+    },
+    (items) => items.length > 0,
+  );
 
   return results.find((result) => result.previewUrl) ?? null;
 }
