@@ -44,6 +44,17 @@ export const SITE = {
     "guess the music",
     "identify the song",
     "what song is this",
+    // Drunk / high mode
+    "drunk mode",
+    "high mode",
+    "guess drunk songs",
+    "guess high songs",
+    "drunk song guess",
+    "high song quiz",
+    "guess the song drunk",
+    "guess the song high",
+    "wasted song game",
+    "drunk music quiz",
   ],
 } as const;
 
@@ -57,7 +68,7 @@ export interface NavItem {
 export const NAV_ITEMS: NavItem[] = [
   { href: "/", label: "Daily" },
   { href: "/unlimited", label: "Unlimited" },
-  { href: "/sped-up", label: "Sped-Up" },
+  { href: "/drunk", label: "Drunk" },
   { href: "/lyrics", label: "Lyrics" },
   { href: "/gauntlet", label: "Gauntlet" },
 ];

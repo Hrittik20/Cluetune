@@ -14,7 +14,7 @@ export const HOME_FAQS: FaqItem[] = [
   },
   {
     q: "How to play Songless multiple times",
-    a: "Finish the Daily, then open Unlimited. Unlimited is how you play Songless multiple times in a row: same guess-the-song ladder, no cooldown, no login. You can also use Sped-Up, Lyrics Guess, or Genre Gauntlet for more rounds.",
+    a: "Finish the Daily, then open Unlimited. Unlimited is how you play Songless multiple times in a row: same guess-the-song ladder, no cooldown, no login. You can also use Drunk mode (high mode), Lyrics Guess, or Genre Gauntlet for more rounds.",
   },
   {
     q: "How to play Songless more than once",
@@ -23,6 +23,18 @@ export const HOME_FAQS: FaqItem[] = [
   {
     q: "How to play Songless unlimited",
     a: "Open /unlimited on Cluetune. That is the Songless unlimited mode: endless rounds, live streak and accuracy, and genre/decade filters. It is free and works in the browser on your phone.",
+  },
+  {
+    q: "What is drunk mode / high mode?",
+    a: "Drunk mode (also called high mode) on Cluetune is a guess-the-song mode where clips are pitch-warped, slowed, echoed, or muffled. You guess drunk songs or high songs from that messy first listen; skip or miss and the mix sobers up while more of the clip unlocks. Free at /drunk — no account.",
+  },
+  {
+    q: "Guess drunk songs",
+    a: "Open Drunk mode on Cluetune to guess drunk songs from distorted previews. The first second is the hardest; each skip clears the effects. Same six attempts as the Daily, then the next track queues immediately.",
+  },
+  {
+    q: "Guess high songs",
+    a: "High mode is the same as Drunk mode on Cluetune: guess high songs from warped, slowed, or echoey clips. Play at /drunk in the browser — no app and no login.",
   },
   {
     q: "Guess who song",
@@ -38,7 +50,7 @@ export const HOME_FAQS: FaqItem[] = [
   },
   {
     q: "Website where you guess the song",
-    a: "Cluetune (cluetune.com) is a website where you guess the song in the browser. There is nothing to install. Daily, Unlimited, Sped-Up, Lyrics Guess and Genre Gauntlet all run on the same site.",
+    a: "Cluetune (cluetune.com) is a website where you guess the song in the browser. There is nothing to install. Daily, Unlimited, Drunk mode / high mode, Lyrics Guess and Genre Gauntlet all run on the same site.",
   },
   {
     q: "Guess what song",
@@ -55,15 +67,18 @@ export const HOME_FAQS: FaqItem[] = [
 ];
 
 export function faqJsonLd(faqs: FaqItem[] = HOME_FAQS) {
+  // Cap schema size — long FAQ graphs bloat HTML and delay mobile FCP.
+  const main = faqs.slice(0, 8);
   return {
     "@context": "https://schema.org",
     "@type": "FAQPage",
-    mainEntity: faqs.map((faq) => ({
+    mainEntity: main.map((faq) => ({
       "@type": "Question",
       name: faq.q,
       acceptedAnswer: {
         "@type": "Answer",
-        text: `<p>${faq.a}</p>`,
+        // Truncate answers in JSON-LD only; visible FAQ copy stays full-length.
+        text: `<p>${faq.a.length > 160 ? `${faq.a.slice(0, 157)}…` : faq.a}</p>`,
       },
     })),
   };

@@ -9,7 +9,7 @@ const routePath = pathWithoutLocale(path);
 const ICONS: Record<string, string> = {
   "/": "M12 3 4 9v12h5v-7h6v7h5V9L12 3Z",
   "/unlimited": "M18.6 6.4a7 7 0 0 0-9.9 0L7 8.1m-1.6 9.5a7 7 0 0 0 9.9 0L17 15.9M4 8.1h4V4M20 15.9h-4V20",
-  "/sped-up": "m13 3-9 11h8l-1 7 9-11h-8l1-7Z",
+  "/drunk": "M12 3c-1.8 3.5-4 6.2-4 9a4 4 0 0 0 8 0c0-2.8-2.2-5.5-4-9Zm0 14.5V21",
   "/lyrics": "M7 4h10M7 9h10M7 14h6M5 20h14a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1Z",
   "/gauntlet": "M8 21V8m4 13V3m4 18v-9",
 };
@@ -41,11 +41,18 @@ const ICONS: Record<string, string> = {
                   href={localizedPath(locale, item.href)}
                   aria-current={active ? "page" : undefined}
                   class:list={[
-                    "block rounded-full px-3 py-2 text-body-sm transition-colors duration-150",
+                    "inline-flex items-center gap-1.5 rounded-full px-3 py-2 text-body-sm transition-colors duration-150",
                     active ? "bg-canvas-soft-2 text-ink" : "text-body hover:text-ink",
                   ]}
                 >
-                  {item.label}
+                  {item.href === "/drunk" ? (
+                    <>
+                      <span class="label-drunk">{item.label}</span>
+                      <span class="badge-new">New</span>
+                    </>
+                  ) : (
+                    item.label
+                  )}
                 </a>
               </li>
             );
@@ -125,7 +132,18 @@ const ICONS: Record<string, string> = {
                   stroke-linecap="round"
                   stroke-linejoin="round"></path>
               </svg>
-              {item.label}
+              {item.href === "/drunk" ? (
+                <span class="inline-flex items-center gap-1">
+                  <span class="label-drunk">{item.label}</span>
+                  <span
+                    class="size-1.5 shrink-0 rounded-full"
+                    style="background: var(--cluetune-pink)"
+                    aria-label="New"
+                  ></span>
+                </span>
+              ) : (
+                item.label
+              )}
             </a>
           </li>
         );

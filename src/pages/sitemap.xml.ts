@@ -13,7 +13,7 @@ export const prerender = true;
 const BASE_PAGES: { path: string; changefreq: string; priority: string }[] = [
   { path: "/", changefreq: "daily", priority: "1.0" },
   { path: "/unlimited", changefreq: "weekly", priority: "0.9" },
-  { path: "/sped-up", changefreq: "weekly", priority: "0.8" },
+  { path: "/drunk", changefreq: "weekly", priority: "0.8" },
   { path: "/lyrics", changefreq: "weekly", priority: "0.8" },
   { path: "/gauntlet", changefreq: "weekly", priority: "0.8" },
   ...GENRE_PACKS.map((pack) => ({
@@ -35,7 +35,7 @@ const LOCALIZED_HOME_PAGES = LOCALE_CODES.filter((code) => code !== "en").map((c
   priority: "0.95",
 }));
 
-/** Localized unlimited, lyrics and sped-up pages. */
+/** Localized unlimited, lyrics and drunk pages. */
 const LOCALIZED_MODE_PAGES = LOCALE_CODES.filter((code) => code !== "en").flatMap((code) =>
   MODE_SLUGS.map((slug) => ({
     path: localizedPath(code, `/${slug}`),

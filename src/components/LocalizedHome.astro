@@ -1,7 +1,7 @@
 ---
 import GamePrefetch from "./GamePrefetch.astro";
 import GameShellFrame from "./GameShellFrame.astro";
-import GameShell from "./game/GameShell";
+import GameShellMount from "./GameShellMount.astro";
 import MeshGradient from "../components/MeshGradient.astro";
 import ModeCard from "../components/ModeCard.astro";
 import Layout from "../layouts/Layout.astro";
@@ -27,13 +27,13 @@ const hreflangs = getHomeHreflangs();
   hreflangs={hreflangs}
   faqJsonLd={faqJsonLdForLocale(locale)}
 >
-  <GamePrefetch />
+  <GamePrefetch mode="daily" count={1} />
 
   <section class="relative isolate">
-    <MeshGradient />
+    <MeshGradient intensity="soft" />
 
-    <div class="page-shell relative pb-10 pt-3 sm:pb-16 sm:pt-5">
-      <header class="mx-auto mb-3 flex max-w-2xl flex-col items-center gap-1.5 text-center sm:mb-4">
+    <div class="page-shell relative pb-8 pt-2 sm:pb-16 sm:pt-5">
+      <header class="mx-auto mb-2 flex max-w-2xl flex-col items-center gap-1 text-center sm:mb-4 sm:gap-1.5">
         <p class="badge">
           <span aria-hidden="true" class="size-1.5 rounded-full bg-tone-correct"></span>
           {t.hero.badge}
@@ -42,10 +42,10 @@ const hreflangs = getHomeHreflangs();
       </header>
 
       <GameShellFrame>
-        <GameShell client:load mode="daily" />
+        <GameShellMount mode="daily" />
       </GameShellFrame>
 
-      <p class="mx-auto mt-6 max-w-md px-2 text-center text-body-sm text-mute sm:mt-8">
+      <p class="mx-auto mt-5 max-w-md px-2 text-center text-body-sm text-mute sm:mt-8">
         {t.hero.donePrompt}{" "}
         <a href={localizedPath(locale, "/unlimited")} class="text-link underline underline-offset-4">{t.hero.unlimitedLink}</a>{" "}
         {t.hero.doneSuffix}

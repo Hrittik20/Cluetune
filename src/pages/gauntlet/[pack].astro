@@ -1,6 +1,6 @@
 ---
 import GameShellFrame from "../../components/GameShellFrame.astro";
-import GameShell from "../../components/game/GameShell";
+import GameShellMount from "../../components/GameShellMount.astro";
 import MeshGradient from "../../components/MeshGradient.astro";
 import Layout from "../../layouts/Layout.astro";
 import { GENRE_PACKS, getPack } from "../../lib/catalog";
@@ -33,7 +33,7 @@ if (!pack) {
       </header>
 
       <GameShellFrame>
-        <GameShell client:load mode="gauntlet" pack={pack.slug} packName={pack.name} />
+        <GameShellMount mode="gauntlet" pack={pack.slug} packName={pack.name} />
       </GameShellFrame>
     </div>
   </section>

@@ -1,8 +1,9 @@
 ---
-import "../styles/global.css";
+import globalStylesHref from "../styles/global.css?url";
 import Footer from "../components/Footer.astro";
 import Nav from "../components/Nav.astro";
 import { SITE } from "../consts";
+import geistLatin from "@fontsource-variable/geist/files/geist-latin-wght-normal.woff2?url";
 
 interface HreflangAlternate {
   hreflang: string;
@@ -111,7 +112,101 @@ const jsonLd = {
       <link rel="alternate" hreflang={alternate.hreflang} href={alternate.href} />
     ))}
     <link rel="sitemap" href="/sitemap.xml" />
-    <link rel="preconnect" href="https://www.googletagmanager.com" />
+    <link
+      rel="preload"
+      href={geistLatin}
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <style is:inline>
+      :root {
+        --cluetune-canvas: #08080a;
+        --cluetune-ink: #fafafa;
+        --cluetune-body: #d4d4d8;
+        --cluetune-mute: #8f8f9c;
+        --font-sans: "Geist Variable", system-ui, -apple-system, sans-serif;
+      }
+      html,
+      body {
+        margin: 0;
+        background: var(--cluetune-canvas);
+        color: var(--cluetune-ink);
+        font-family: var(--font-sans);
+      }
+      body {
+        min-height: 100dvh;
+        overflow-x: clip;
+      }
+      .hidden {
+        display: none;
+      }
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border-width: 0;
+      }
+      @media (width >= 768px) {
+        .md\:block {
+          display: block;
+        }
+        .md\:hidden {
+          display: none;
+        }
+      }
+      .page-shell {
+        width: 100%;
+        max-width: 42rem;
+        margin-inline: auto;
+        padding-inline: max(1rem, env(safe-area-inset-left, 0px))
+          max(1rem, env(safe-area-inset-right, 0px));
+      }
+      .game-shell-frame {
+        margin-inline: auto;
+        width: 100%;
+        max-width: 42rem;
+        min-height: 30rem;
+      }
+      .vinyl-disc {
+        aspect-ratio: 1;
+        width: min(100%, 9.5rem);
+        border-radius: 9999px;
+        background: radial-gradient(
+          circle at 50% 45%,
+          #151519 0%,
+          #151519 28%,
+          #0d0d10 55%,
+          #08080a 100%
+        );
+        box-shadow: inset 0 0 0 1px color-mix(in oklab, white 8%, transparent);
+      }
+      @media (width >= 640px) {
+        .vinyl-disc {
+          width: 100%;
+          max-width: min(52vw, 15rem);
+        }
+        .game-shell-frame {
+          min-height: 32rem;
+        }
+      }
+    </style>
+    <link
+      rel="stylesheet"
+      href={globalStylesHref}
+      media="print"
+      onload="this.media='all'"
+    />
+    <noscript>
+      <link rel="stylesheet" href={globalStylesHref} />
+    </noscript>
+    <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+    <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com" />
     {noindex ? <meta name="robots" content="noindex, nofollow" /> : <meta name="robots" content="index, follow" />}
     <meta name="theme-color" content={SITE.themeColor} />
     <meta name="color-scheme" content="dark light" />
@@ -145,28 +240,40 @@ const jsonLd = {
 
     <script is:inline define:vars={{ gaId: SITE.gaId }}>
       window.addEventListener("load", function () {
-        var script = document.createElement("script");
-        script.async = true;
-        script.src = "https://www.googletagmanager.com/gtag/js?id=" + gaId;
-        document.head.appendChild(script);
-        window.dataLayer = window.dataLayer || [];
-        function gtag() {
-          window.dataLayer.push(arguments);
+        var loadThirdParty = function () {
+          var ga = document.createElement("script");
+          ga.async = true;
+          ga.src = "https://www.googletagmanager.com/gtag/js?id=" + gaId;
+          document.head.appendChild(ga);
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            window.dataLayer.push(arguments);
+          }
+          window.gtag = gtag;
+          gtag("js", new Date());
+          gtag("config", gaId);
+
+          var ads = document.createElement("script");
+          ads.async = true;
+          ads.crossOrigin = "anonymous";
+          ads.src =
+            "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4283994187571753";
+          document.head.appendChild(ads);
+        };
+        if ("requestIdleCallback" in window) {
+          requestIdleCallback(loadThirdParty, { timeout: 2500 });
+        } else {
+          setTimeout(loadThirdParty, 1500);
         }
-        window.gtag = gtag;
-        gtag("js", new Date());
-        gtag("config", gaId);
       });
     </script>
 
-    {/* Preview audio and album art come from these hosts on nearly every round. */}
     <link rel="preconnect" href="https://audio-ssl.itunes.apple.com" crossorigin />
     <link rel="preconnect" href="https://is1-ssl.mzstatic.com" crossorigin />
     <link rel="dns-prefetch" href="https://cdns-preview-a.dzcdn.net" />
     <link rel="dns-prefetch" href="https://i.scdn.co" />
     <link rel="dns-prefetch" href="https://lrclib.net" />
 
-    {/* Applied before first paint so the chosen theme never flashes. */}
     <script is:inline>
       try {
         const stored = localStorage.getItem("cluetune:theme");

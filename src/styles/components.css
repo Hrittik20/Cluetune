@@ -141,6 +141,49 @@
     box-shadow: var(--shadow-level-1);
   }
 
+  /* Tipsy wordmark — nav / cards / HUD. Mode-page badge stays still. */
+  @keyframes drunk-sway {
+    0%,
+    100% {
+      transform: rotate(-3deg) skewX(-4deg) translate3d(-1px, 0, 0);
+    }
+    40% {
+      transform: rotate(2.5deg) skewX(3deg) translate3d(1px, 1px, 0);
+    }
+    70% {
+      transform: rotate(-1.5deg) skewX(2deg) translate3d(0, -1px, 0);
+    }
+  }
+
+  .label-drunk {
+    display: inline-block;
+    transform-origin: 50% 80%;
+    animation: drunk-sway 2.8s ease-in-out infinite;
+  }
+
+  .badge-new {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 9999px;
+    padding-inline: --spacing(1.5);
+    padding-block: 1px;
+    font-size: 0.65rem;
+    line-height: 1.2;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--cluetune-ink);
+    background-color: color-mix(in oklab, var(--cluetune-pink) 22%, var(--cluetune-canvas-soft-2));
+    box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--cluetune-pink) 35%, transparent);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .label-drunk {
+      animation: none;
+      transform: rotate(-2deg) skewX(-2deg);
+    }
+  }
+
   .field {
     width: 100%;
     background-color: var(--cluetune-canvas-soft-2);

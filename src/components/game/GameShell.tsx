@@ -1,6 +1,6 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { DEFAULT_FILTERS, filterCatalog } from "../../lib/catalog";
-import { formatCountdown, localDateKey, msUntilLocalMidnight, puzzleNumber } from "../../lib/daily";
+import { formatCountdown, localDateKey, msUntilLocalMidnight, puzzleNumber } from "../../lib/daily-time";
+import { DEFAULT_FILTERS } from "../../lib/filters";
 import {
   EMPTY_SESSION,
   accuracy,
@@ -8,15 +8,24 @@ import {
   averageAttempts,
   createRound,
   ladderFor,
-  playbackRateFor,
   recordRound,
   tilePattern,
   unlockedMs,
   type RoundState,
   type SessionStats,
 } from "../../lib/game";
+import {
+  DRUNK_LEVEL_LABELS,
+  DRUNK_START_LEVEL,
+  DRUNK_MAX_LEVEL,
+  buildDrunkFx,
+  buzzFlavor,
+  nextBuzzLevel,
+  skipSoberingFlavor,
+  type DrunkLevel,
+} from "../../lib/audioFx";
 import { judgeGuess } from "../../lib/matching";
-import { getDailyRecord, getSession, loadState, putSession, recordDaily } from "../../lib/storage";
+import { getDailyRecord, getDrunkBuzz, getSession, loadState, putDrunkBuzz, putSession, recordDaily } from "../../lib/storage";
 import type { GameMode, ModeFilters, ResolvedTrack } from "../../lib/types";
 import { GameShellSkeleton } from "./GameShellSkeleton";
 import { GuessInput } from "./GuessInput";
@@ -31,10 +40,32 @@ const RevealPanel = lazy(() =>
   import("./RevealPanel").then((module) => ({ default: module.RevealPanel })),
 );
 
+type PrefetchPayload = {
+  mode: string;
+  date?: string;
+  promise: Promise<{ rounds?: ResolvedTrack[]; error?: string }>;
+};
+
 function readPrefetchDateKey(): string | null {
   if (typeof window === "undefined") return null;
   const value = (window as Window & { __CLUETUNE_DATE__?: string }).__CLUETUNE_DATE__;
   return typeof value === "string" && value.length > 0 ? value : null;
+}
+
+function takePrefetchedRounds(
+  mode: GameMode,
+  dateKey: string | null,
+): Promise<ResolvedTrack[]> | null {
+  if (typeof window === "undefined") return null;
+  const bag = window as Window & { __CLUETUNE_ROUND__?: PrefetchPayload };
+  const payload = bag.__CLUETUNE_ROUND__;
+  if (!payload || payload.mode !== mode) return null;
+  if (mode === "daily" && payload.date && dateKey && payload.date !== dateKey) return null;
+  bag.__CLUETUNE_ROUND__ = undefined;
+  return payload.promise.then((data) => {
+    if (data.error) throw new Error(data.error);
+    return data.rounds ?? [];
+  });
 }
 
 export interface GameShellProps {
@@ -86,6 +117,8 @@ export default function GameShell(props: GameShellProps) {
   const [completedRounds, setCompletedRounds] = useState(0);
   const [reducedGlitch, setReducedGlitch] = useState(false);
   const [dateKey, setDateKey] = useState<string | null>(dateKeyProp ?? readPrefetchDateKey());
+  const [buzzLevel, setBuzzLevel] = useState<DrunkLevel>(DRUNK_START_LEVEL);
+  const [buzzNote, setBuzzNote] = useState<string | null>(null);
 
   const puzzle = dateKey ? puzzleNumber(dateKey) : undefined;
 
@@ -94,10 +127,21 @@ export default function GameShell(props: GameShellProps) {
   const seenIdsRef = useRef<Set<string>>(new Set());
 
   const ladder = useMemo(() => ladderFor(mode), [mode]);
-  const rate = useMemo(() => playbackRateFor(mode), [mode]);
   const totalMs = ladder[ladder.length - 1]!;
 
-  const audio = useAudioClip(current?.source?.kind === "audio" ? current.source.ref : null, rate);
+  const drunkFx = useMemo(() => {
+    if (mode !== "drunk" || !current) return null;
+    // First listen is the most distorted; each miss/skip sobers the mix.
+    // After the round ends, play the reveal clean.
+    const attemptIndex =
+      round?.status === "playing" ? round.guesses.length : DRUNK_MAX_LEVEL;
+    return buildDrunkFx(buzzLevel, current.track.id, attemptIndex);
+  }, [mode, buzzLevel, current, round?.status, round?.guesses.length]);
+
+  const audio = useAudioClip(
+    current?.source?.kind === "audio" ? current.source.ref : null,
+    drunkFx,
+  );
 
   // Resolve the puzzle date from the browser's calendar, not the server's.
   useEffect(() => {
@@ -109,19 +153,47 @@ export default function GameShell(props: GameShellProps) {
     const persisted = loadState();
     setSession(persisted.sessions[mode] ?? getSession(mode));
     setReducedGlitch(persisted.prefs.reducedGlitch);
+    if (mode === "drunk") setBuzzLevel(getDrunkBuzz());
 
     if (!showFilters) return;
     const fromUrl = readFilters(new URLSearchParams(location.search));
     setFilters(fromUrl ?? persisted.prefs.filters ?? DEFAULT_FILTERS);
   }, [mode, showFilters]);
 
-  const poolCount = useMemo(
-    () => (showFilters ? filterCatalog(filters).length : undefined),
-    [filters, showFilters],
-  );
+  const [poolCount, setPoolCount] = useState<number | undefined>(undefined);
+
+  useEffect(() => {
+    if (!showFilters) {
+      setPoolCount(undefined);
+      return;
+    }
+    let cancelled = false;
+    void import("../../lib/catalog").then(({ filterCatalog }) => {
+      if (!cancelled) setPoolCount(filterCatalog(filters).length);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [showFilters, filters]);
 
   const fetchRounds = useCallback(
     async (count: number, signal?: AbortSignal): Promise<ResolvedTrack[]> => {
+      const filtersAreDefault =
+        filters.genres.length === 0 &&
+        filters.decades.length === 0 &&
+        filters.difficulty[0] === DEFAULT_FILTERS.difficulty[0] &&
+        filters.difficulty[1] === DEFAULT_FILTERS.difficulty[1];
+
+      const prefetched =
+        count <= 3 && !lockedTrackId && !pack && filtersAreDefault
+          ? takePrefetchedRounds(mode, dateKey)
+          : null;
+      if (prefetched) {
+        const rounds = await prefetched;
+        if (signal?.aborted) throw new DOMException("Aborted", "AbortError");
+        if (rounds.length) return rounds.slice(0, count);
+      }
+
       const params = new URLSearchParams({ mode, count: String(count) });
 
       if (dateKey) params.set("date", dateKey);
@@ -247,7 +319,10 @@ export default function GameShell(props: GameShellProps) {
     (next: RoundState) => {
       setRound(next);
 
-      if (next.status === "playing") return;
+      if (next.status === "playing") {
+        if (mode === "drunk") setBuzzNote(skipSoberingFlavor(next.guesses.length));
+        return;
+      }
 
       audio.pause();
 
@@ -255,6 +330,14 @@ export default function GameShell(props: GameShellProps) {
       setSession(updatedSession);
       putSession(mode, updatedSession);
       setCompletedRounds((value) => value + 1);
+
+      if (mode === "drunk") {
+        const previous = buzzLevel;
+        const updated = nextBuzzLevel(buzzLevel, next);
+        setBuzzLevel(updated);
+        putDrunkBuzz(updated);
+        setBuzzNote(buzzFlavor(previous, updated));
+      }
 
       if (mode === "daily" && dateKey) {
         recordDaily({
@@ -268,7 +351,7 @@ export default function GameShell(props: GameShellProps) {
         });
       }
     },
-    [audio, session, mode, dateKey],
+    [audio, session, mode, dateKey, buzzLevel],
   );
 
   const commitGuess = useCallback(
@@ -295,6 +378,7 @@ export default function GameShell(props: GameShellProps) {
   }, [round, unlocked, resolveRound, audio]);
 
   const advance = useCallback(async () => {
+    setBuzzNote(null);
     const [next, ...rest] = queue;
 
     if (next) {
@@ -375,7 +459,7 @@ export default function GameShell(props: GameShellProps) {
   const showNextCta = finished && !gauntletComplete;
 
   return (
-    <div className="flex flex-col gap-3 sm:gap-5">
+    <div className="flex flex-col gap-2.5 sm:gap-5">
       {challengerAttempt != null ? (
         <ChallengeBanner
           name={challengerName}
@@ -389,9 +473,9 @@ export default function GameShell(props: GameShellProps) {
       ) : null}
 
       {showPlayer ? (
-        <div className="flex flex-col items-center gap-3 sm:gap-4">
+        <div className="flex flex-col items-center gap-2.5 sm:gap-4">
           {showNextCta ? (
-            <div className="flex justify-center">
+            <div className="flex flex-col items-center gap-1.5">
               {mode === "daily" ? (
                 <a className="btn btn-primary btn-md h-11 px-6 shadow-level-2" href="/unlimited">
                   Play Unlimited
@@ -407,20 +491,45 @@ export default function GameShell(props: GameShellProps) {
                   <ArrowIcon />
                 </button>
               )}
+              {mode === "drunk" && buzzNote ? (
+                <p className="text-caption text-mute">{buzzNote}</p>
+              ) : null}
             </div>
-          ) : null}
+          ) : (
+            // Mobile: Play first so the CTA clears the fold. Desktop: vinyl first.
+            <div className="order-1 flex w-full max-w-md items-center justify-center gap-2 sm:gap-3 md:order-2">
+              <button
+                type="button"
+                className="btn btn-primary btn-lg min-w-0 flex-1 shadow-level-2 sm:min-w-40 sm:flex-none"
+                onClick={() => audio.toggle(unlocked)}
+                disabled={!audio.ready && !audio.error}
+              >
+                {audio.playing ? "Pause" : `Play ${(unlocked / 1000).toFixed(0)}s`}
+              </button>
+              <button
+                type="button"
+                className="btn btn-secondary btn-icon"
+                aria-label="Restart the clip from the beginning"
+                onClick={() => audio.play(unlocked, 0)}
+              >
+                <RestartIcon />
+              </button>
+            </div>
+          )}
 
-          <VinylPlayer
-            playing={audio.playing}
-            positionMs={audio.positionMs}
-            unlockedMs={unlocked}
-            totalMs={totalMs}
-            readLevels={audio.readLevels}
-            scratchKey={scratchKey}
-            artworkUrl={current.source?.artworkUrl}
-            revealArtwork={finished}
-            reducedGlitch={reducedGlitch}
-          />
+          <div className={showNextCta ? undefined : "order-2 md:order-1"}>
+            <VinylPlayer
+              playing={audio.playing}
+              positionMs={audio.positionMs}
+              unlockedMs={unlocked}
+              totalMs={totalMs}
+              readLevels={audio.readLevels}
+              scratchKey={scratchKey}
+              artworkUrl={current.source?.artworkUrl}
+              revealArtwork={finished}
+              reducedGlitch={reducedGlitch}
+            />
+          </div>
 
           {showNextCta ? (
             <div className="flex items-center justify-center gap-2">
@@ -442,31 +551,16 @@ export default function GameShell(props: GameShellProps) {
                 <RestartIcon />
               </button>
             </div>
-          ) : (
-            <div className="flex w-full max-w-md items-center justify-center gap-2 sm:gap-3">
-              <button
-                type="button"
-                className="btn btn-primary btn-lg min-w-0 flex-1 sm:min-w-40 sm:flex-none"
-                onClick={() => audio.toggle(unlocked)}
-                disabled={!audio.ready && !audio.error}
-              >
-                {audio.playing ? "Pause" : `Play ${(unlocked / 1000).toFixed(0)}s`}
-              </button>
-              <button
-                type="button"
-                className="btn btn-secondary btn-icon"
-                aria-label="Restart the clip from the beginning"
-                onClick={() => audio.play(unlocked, 0)}
-              >
-                <RestartIcon />
-              </button>
-            </div>
-          )}
+          ) : null}
 
           {audio.error ? (
             <p role="status" className="text-body-sm text-tone-wrong">
               {audio.error}
             </p>
+          ) : null}
+
+          {mode === "drunk" && buzzNote && !showNextCta ? (
+            <p className="text-caption text-mute">{buzzNote}</p>
           ) : null}
 
           {lyricsMode ? null : (
@@ -535,7 +629,16 @@ export default function GameShell(props: GameShellProps) {
 
       {gauntletComplete ? <GauntletSummary session={session} packName={packName} /> : null}
 
-      {continuous ? <SessionHud session={session} /> : null}
+      {continuous ? (
+        <SessionHud
+          session={session}
+          buzz={
+            mode === "drunk"
+              ? { level: buzzLevel, label: DRUNK_LEVEL_LABELS[buzzLevel] }
+              : undefined
+          }
+        />
+      ) : null}
 
       {showFilters ? (
         <Suspense fallback={null}>

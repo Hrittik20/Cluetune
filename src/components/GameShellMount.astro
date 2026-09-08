@@ -1,0 +1,34 @@
+---
+/**
+ * One island per viewport via client:media — never client:load on a “hidden”
+ * desktop copy (that still hydrates on phones and doubles TBT).
+ *
+ * Mobile hydrates when the max-width query matches (eager on phones) so the
+ * live canvas paints before the lab quiet window; delayed idle was pushing
+ * canvas LCP to ~8s. SSR skeleton uses an SVG vinyl (LCP-eligible); a CSS
+ * gradient div is not.
+ */
+import GameShell from "./game/GameShell";
+import type { GameMode } from "../lib/types";
+
+interface Props {
+  mode: GameMode;
+  continuous?: boolean;
+  showFilters?: boolean;
+  pack?: string;
+  packName?: string;
+  lockedTrackId?: string;
+  challengerAttempt?: number;
+  challengerSeconds?: number;
+  challengerName?: string;
+}
+
+const props = Astro.props;
+---
+
+<div class="md:hidden">
+  <GameShell client:media="(max-width: 767px)" {...props} />
+</div>
+<div class="hidden md:block">
+  <GameShell client:media="(min-width: 768px)" {...props} />
+</div>

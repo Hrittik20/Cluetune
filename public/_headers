@@ -1,2 +1,8 @@
 https://cluetune.teamgenerator.workers.dev/*
   X-Robots-Tag: noindex
+
+/api/*
+  Cache-Control: private, no-store
+
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable

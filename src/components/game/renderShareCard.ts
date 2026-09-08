@@ -1,4 +1,4 @@
-import { hashString } from "../../lib/daily";
+import { hashString } from "../../lib/daily-time";
 import type { GuessVerdict } from "../../lib/types";
 
 export interface ShareCardOptions {

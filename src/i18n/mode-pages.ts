@@ -1,6 +1,6 @@
 import type { LocaleCode } from "./config";
 
-export type ModeSlug = "unlimited" | "lyrics" | "sped-up";
+export type ModeSlug = "unlimited" | "lyrics" | "drunk";
 
 export interface ModePageCopy {
   title: string;
@@ -10,6 +10,11 @@ export interface ModePageCopy {
   seoHeading: string;
   seoParagraphs: string[];
   seoSubheadings: string[];
+  /** Optional page-level keywords meta (falls back to site defaults). */
+  keywords?: string;
+  /** Optional FAQ block under the SEO section (Drunk / High). */
+  faqHeading?: string;
+  faqs?: { q: string; a: string }[];
 }
 
 const EN: Record<ModeSlug, ModePageCopy> = {
@@ -52,23 +57,41 @@ const EN: Record<ModeSlug, ModePageCopy> = {
       "Title matching is forgiving: typos, remaster suffixes, and artist-title in either order all count. No account, no app — play in the browser.",
     ],
   },
-  "sped-up": {
-    title: "Sped-Up Round — 1.35× Guess the Song",
+  drunk: {
+    title: "Drunk Mode & High Mode — Guess Drunk Songs Online",
     description:
-      "Every clip pitched and tempo-shifted up 1.35×, the way it sounds on your For You page. A harder twist on the guess-the-song ladder.",
-    badge: "Sped-up · 1.35× pitch and tempo",
-    h1: "Sped-Up round — guess the song at 1.35×",
-    seoHeading: "Guess the song when it's sped up",
+      "Play drunk mode or high mode on Cluetune: guess drunk songs and guess high songs from pitch-warped, slowed, echoey clips. First listen is the hardest — skip to sober up. Free, no account.",
+    badge: "Drunk mode · skip to sober up",
+    h1: "Drunk mode / high mode — guess drunk songs from a wasted clip",
+    seoHeading: "Drunk mode and high mode: guess the song when the audio is wasted",
+    keywords:
+      "drunk mode, high mode, guess drunk songs, guess high songs, drunk song guess, high song quiz, guess the song drunk, guess the song high, wasted song game, drunk music quiz, high music quiz, distorted song guess game, cluetune drunk, cluetune high mode",
     seoSubheadings: [
-      "Why 1.35× is harder than it sounds",
-      "Shorter clip ladder, same six tries",
-      "TikTok-speed audio, classic format",
+      "What is drunk mode (and high mode)?",
+      "Guess drunk songs and high songs from a distorted clip",
+      "Skip to sober up — same six-try ladder",
     ],
     seoParagraphs: [
-      "Sped-Up plays every preview at 1.35× pitch and tempo — the way tracks sound when they blow up on short-form video. Same guess-the-song goal, harder execution.",
-      "The clip ladder is compressed in time because the audio is faster. You still get six attempts; each miss unlocks more of the sped-up fragment.",
-      "Use filters to stick to a genre or decade if you want a themed session. Unlimited-style continuous play with no daily limit.",
-      "Free, no account, runs entirely in your browser. Part of Cluetune alongside the Daily, Unlimited, Lyrics Guess, and Genre Gauntlet.",
+      "Drunk mode (also searched as high mode) is Cluetune's distorted guess-the-song mode: every clip arrives pitch-warped, slowed, muffled, or swimming in echo and reverb so naming the track feels like guessing drunk songs or high songs from a messy party playlist.",
+      "The first listen is the most wasted. Skip or miss and the mix sobers up while the clip ladder unlocks more audio — so you can try to crush a round while it's still messy, or burn attempts to hear a clearer version of the same track.",
+      "People look for drunk mode, high mode, guess drunk songs, and guess high songs when they want a harder twist on Heardle / Songless-style play. Cluetune's version keeps the familiar six attempts, then queues the next round with no cooldown and no account.",
+      "Each track picks a drunk character (slow slurry, chipmunk echo, bathroom reverb, underwater, tape wobble) that stays consistent as intensity drops. A session buzz meter can make the next round start rougher if you were struggling — or clearer if you were sharp.",
+      "Play free in the browser on phone or desktop. Filters for genre, decade, and difficulty work the same as Unlimited. Part of Cluetune alongside the Daily, Unlimited, Lyrics Guess, and Genre Gauntlet.",
+    ],
+    faqHeading: "Drunk mode / high mode FAQ",
+    faqs: [
+      {
+        q: "What is drunk mode / high mode on Cluetune?",
+        a: "Drunk mode (also called high mode) is a free guess-the-song mode where clips are pitch-warped, slowed, echoed, or muffled. You guess drunk songs or high songs from that messy first listen; skip to sober up.",
+      },
+      {
+        q: "How do I guess drunk songs or high songs?",
+        a: "Open /drunk, press play, and type the song title. The first second is the most distorted. Each miss or skip clears the effects and unlocks more of the clip — six attempts, same as the Daily.",
+      },
+      {
+        q: "Is high mode different from drunk mode?",
+        a: "No. High mode and drunk mode are the same Cluetune mode. Search either phrase and play at cluetune.com/drunk — no account required.",
+      },
     ],
   },
 };
@@ -109,24 +132,44 @@ const ES: Record<ModeSlug, ModePageCopy> = {
       "Coincidencia flexible de títulos. Sin cuenta — juega en el navegador.",
     ],
   },
-  "sped-up": {
-    title: "Acelerado — Adivina a 1.35×",
+  drunk: {
+    title: "Modo Drunk y High — Adivina canciones borrachas online",
     description:
-      "Cada clip subido a 1.35× en tono y tempo, como en tu feed. Un giro más difícil del quiz musical.",
-    badge: "Acelerado · 1.35× tono y tempo",
-    h1: "Modo acelerado — adivina la canción a 1.35×",
-    seoHeading: "Adivina la canción acelerada",
-    seoSubheadings: ["Por qué 1.35× es más difícil", "Escalera más corta", "Audio estilo TikTok"],
+      "Juega al modo drunk o high en Cluetune: adivina canciones borrachas o high con clips distorsionados (pitch, ralentizado, eco). La primera escucha es la más dura; salta para aclarar. Gratis, sin cuenta.",
+    badge: "Modo Drunk · salta para aclarar",
+    h1: "Modo drunk / high — adivina canciones con un clip borracho",
+    seoHeading: "Modo drunk y high: adivina la canción cuando el audio está borracho",
+    keywords:
+      "drunk mode, high mode, modo borracho, modo high, adivinar canciones borrachas, guess drunk songs, guess high songs, canción distorsionada, quiz musical borracho, cluetune drunk, cluetune high",
+    seoSubheadings: [
+      "Qué es el modo drunk (y high)",
+      "Adivina canciones borrachas o high con un clip distorsionado",
+      "Salta para aclarar — misma escalera de seis intentos",
+    ],
     seoParagraphs: [
-      "Reproduce cada preview a 1.35× — como cuando una canción se viraliza en vídeo corto.",
-      "La escalera de clip se comprime en el tiempo. Sigues teniendo seis intentos.",
-      "Usa filtros para temáticas por género o década.",
-      "Gratis, sin cuenta, en el navegador.",
+      "El modo drunk (también buscado como high mode) es el modo distorsionado de Cluetune: cada clip llega con pitch alterado, ralentizado, ahogado o nadando en eco y reverb, como adivinar canciones borrachas o high en una playlist de fiesta.",
+      "La primera escucha es la más borracha. Si saltas o fallas, la mezcla se aclara mientras la escalera desbloquea más audio: puedes acertar en el caos o gastar intentos para oír una versión más clara.",
+      "Quien busca drunk mode, high mode o adivinar canciones borrachas quiere un giro más difícil al estilo Heardle / Songless. Cluetune mantiene seis intentos y encadena la siguiente ronda sin espera ni cuenta.",
+      "Cada pista elige un carácter borracho (arrastre lento, eco chipmunk, reverb de baño, underwater, cinta temblorosa) que se mantiene mientras baja la intensidad. El medidor de buzz de la sesión puede hacer que la siguiente ronda empiece más dura o más clara.",
+      "Juega gratis en el navegador, en móvil o escritorio. Los filtros de género, década y dificultad son los mismos que en Ilimitado. Forma parte de Cluetune junto al Diario, Ilimitado, Letra y Desafío de género.",
+    ],
+    faqHeading: "FAQ del modo Drunk / High",
+    faqs: [
+      {
+        q: "¿Qué es el modo drunk / high en Cluetune?",
+        a: "El modo drunk (también llamado high) es un modo gratis de adivinar la canción con clips distorsionados: pitch, ralentizado, eco o ahogado. Adivinas canciones borrachas o high en esa primera escucha caótica; salta para aclarar.",
+      },
+      {
+        q: "¿Cómo adivino canciones borrachas o high?",
+        a: "Abre /drunk, pulsa play y escribe el título. El primer segundo es el más distorsionado. Cada fallo o salto aclara los efectos y desbloquea más clip — seis intentos, igual que el Diario.",
+      },
+      {
+        q: "¿El high mode es distinto del drunk mode?",
+        a: "No. High mode y drunk mode son el mismo modo de Cluetune. Busca cualquiera de las dos frases y juega en cluetune.com/drunk — sin cuenta.",
+      },
     ],
   },
 };
-
-// For brevity in other locales, provide full SEO content - I'll write reasonable translations for JA, FR, DE, PT, KO, IT, RU
 
 const JA: Record<ModeSlug, ModePageCopy> = {
   unlimited: {
@@ -158,18 +201,41 @@ const JA: Record<ModeSlug, ModePageCopy> = {
       "表記ゆれは許容。ブラウザで無料プレイ。",
     ],
   },
-  "sped-up": {
-    title: "スピードアップ — 1.35倍で曲当て",
-    description: "全クリップを1.35倍のピッチとテンポで再生。ショート動画風の難しいモード。",
-    badge: "スピードアップ · 1.35×",
-    h1: "スピードアップラウンド",
-    seoHeading: "早送り音声で曲当て",
-    seoSubheadings: ["1.35倍の難しさ", "短いラダー", "TikTok速度の音源"],
+  drunk: {
+    title: "Drunk / Highモード — 酔った音源で曲当て",
+    description:
+      "Cluetuneのdrunk mode / high mode。ピッチずれ・スロー・エコーのかかったクリップから曲名を当てる。最初がいちばん歪み、スキップでクリアに。無料・アカウント不要。",
+    badge: "Drunkモード · スキップでクリアに",
+    h1: "Drunk / Highモード — 酔ったクリップで曲当て",
+    seoHeading: "Drunk modeとhigh mode：歪んだ音源で曲を当てる",
+    keywords:
+      "drunk mode, high mode, 曲当て 歪み, イントロドン 難しい, guess drunk songs, guess high songs, 酔い 音楽クイズ, cluetune drunk",
+    seoSubheadings: [
+      "Drunk mode（High mode）とは",
+      "歪んだクリップから曲を当てる",
+      "スキップで酔いが覚める — 6回のラダー",
+    ],
     seoParagraphs: [
-      "プレビューを1.35倍で再生。ショート動画で流行る速さ。",
-      "時間圧縮されたラダー。6回の試行は同じ。",
-      "ジャンル・年代でフィルター可能。",
-      "無料・アカウント不要。",
+      "Drunk mode（検索では high mode とも呼ばれる）は、Cluetuneの歪み曲当てモード。クリップはピッチずれ・スロー・こもった音・エコーやリバーブ付きで、酔ったプレイリストから曲を当てる感覚です。",
+      "最初の再生がいちばん「酔い」ます。スキップやミスでミックスがクリアになり、同時にクリップの長さも伸びます。ぐちゃぐちゃなまま当てるか、試行を使ってクリアな音を聞くかを選べます。",
+      "Heardle / Songless系をもっと難しくしたい人が drunk mode や high mode を探します。Cluetuneはおなじみの6回挑戦のまま、クールダウンなし・アカウント不要で次のラウンドへ。",
+      "曲ごとに酔いのキャラクター（ゆっくりスラー、チップマンクエコー、バスルームリバーブ、水中、テープの揺れ）が決まり、強度が下がっても維持されます。セッションのbuzzメーターで次ラウンドの開始難易度が変わります。",
+      "スマホでもPCでもブラウザで無料。ジャンル・年代・難易度フィルターはアンリミテッドと同じ。デイリー、アンリミテッド、歌詞当て、ジャンルガントレットと並ぶCluetuneのモードです。",
+    ],
+    faqHeading: "Drunk / Highモード FAQ",
+    faqs: [
+      {
+        q: "Cluetuneのdrunk mode / high modeとは？",
+        a: "Drunk mode（high modeとも）は、ピッチずれ・スロー・エコー・こもった音のクリップから曲名を当てる無料モードです。最初がいちばん歪み、スキップでクリアになります。",
+      },
+      {
+        q: "どうやって酔った曲を当てる？",
+        a: "/drunk を開き、再生して曲名を入力。最初の1秒がいちばん歪んでいます。ミスやスキップで効果が薄れ、クリップも長くなります — デイリーと同じ6回。",
+      },
+      {
+        q: "High modeとDrunk modeは別？",
+        a: "いいえ。同じモードです。どちらの言葉で検索しても cluetune.com/drunk でプレイできます。アカウント不要。",
+      },
     ],
   },
 };
@@ -205,18 +271,41 @@ const FR: Record<ModeSlug, ModePageCopy> = {
       "Titres tolérants aux fautes. Sans compte.",
     ],
   },
-  "sped-up": {
-    title: "Accéléré — Devine à 1,35×",
-    description: "Chaque extrait accéléré à 1,35× en hauteur et tempo. Un blind test plus difficile.",
-    badge: "Accéléré · 1,35×",
-    h1: "Manche accélérée",
-    seoHeading: "Deviner une chanson accélérée",
-    seoSubheadings: ["Pourquoi 1,35× est dur", "Échelle raccourcie", "Son style TikTok"],
+  drunk: {
+    title: "Mode Drunk et High — Devine des chansons saoules",
+    description:
+      "Jouez au mode drunk ou high sur Cluetune : devinez des chansons saoules ou high avec des extraits pitchés, ralentis et écho. La première écoute est la plus dure ; passez pour dégriser. Gratuit, sans compte.",
+    badge: "Mode Drunk · passez pour dégriser",
+    h1: "Mode drunk / high — devinez la chanson sur un extrait saoul",
+    seoHeading: "Mode drunk et high : devinez quand l'audio est saoul",
+    keywords:
+      "drunk mode, high mode, mode bourré, deviner chanson distordue, guess drunk songs, guess high songs, quiz musical saoul, cluetune drunk, cluetune high",
+    seoSubheadings: [
+      "Qu'est-ce que le mode drunk (et high) ?",
+      "Devinez des chansons saoules ou high sur un extrait distordu",
+      "Passez pour dégriser — même échelle à six essais",
+    ],
     seoParagraphs: [
-      "Extraits à 1,35× comme sur les réseaux courts.",
-      "Échelle compressée, six essais.",
-      "Filtres par genre ou décennie.",
-      "Gratuit, sans compte.",
+      "Le mode drunk (aussi cherché comme high mode) est le mode distordu de Cluetune : chaque extrait arrive pitché, ralenti, étouffé ou noyé dans l'écho et la réverb — comme deviner des chansons saoules ou high sur une playlist de soirée.",
+      "La première écoute est la plus saoule. Passez ou ratez et le mix se clarifie pendant que l'échelle débloque plus d'audio : tentez le chaos ou brûlez des essais pour une version plus nette.",
+      "Ceux qui cherchent drunk mode, high mode ou guess drunk songs veulent un twist plus dur du style Heardle / Songless. Cluetune garde six essais, puis enchaîne la manche suivante sans cooldown ni compte.",
+      "Chaque piste choisit un caractère saoul (trainant lent, écho chipmunk, réverb de salle de bain, underwater, wobble de bande) qui reste stable pendant que l'intensité baisse. Le compteur de buzz de session peut rendre la manche suivante plus rude ou plus claire.",
+      "Gratuit dans le navigateur, téléphone ou desktop. Les filtres genre, décennie et difficulté sont les mêmes qu'Illimité. Aux côtés du Quotidien, Illimité, Paroles et Genre Gauntlet.",
+    ],
+    faqHeading: "FAQ mode Drunk / High",
+    faqs: [
+      {
+        q: "Qu'est-ce que le mode drunk / high sur Cluetune ?",
+        a: "Le mode drunk (aussi appelé high) est un mode gratuit où les extraits sont pitchés, ralentis, avec écho ou étouffés. Vous devinez des chansons saoules ou high dès la première écoute chaotique ; passez pour dégriser.",
+      },
+      {
+        q: "Comment deviner des chansons saoules ou high ?",
+        a: "Ouvrez /drunk, appuyez sur lecture et tapez le titre. La première seconde est la plus distordue. Chaque échec ou skip clarifie les effets et débloque plus d'extrait — six essais, comme le Quotidien.",
+      },
+      {
+        q: "High mode est-il différent de drunk mode ?",
+        a: "Non. High mode et drunk mode sont le même mode Cluetune. Cherchez l'une ou l'autre expression et jouez sur cluetune.com/drunk — sans compte.",
+      },
     ],
   },
 };
@@ -252,18 +341,41 @@ const DE: Record<ModeSlug, ModePageCopy> = {
       "Tippfehler tolerant. Ohne Konto.",
     ],
   },
-  "sped-up": {
-    title: "Beschleunigt — 1,35× Raten",
-    description: "Jeder Clip mit 1,35× Tonhöhe und Tempo — schwerer als es klingt.",
-    badge: "Beschleunigt · 1,35×",
-    h1: "Beschleunigte Runde",
-    seoHeading: "Song im Fast-Forward erraten",
-    seoSubheadings: ["Warum 1,35× schwer ist", "Kürzere Leiter", "TikTok-Tempo"],
+  drunk: {
+    title: "Drunk- & High-Modus — Betrunkene Songs erraten",
+    description:
+      "Spiele Drunk Mode oder High Mode auf Cluetune: errate betrunkene oder high Songs aus pitch-verschobenen, verlangsamten Echo-Clips. Der erste Hörversuch ist am härtesten — skippen zum Nüchternwerden. Kostenlos, ohne Konto.",
+    badge: "Drunk-Modus · skippen zum Nüchternwerden",
+    h1: "Drunk- / High-Modus — Song aus einem betrunkenen Clip erraten",
+    seoHeading: "Drunk- und High-Modus: Song erraten, wenn das Audio betrunken klingt",
+    keywords:
+      "drunk mode, high mode, betrunkener Song raten, verzerrter Song Quiz, guess drunk songs, guess high songs, Musikquiz betrunken, cluetune drunk, cluetune high",
+    seoSubheadings: [
+      "Was ist Drunk Mode (und High Mode)?",
+      "Betrunkene oder high Songs aus einem verzerrten Clip erraten",
+      "Skippen zum Nüchternwerden — gleiche Sechs-Versuch-Leiter",
+    ],
     seoParagraphs: [
-      "Previews mit 1,35× Geschwindigkeit.",
-      "Komprimierte Leiter, sechs Versuche.",
-      "Filter nach Genre oder Jahrzehnt.",
-      "Kostenlos, ohne Konto.",
+      "Drunk Mode (auch als High Mode gesucht) ist Cluetunes verzerrter Guess-the-Song-Modus: Clips kommen pitch-verschoben, verlangsamt, gedämpft oder in Echo und Hall — wie betrunkene oder high Songs von einer Party-Playlist zu erraten.",
+      "Der erste Hörversuch ist am betrunkensten. Skippen oder danebenliegen lässt den Mix nüchterner werden, während die Leiter mehr Audio freigibt — du kannst im Chaos treffen oder Versuche opfern für eine klarere Version.",
+      "Wer Drunk Mode, High Mode oder guess drunk songs sucht, will einen härteren Twist à la Heardle / Songless. Cluetune behält sechs Versuche und startet die nächste Runde ohne Cooldown und ohne Konto.",
+      "Jeder Track wählt einen betrunkenen Charakter (langsames Slur, Chipmunk-Echo, Badezimmer-Hall, underwater, Tape-Wobble), der bleibt, während die Intensität sinkt. Der Session-Buzz-Meter kann die nächste Runde härter oder klarer starten lassen.",
+      "Kostenlos im Browser auf Handy oder Desktop. Genre-, Jahrzehnt- und Schwierigkeitsfilter wie bei Unbegrenzt. Neben Daily, Unbegrenzt, Songtext und Genre Gauntlet.",
+    ],
+    faqHeading: "FAQ Drunk- / High-Modus",
+    faqs: [
+      {
+        q: "Was ist Drunk Mode / High Mode auf Cluetune?",
+        a: "Drunk Mode (auch High Mode) ist ein kostenloser Modus mit pitch-verschobenen, verlangsamten, echoigen oder gedämpften Clips. Du errätst betrunkene oder high Songs beim chaotischen ersten Hören; skippen nüchtert den Mix.",
+      },
+      {
+        q: "Wie errate ich betrunkene oder high Songs?",
+        a: "Öffne /drunk, drücke Play und tippe den Titel. Die erste Sekunde ist am stärksten verzerrt. Jeder Fehlversuch oder Skip mildert die Effekte und schaltet mehr Clip frei — sechs Versuche wie beim Daily.",
+      },
+      {
+        q: "Ist High Mode anders als Drunk Mode?",
+        a: "Nein. High Mode und Drunk Mode sind derselbe Cluetune-Modus. Suche entweder Phrase und spiele auf cluetune.com/drunk — ohne Konto.",
+      },
     ],
   },
 };
@@ -299,18 +411,41 @@ const PT: Record<ModeSlug, ModePageCopy> = {
       "Sem conta.",
     ],
   },
-  "sped-up": {
-    title: "Acelerado — 1,35×",
-    description: "Cada clipe em 1,35× de tom e tempo. Modo mais difícil.",
-    badge: "Acelerado · 1,35×",
-    h1: "Rodada acelerada",
-    seoHeading: "Adivinhe acelerado",
-    seoSubheadings: ["Por que 1,35× é difícil", "Escada curta", "Som estilo TikTok"],
+  drunk: {
+    title: "Modo Drunk e High — Adivinha músicas bêbadas",
+    description:
+      "Joga o modo drunk ou high no Cluetune: adivinha músicas bêbadas ou high com clipes distorcidos (pitch, lentidão, eco). A primeira escuta é a mais dura; salta para ficar sóbrio. Grátis, sem conta.",
+    badge: "Modo Drunk · salta para ficar sóbrio",
+    h1: "Modo drunk / high — adivinha a música num clipe bêbado",
+    seoHeading: "Modo drunk e high: adivinha quando o áudio está bêbado",
+    keywords:
+      "drunk mode, high mode, modo bêbado, adivinhar músicas distorcidas, guess drunk songs, guess high songs, quiz musical bêbado, cluetune drunk, cluetune high",
+    seoSubheadings: [
+      "O que é o modo drunk (e high)?",
+      "Adivinha músicas bêbadas ou high com um clipe distorcido",
+      "Salta para ficar sóbrio — mesma escada de seis tentativas",
+    ],
     seoParagraphs: [
-      "Previews em 1,35×.",
-      "Escada comprimida, seis tentativas.",
-      "Filtros por gênero.",
-      "Grátis, sem conta.",
+      "O modo drunk (também procurado como high mode) é o modo distorcido do Cluetune: cada clipe chega com pitch alterado, mais lento, abafado ou a nadar em eco e reverb — como adivinhar músicas bêbadas ou high numa playlist de festa.",
+      "A primeira escuta é a mais bêbada. Se saltas ou falhas, a mistura fica sóbria enquanto a escada desbloqueia mais áudio: podes acertar no caos ou gastar tentativas para ouvir uma versão mais clara.",
+      "Quem procura drunk mode, high mode ou guess drunk songs quer um twist mais difícil ao estilo Heardle / Songless. O Cluetune mantém seis tentativas e encadeia a ronda seguinte sem espera nem conta.",
+      "Cada faixa escolhe um carácter bêbado (arrasto lento, eco chipmunk, reverb de casa de banho, underwater, wobble de fita) que se mantém enquanto a intensidade baixa. O medidor de buzz da sessão pode tornar a ronda seguinte mais dura ou mais clara.",
+      "Grátis no browser, telemóvel ou desktop. Filtros de género, década e dificuldade iguais ao Ilimitado. Junto ao Diário, Ilimitado, Letra e Desafio de género.",
+    ],
+    faqHeading: "FAQ do modo Drunk / High",
+    faqs: [
+      {
+        q: "O que é o modo drunk / high no Cluetune?",
+        a: "O modo drunk (também chamado high) é um modo grátis em que os clipes têm pitch alterado, lentidão, eco ou abafamento. Adivinhas músicas bêbadas ou high na primeira escuta caótica; salta para ficar sóbrio.",
+      },
+      {
+        q: "Como adivinhar músicas bêbadas ou high?",
+        a: "Abre /drunk, carrega play e escreve o título. O primeiro segundo é o mais distorcido. Cada falha ou salto clarifica os efeitos e desbloqueia mais clipe — seis tentativas, como o Diário.",
+      },
+      {
+        q: "High mode é diferente de drunk mode?",
+        a: "Não. High mode e drunk mode são o mesmo modo do Cluetune. Procura qualquer uma das frases e joga em cluetune.com/drunk — sem conta.",
+      },
     ],
   },
 };
@@ -345,18 +480,41 @@ const KO: Record<ModeSlug, ModePageCopy> = {
       "계정 불필요.",
     ],
   },
-  "sped-up": {
-    title: "스피드업 — 1.35배",
-    description: "모든 클립을 1.35배 피치·템포로 재생. 더 어려운 모드.",
-    badge: "스피드업 · 1.35×",
-    h1: "스피드업 라운드",
-    seoHeading: "빨라진 곡 맞히기",
-    seoSubheadings: ["1.35배의 난이도", "짧은 래더", "숏폼 속도"],
+  drunk: {
+    title: "Drunk / High 모드 — 취한 음원으로 곡 맞히기",
+    description:
+      "클루튠 drunk mode / high mode. 피치·슬로우·에코가 걸린 클립으로 곡명을 맞히세요. 첫 재생이 가장 심하고, 스킵하면 맑아집니다. 무료, 계정 불필요.",
+    badge: "Drunk 모드 · 스킵하면 맑아짐",
+    h1: "Drunk / High 모드 — 취한 클립으로 곡 맞히기",
+    seoHeading: "Drunk mode와 high mode: 왜곡된 소리로 곡 맞히기",
+    keywords:
+      "drunk mode, high mode, 왜곡 곡맞히기, guess drunk songs, guess high songs, 취한 음악 퀴즈, cluetune drunk, cluetune high",
+    seoSubheadings: [
+      "Drunk mode(High mode)란?",
+      "왜곡된 클립으로 취한/하이 곡 맞히기",
+      "스킵으로 술이 깸 — 6번의 래더",
+    ],
     seoParagraphs: [
-      "1.35배 속도로 프리뷰 재생.",
-      "압축된 래더, 6시도.",
-      "장르 필터.",
-      "무료, 계정 불필요.",
+      "Drunk mode(검색어로는 high mode)는 클루튠의 왜곡 곡맞히기 모드입니다. 클립은 피치 변형·슬로우·먹먹함·에코·리버브로 들어와, 파티 플레이리스트에서 취한 곡을 맞히는 느낌입니다.",
+      "첫 재생이 가장 '취합니다'. 스킵하거나 틀리면 믹스가 맑아지면서 클립도 길어집니다. 엉망인 채로 맞히거나, 시도를 써서 더 맑은 버전을 들을 수 있습니다.",
+      "Heardle / Songless 스타일을 더 어렵게 하고 싶은 사람이 drunk mode, high mode를 찾습니다. 클루튠은 익숙한 6시도를 유지하고, 쿨다운·계정 없이 다음 라운드로 이어집니다.",
+      "곡마다 취기 캐릭터(느린 슬러리, chipmunk 에코, 욕실 리버브, underwater, 테이프 흔들림)가 정해지고 강도가 내려가도 유지됩니다. 세션 buzz 미터로 다음 라운드 시작 난이도가 달라질 수 있습니다.",
+      "휴대폰·PC 브라우저에서 무료. 장르·연대·난이도 필터는 무제한과 같습니다. 데일리, 무제한, 가사 맞히기, 장르 건틀릿과 함께하는 클루튠 모드입니다.",
+    ],
+    faqHeading: "Drunk / High 모드 FAQ",
+    faqs: [
+      {
+        q: "클루튠의 drunk mode / high mode란?",
+        a: "Drunk mode(high mode라고도 함)는 피치·슬로우·에코·먹먹한 클립으로 곡명을 맞히는 무료 모드입니다. 첫 재생이 가장 왜곡되고, 스킵하면 맑아집니다.",
+      },
+      {
+        q: "취한 곡은 어떻게 맞히나요?",
+        a: "/drunk를 열고 재생한 뒤 곡명을 입력하세요. 첫 1초가 가장 왜곡됩니다. 틀리거나 스킵하면 효과가 줄고 클립이 길어집니다 — 데일리와 같은 6번.",
+      },
+      {
+        q: "High mode와 Drunk mode는 다른가요?",
+        a: "아니요. 같은 클루튠 모드입니다. 어느 쪽 검색어든 cluetune.com/drunk에서 플레이하면 됩니다. 계정 불필요.",
+      },
     ],
   },
 };
@@ -392,18 +550,41 @@ const IT: Record<ModeSlug, ModePageCopy> = {
       "Senza account.",
     ],
   },
-  "sped-up": {
-    title: "Accelerato — 1,35×",
-    description: "Ogni clip a 1,35× di pitch e tempo. Modalità più difficile.",
-    badge: "Accelerato · 1,35×",
-    h1: "Round accelerato",
-    seoHeading: "Indovina accelerato",
-    seoSubheadings: ["Perché 1,35× è difficile", "Scala corta", "Suono stile TikTok"],
+  drunk: {
+    title: "Modalità Drunk e High — Indovina canzoni ubriache",
+    description:
+      "Gioca alla modalità drunk o high su Cluetune: indovina canzoni ubriache o high da clip distorti (pitch, rallentati, eco). Il primo ascolto è il più duro; salta per smaltire. Gratis, senza account.",
+    badge: "Modalità Drunk · salta per smaltire",
+    h1: "Modalità drunk / high — indovina la canzone da un clip ubriaco",
+    seoHeading: "Modalità drunk e high: indovina quando l'audio è ubriaco",
+    keywords:
+      "drunk mode, high mode, modalità ubriaca, indovina canzone distorta, guess drunk songs, guess high songs, quiz musicale ubriaco, cluetune drunk, cluetune high",
+    seoSubheadings: [
+      "Cos'è la modalità drunk (e high)?",
+      "Indovina canzoni ubriache o high da un clip distorto",
+      "Salta per smaltire — stessa scala a sei tentativi",
+    ],
     seoParagraphs: [
-      "Anteprime a 1,35×.",
-      "Scala compressa, sei tentativi.",
-      "Filtri per genere.",
-      "Gratis, senza account.",
+      "La modalità drunk (cercata anche come high mode) è la modalità distorta di Cluetune: ogni clip arriva pitchato, rallentato, ovattato o immerso in eco e reverb — come indovinare canzoni ubriache o high da una playlist di festa.",
+      "Il primo ascolto è il più ubriaco. Se salti o sbagli, il mix si schiarisce mentre la scala sblocca più audio: puoi indovinare nel caos o bruciare tentativi per una versione più chiara.",
+      "Chi cerca drunk mode, high mode o guess drunk songs vuole un twist più duro in stile Heardle / Songless. Cluetune mantiene sei tentativi e avvia subito il round successivo senza cooldown né account.",
+      "Ogni traccia sceglie un carattere ubriaco (slur lento, eco chipmunk, reverb da bagno, underwater, wobble da nastro) che resta stabile mentre l'intensità scende. Il misuratore di buzz della sessione può rendere il round successivo più duro o più chiaro.",
+      "Gratis nel browser su telefono o desktop. Filtri per genere, decennio e difficoltà come in Illimitato. Accanto a Giornaliero, Illimitato, Testo e Genre Gauntlet.",
+    ],
+    faqHeading: "FAQ modalità Drunk / High",
+    faqs: [
+      {
+        q: "Cos'è la modalità drunk / high su Cluetune?",
+        a: "La modalità drunk (detta anche high) è una modalità gratuita con clip pitchati, rallentati, con eco o ovattati. Indovini canzoni ubriache o high al primo ascolto caotico; salta per smaltire.",
+      },
+      {
+        q: "Come indovino canzoni ubriache o high?",
+        a: "Apri /drunk, premi play e digita il titolo. Il primo secondo è il più distorto. Ogni errore o skip schiarisce gli effetti e sblocca più clip — sei tentativi, come il Giornaliero.",
+      },
+      {
+        q: "High mode è diverso da drunk mode?",
+        a: "No. High mode e drunk mode sono la stessa modalità Cluetune. Cerca entrambe le frasi e gioca su cluetune.com/drunk — senza account.",
+      },
     ],
   },
 };
@@ -439,18 +620,41 @@ const RU: Record<ModeSlug, ModePageCopy> = {
       "Без аккаунта.",
     ],
   },
-  "sped-up": {
-    title: "Ускоренный — 1,35×",
-    description: "Каждый клип с ускорением 1,35× по тону и темпу. Сложнее, чем кажется.",
-    badge: "Ускоренный · 1,35×",
-    h1: "Ускоренный раунд",
-    seoHeading: "Угадать ускоренную песню",
-    seoSubheadings: ["Почему 1,35× сложно", "Короткая лестница", "Звук как в TikTok"],
+  drunk: {
+    title: "Режим Drunk и High — Угадай пьяные песни",
+    description:
+      "Играй в drunk mode или high mode на Cluetune: угадывай пьяные или high песни по искажённым клипам (pitch, замедление, эхо). Первое прослушивание самое тяжёлое — пропуск отрезвляет. Бесплатно, без аккаунта.",
+    badge: "Режим Drunk · пропуск отрезвляет",
+    h1: "Режим drunk / high — угадай песню по пьяному клипу",
+    seoHeading: "Режим drunk и high: угадай песню, когда аудио пьяное",
+    keywords:
+      "drunk mode, high mode, пьяный режим, угадать песню искажение, guess drunk songs, guess high songs, музыкальный квиз пьяный, cluetune drunk, cluetune high",
+    seoSubheadings: [
+      "Что такое drunk mode (и high mode)?",
+      "Угадывай пьяные или high песни по искажённому клипу",
+      "Пропуск отрезвляет — та же лестница из шести попыток",
+    ],
     seoParagraphs: [
-      "Превью с ускорением 1,35×.",
-      "Сжатая лестница, шесть попыток.",
-      "Фильтры по жанру.",
-      "Бесплатно, без аккаунта.",
+      "Drunk mode (также ищут как high mode) — искажённый режим угадай-песню на Cluetune: клипы приходят со сдвигом тона, замедлением, глушением или в эхе и ревербе — как угадывать пьяные или high песни с вечериночной плейлиста.",
+      "Первое прослушивание самое пьяное. Пропуск или промах проясняет микс, пока лестница открывает больше аудио: можно угадать в хаосе или потратить попытки на более чистую версию.",
+      "Те, кто ищет drunk mode, high mode или guess drunk songs, хотят более жёсткий твист в духе Heardle / Songless. Cluetune сохраняет шесть попыток и сразу запускает следующий раунд без кулдауна и без аккаунта.",
+      "У каждого трека свой пьяный характер (медленный slur, chipmunk-эхо, ванная реверберация, underwater, wobble ленты), который держится, пока интенсивность падает. Счётчик buzz сессии может сделать следующий раунд жёстче или чище.",
+      "Бесплатно в браузере на телефоне или компьютере. Фильтры жанра, десятилетия и сложности как в Безлимите. Рядом с Ежедневным, Безлимитом, Текстом и Genre Gauntlet.",
+    ],
+    faqHeading: "FAQ режима Drunk / High",
+    faqs: [
+      {
+        q: "Что такое drunk mode / high mode на Cluetune?",
+        a: "Drunk mode (также high mode) — бесплатный режим с клипами со сдвигом тона, замедлением, эхом или глушением. Угадываешь пьяные или high песни с хаотичного первого прослушивания; пропуск отрезвляет.",
+      },
+      {
+        q: "Как угадывать пьяные или high песни?",
+        a: "Открой /drunk, нажми play и введи название. Первая секунда — самая искажённая. Каждый промах или пропуск ослабляет эффекты и открывает больше клипа — шесть попыток, как в Ежедневном.",
+      },
+      {
+        q: "High mode отличается от drunk mode?",
+        a: "Нет. High mode и drunk mode — один и тот же режим Cluetune. Ищи любую фразу и играй на cluetune.com/drunk — без аккаунта.",
+      },
     ],
   },
 };
@@ -471,7 +675,7 @@ export function getModePageCopy(locale: LocaleCode, slug: ModeSlug): ModePageCop
   return MODE_PAGES[locale][slug];
 }
 
-export const MODE_SLUGS: ModeSlug[] = ["unlimited", "lyrics", "sped-up"];
+export const MODE_SLUGS: ModeSlug[] = ["unlimited", "lyrics", "drunk"];
 
 export function modePath(slug: ModeSlug): string {
   return `/${slug}`;

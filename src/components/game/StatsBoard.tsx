@@ -4,7 +4,7 @@ import { modeLabel } from "../../lib/share";
 import { dailyDistribution, emptyState, loadState, saveState, type PersistedState } from "../../lib/storage";
 import type { GameMode } from "../../lib/types";
 
-const MODES: GameMode[] = ["unlimited", "daily", "sped-up", "lyric-flip", "gauntlet"];
+const MODES: GameMode[] = ["unlimited", "daily", "drunk", "lyric-flip", "gauntlet"];
 
 /**
  * Stats live entirely in this browser. There is no account to create and no

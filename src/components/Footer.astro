@@ -10,7 +10,7 @@ const columns = [
     links: [
       { href: "/", label: "Daily challenge" },
       { href: "/unlimited", label: "Unlimited" },
-      { href: "/sped-up", label: "Sped-Up round" },
+      { href: "/drunk", label: "Drunk mode", drunk: true },
       { href: "/lyrics", label: "Lyrics Guess" },
       { href: "/gauntlet", label: "Genre Gauntlet" },
     ],
@@ -52,9 +52,17 @@ const year = new Date().getFullYear();
               <li>
                 <a
                   href={localizedPath(locale, link.href)}
-                  class="rounded-xs text-body-sm text-body hover:text-ink"
+                  class="inline-flex items-center gap-1.5 rounded-xs text-body-sm text-body hover:text-ink"
                 >
-                  {link.label}
+                  {"drunk" in link && link.drunk ? (
+                    <>
+                      <span class="label-drunk">Drunk</span>
+                      <span>mode</span>
+                      <span class="badge-new">New</span>
+                    </>
+                  ) : (
+                    link.label
+                  )}
                 </a>
               </li>
             ))}

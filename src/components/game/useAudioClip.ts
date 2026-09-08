@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import type { AudioFxPreset } from "../../lib/audioFx";
 
 export interface AudioClipState {
   ready: boolean;
@@ -29,6 +30,32 @@ export interface UseAudioClipResult extends AudioClipState {
 
 const BIN_COUNT = 48;
 
+const CLEAN_FX: AudioFxPreset = {
+  rate: 1,
+  lowpassHz: null,
+  delayTime: 0,
+  delayFeedback: 0,
+  delayWet: 0,
+  reverbWet: 0,
+  wobbleDepth: 0,
+  character: "clean",
+};
+
+interface FxGraph {
+  source: MediaElementAudioSourceNode;
+  lowpass: BiquadFilterNode;
+  dryGain: GainNode;
+  delay: DelayNode;
+  delayFeedback: GainNode;
+  delayWet: GainNode;
+  reverbInput: GainNode;
+  reverbWet: GainNode;
+  mix: GainNode;
+  analyser: AnalyserNode;
+  lfo: OscillatorNode | null;
+  lfoGain: GainNode | null;
+}
+
 /**
  * Clip playback for the guessing game.
  *
@@ -38,15 +65,18 @@ const BIN_COUNT = 48;
  *    every ~250ms, which would leak up to a quarter-second of extra audio and
  *    hand out free hints, so the boundary is polled on rAF instead.
  *
- * 2. Driving the reactive visual needs an AnalyserNode, which needs the media
- *    element to be CORS-clean. Preview CDNs mostly are, but not universally,
- *    and a `crossOrigin` element against a non-CORS host fails to load at all.
- *    So we try the CORS-enabled element first and silently rebuild without it
- *    on failure — audio always wins over visuals.
+ * 2. Driving the reactive visual (and Drunk wet FX) needs an AnalyserNode /
+ *    MediaElementSource, which needs the media element to be CORS-clean.
+ *    Preview CDNs mostly are, but not universally, and a `crossOrigin` element
+ *    against a non-CORS host fails to load at all. So we try CORS first and
+ *    silently rebuild without it on failure — audio always wins over visuals.
+ *    Without CORS, Drunk still applies playbackRate (pitch/tempo).
  */
-export function useAudioClip(src: string | null, rate = 1): UseAudioClipResult {
+export function useAudioClip(src: string | null, fx: AudioFxPreset | null = null): UseAudioClipResult {
+  const preset = fx ?? CLEAN_FX;
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const contextRef = useRef<AudioContext | null>(null);
+  const graphRef = useRef<FxGraph | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const binsRef = useRef<Uint8Array | null>(null);
   const levelsRef = useRef<Float32Array>(new Float32Array(BIN_COUNT));
@@ -54,6 +84,8 @@ export function useAudioClip(src: string | null, rate = 1): UseAudioClipResult {
   const limitRef = useRef<number>(Number.POSITIVE_INFINITY);
   /** Set once a CORS load has failed so the retry does not loop. */
   const corsFailedRef = useRef(false);
+  const fxRef = useRef(preset);
+  fxRef.current = preset;
 
   const [state, setState] = useState<AudioClipState>({
     ready: false,
@@ -67,8 +99,8 @@ export function useAudioClip(src: string | null, rate = 1): UseAudioClipResult {
   const stopLoop = useCallback(() => {
     if (frameRef.current != null) {
       cancelAnimationFrame(frameRef.current);
-      frameRef.current = null;
     }
+    frameRef.current = null;
   }, []);
 
   const pause = useCallback(() => {
@@ -77,10 +109,24 @@ export function useAudioClip(src: string | null, rate = 1): UseAudioClipResult {
     setState((prev) => ({ ...prev, playing: false }));
   }, [stopLoop]);
 
-  /** rAF loop: enforces the clip boundary and samples the analyser. */
+  /** rAF loop: enforces the clip boundary, drunk rate-sway, and samples the analyser. */
   const tick = useCallback(() => {
     const audio = audioRef.current;
     if (!audio) return;
+
+    const fx = fxRef.current;
+    if (fx.wobbleDepth > 0.05) {
+      // Mild pitch/tempo sway — readable drunk, not seasick.
+      const sway =
+        1 +
+        Math.sin(performance.now() / 1000 * (0.8 + fx.wobbleDepth)) * fx.wobbleDepth * 0.06 +
+        Math.sin(performance.now() / 1000 * 0.35) * fx.wobbleDepth * 0.025;
+      const nextRate = Math.max(0.55, Math.min(1.6, fx.rate * sway));
+      if (Math.abs(audio.playbackRate - nextRate) > 0.002) {
+        audio.playbackRate = nextRate;
+        (audio as HTMLAudioElement & { preservesPitch?: boolean }).preservesPitch = false;
+      }
+    }
 
     const positionMs = audio.currentTime * 1000;
 
@@ -115,10 +161,52 @@ export function useAudioClip(src: string | null, rate = 1): UseAudioClipResult {
     frameRef.current = requestAnimationFrame(tick);
   }, [stopLoop]);
 
+  const applyRate = useCallback((audio: HTMLAudioElement, rate: number, forceUnpitched = false) => {
+    audio.playbackRate = rate;
+    (audio as HTMLAudioElement & { preservesPitch?: boolean }).preservesPitch = rate === 1 && !forceUnpitched;
+  }, []);
+
+  const applyFxParams = useCallback((graph: FxGraph, next: AudioFxPreset) => {
+    const now = graph.lowpass.context.currentTime;
+    const cutoff = next.lowpassHz ?? 18_000;
+    graph.lowpass.frequency.setTargetAtTime(cutoff, now, 0.02);
+    graph.lowpass.Q.setTargetAtTime(next.wobbleDepth > 0.35 ? 1.1 : 0.7, now, 0.05);
+
+    // Keep dry dominant so the track stays recognizable.
+    const dry = Math.max(0.35, 1 - next.delayWet * 0.45 - next.reverbWet * 0.4);
+    graph.dryGain.gain.setTargetAtTime(dry, now, 0.02);
+    graph.delay.delayTime.setTargetAtTime(Math.max(0.01, next.delayTime || 0.01), now, 0.02);
+    graph.delayFeedback.gain.setTargetAtTime(Math.min(0.55, next.delayFeedback), now, 0.02);
+    graph.delayWet.gain.setTargetAtTime(next.delayWet, now, 0.02);
+    graph.reverbInput.gain.setTargetAtTime(next.reverbWet > 0.01 ? 1 : 0, now, 0.02);
+    graph.reverbWet.gain.setTargetAtTime(next.reverbWet, now, 0.02);
+
+    if (graph.lfo && graph.lfoGain) {
+      graph.lfo.frequency.setTargetAtTime(0.6 + next.wobbleDepth * 0.9, now, 0.05);
+      const depthHz = next.wobbleDepth * Math.min(900, Math.max(200, cutoff * 0.28));
+      graph.lfoGain.gain.setTargetAtTime(depthHz, now, 0.05);
+    }
+  }, []);
+
+  const teardownGraph = useCallback(() => {
+    const graph = graphRef.current;
+    if (graph?.lfo) {
+      try {
+        graph.lfo.stop();
+      } catch {
+        /* already stopped */
+      }
+    }
+    graphRef.current = null;
+    analyserRef.current = null;
+    binsRef.current = null;
+  }, []);
+
   // (Re)build the element whenever the source changes.
   useEffect(() => {
     stopLoop();
     corsFailedRef.current = false;
+    teardownGraph();
 
     if (!src) {
       audioRef.current = null;
@@ -129,10 +217,12 @@ export function useAudioClip(src: string | null, rate = 1): UseAudioClipResult {
     let disposed = false;
 
     const build = (withCors: boolean) => {
+      teardownGraph();
       const audio = new Audio();
       if (withCors) audio.crossOrigin = "anonymous";
       audio.preload = "auto";
       audio.src = src;
+      applyRate(audio, fxRef.current.rate, fxRef.current.wobbleDepth > 0.05);
 
       audio.addEventListener("loadedmetadata", () => {
         if (disposed) return;
@@ -148,11 +238,10 @@ export function useAudioClip(src: string | null, rate = 1): UseAudioClipResult {
         if (disposed) return;
 
         // A CORS-enabled element against a non-CORS host fails here. Rebuild
-        // without it and accept losing the analyser.
+        // without it and accept losing the analyser / wet FX.
         if (withCors && !corsFailedRef.current) {
           corsFailedRef.current = true;
-          analyserRef.current = null;
-          binsRef.current = null;
+          teardownGraph();
           build(false);
           return;
         }
@@ -176,22 +265,25 @@ export function useAudioClip(src: string | null, rate = 1): UseAudioClipResult {
       stopLoop();
       audioRef.current?.pause();
       audioRef.current = null;
+      teardownGraph();
     };
-  }, [src, stopLoop]);
+  }, [src, stopLoop, teardownGraph, applyRate]);
 
+  // Keep element rate in sync when the preset changes (same src).
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
+    applyRate(audio, preset.rate, preset.wobbleDepth > 0.05);
+    if (graphRef.current) applyFxParams(graphRef.current, preset);
+  }, [preset, applyRate, applyFxParams, state.ready]);
 
-    audio.playbackRate = rate;
-    // Letting pitch ride with tempo is the entire point of Sped-Up mode.
-    (audio as HTMLAudioElement & { preservesPitch?: boolean }).preservesPitch = rate === 1;
-  }, [rate, state.ready]);
-
-  /** Lazily wires the analyser on first play, when a user gesture exists. */
+  /** Lazily wires the analyser + FX chain on first play, when a user gesture exists. */
   const ensureGraph = useCallback(() => {
     const audio = audioRef.current;
-    if (!audio || corsFailedRef.current || analyserRef.current) return;
+    if (!audio || corsFailedRef.current || graphRef.current) {
+      if (graphRef.current) applyFxParams(graphRef.current, fxRef.current);
+      return;
+    }
 
     try {
       const Ctor = window.AudioContext ?? (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
@@ -199,22 +291,88 @@ export function useAudioClip(src: string | null, rate = 1): UseAudioClipResult {
       contextRef.current = context;
 
       const source = context.createMediaElementSource(audio);
+      const lowpass = context.createBiquadFilter();
+      lowpass.type = "lowpass";
+      lowpass.Q.value = 0.7;
+
+      const dryGain = context.createGain();
+      const delay = context.createDelay(1.0);
+      const delayFeedback = context.createGain();
+      const delayWet = context.createGain();
+      const reverbInput = context.createGain();
+      const reverbWet = context.createGain();
+      const mix = context.createGain();
+      mix.gain.value = 1;
+
       const analyser = context.createAnalyser();
       analyser.fftSize = 256;
       analyser.smoothingTimeConstant = 0.72;
 
-      source.connect(analyser);
+      // Dry path
+      source.connect(lowpass);
+      lowpass.connect(dryGain);
+      dryGain.connect(mix);
+
+      // Echo: delay with feedback loop
+      lowpass.connect(delay);
+      delay.connect(delayFeedback);
+      delayFeedback.connect(delay);
+      delay.connect(delayWet);
+      delayWet.connect(mix);
+
+      // Filter wobble LFO (depth driven by preset) — slow drunk sway
+      const lfo = context.createOscillator();
+      lfo.type = "sine";
+      lfo.frequency.value = 0.8;
+      const lfoGain = context.createGain();
+      lfoGain.gain.value = 0;
+      lfo.connect(lfoGain);
+      lfoGain.connect(lowpass.frequency);
+      lfo.start();
+
+      // Longer, louder room taps so reverb actually reads as drunk space
+      const tapTimes = [0.031, 0.073, 0.131, 0.197, 0.281];
+      for (let i = 0; i < tapTimes.length; i++) {
+        const tap = context.createDelay(0.5);
+        tap.delayTime.value = tapTimes[i]!;
+        const tapGain = context.createGain();
+        tapGain.gain.value = 0.35 / (i + 1);
+        reverbInput.connect(tap);
+        tap.connect(tapGain);
+        tapGain.connect(reverbWet);
+      }
+      lowpass.connect(reverbInput);
+      reverbWet.connect(mix);
+
+      mix.connect(analyser);
       analyser.connect(context.destination);
 
+      const graph: FxGraph = {
+        source,
+        lowpass,
+        dryGain,
+        delay,
+        delayFeedback,
+        delayWet,
+        reverbInput,
+        reverbWet,
+        mix,
+        analyser,
+        lfo,
+        lfoGain,
+      };
+
+      applyFxParams(graph, fxRef.current);
+      graphRef.current = graph;
       analyserRef.current = analyser;
       binsRef.current = new Uint8Array(analyser.frequencyBinCount);
       setState((prev) => ({ ...prev, reactive: true }));
     } catch {
-      // Tainted stream or an unsupported context: fall back to flat visuals.
-      analyserRef.current = null;
+      // Tainted stream or an unsupported context: fall back to flat visuals / rate-only.
+      teardownGraph();
       setState((prev) => ({ ...prev, reactive: false }));
     }
-  }, []);
+  }, [applyFxParams, teardownGraph]);
 
   const play = useCallback(
     (limitMs: number, fromMs = 0) => {

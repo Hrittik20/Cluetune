@@ -36,7 +36,7 @@ audio.
 | --- | --- | --- |
 | **Daily** | `/` | One clip for everyone, resets at *your* local midnight. Streaks persist. This is the landing page. `/daily` redirects here. |
 | **Unlimited** | `/unlimited` | Continuous rounds, no cooldown, live session stats, genre/decade/difficulty filters. |
-| **Sped-Up** | `/sped-up` | Same ladder at 1.35× playback rate. |
+| **Drunk / High** | `/drunk` | First listen is distorted (pitch, slow, echo, reverb); skip sobers the mix. Also searchable as high mode. `/sped-up` and `/faded` redirect here. |
 | **Lyrics Guess** | `/lyrics` | A few lines of the song. Guess the title. Skip or miss to reveal the next lines. `/lyric-flip` redirects here. |
 | **Genre Gauntlet** | `/gauntlet/[pack]` | Five back-to-back rounds from one scene. Six packs. |
 | **Challenge** | `/challenge/[code]` | A friend's exact round, replayed and scored against their result. No account. |
@@ -46,8 +46,7 @@ calibration and coverage stay consistent.
 
 ### The clip ladder
 
-`1s → 2s → 4s → 7s → 11s → 16s`, one rung per wrong guess or skip. Sped-Up uses a
-shorter ladder because the audio is compressed in time.
+`1s → 2s → 4s → 7s → 11s → 16s`, one rung per wrong guess or skip.
 
 ## Architecture
 
@@ -181,7 +180,7 @@ Set `SPOTIFY_CLIENT_ID`, `SPOTIFY_CLIENT_SECRET` and `YOUTUBE_API_KEY` with
 
 ## Adding tracks
 
-**Unlimited, Sped-Up and Lyrics Guess** merge in current iTunes and Deezer
+**Unlimited, Drunk and Lyrics Guess** merge in current iTunes and Deezer
 charts automatically, so you do not have to type every song by hand. Spotify
 editorial playlists are used too when the Web API allows it.
 

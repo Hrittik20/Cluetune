@@ -9,7 +9,7 @@ import {
 import { deezerSearchDisabled } from "./deezer";
 
 /**
- * Extra pool for Unlimited / Sped-Up / Lyrics Guess.
+ * Extra pool for Unlimited / Drunk / Lyrics Guess.
  *
  * Daily and Gauntlet stay on the handwritten catalogue. These modes can
  * afford a rotating chart because nobody is sharing a single daily answer.

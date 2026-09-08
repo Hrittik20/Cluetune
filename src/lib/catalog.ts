@@ -1,11 +1,11 @@
 import type { Decade, Difficulty, Genre, ModeFilters, Track } from "./types";
 
 /**
- * The seed pool. Every mode (Daily, Unlimited, Sped-Up, Lyrics Guess, Gauntlet)
+ * The seed pool. Every mode (Daily, Unlimited, Drunk, Lyrics Guess, Gauntlet)
  * draws from this single catalog so difficulty and coverage stay consistent
  * across the product.
  *
- * Unlimited, Sped-Up and Lyrics Guess also merge in Spotify editorial playlists
+ * Unlimited, Drunk and Lyrics Guess also merge in Spotify editorial playlists
  * at request time when API credentials are present. Daily and Gauntlet stay on
  * this list so a rotating chart cannot change a shared puzzle.
  *
@@ -487,11 +487,7 @@ export const DIFFICULTY_LABELS: Record<Difficulty, string> = {
   5: "Crate digger",
 };
 
-export const DEFAULT_FILTERS: ModeFilters = {
-  genres: [],
-  decades: [],
-  difficulty: [1, 3],
-};
+export { DEFAULT_FILTERS } from "./filters";
 
 /**
  * How often a track is drawn, by obscurity. Level 1 songs show up an order of

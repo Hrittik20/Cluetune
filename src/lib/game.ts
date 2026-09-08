@@ -10,18 +10,10 @@ export const CLIP_LADDER_MS = [1000, 2000, 4000, 7000, 11_000, 16_000] as const;
 
 export const MAX_ATTEMPTS = CLIP_LADDER_MS.length;
 
-/** Sped-Up compresses the ladder because pitch-shifted audio reveals faster. */
-export const SPED_UP_LADDER_MS = [800, 1600, 3000, 5000, 8000, 12_000] as const;
-
-/** Playback rate for Sped-Up. Pitch rises with tempo, which is the point. */
-export const SPED_UP_RATE = 1.35;
-
 export function ladderFor(mode: GameMode): readonly number[] {
-  return mode === "sped-up" ? SPED_UP_LADDER_MS : CLIP_LADDER_MS;
-}
-
-export function playbackRateFor(mode: GameMode): number {
-  return mode === "sped-up" ? SPED_UP_RATE : 1;
+  // All modes share the same unlock curve; Drunk varies difficulty via audio FX.
+  void mode;
+  return CLIP_LADDER_MS;
 }
 
 export interface RoundState {

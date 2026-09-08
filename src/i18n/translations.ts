@@ -54,7 +54,7 @@ const EN: LocaleTranslation = {
     description:
       "Cluetune is a free song guessing game online. Name the track from 1 second — a Songless-style daily puzzle, then unlimited rounds with no account.",
     keywords:
-      "song guess game, song guessing game online, songless, songless unlimited, guess the song game, music guessing game, heardle, guessable",
+      "song guess game, song guessing game online, songless, songless unlimited, guess the song game, music guessing game, heardle, guessable, drunk mode, high mode, guess drunk songs, guess high songs",
     h1: "Cluetune — guess the song from 1 second",
   },
   hero: {
@@ -76,10 +76,10 @@ const EN: LocaleTranslation = {
         featured: true,
       },
       {
-        href: "/sped-up",
-        name: "Sped-Up",
-        meta: "1.35×",
-        blurb: "Pitched and tempo-shifted, the way it sounds on your For You page.",
+        href: "/drunk",
+        name: "Drunk",
+        meta: "Drunk / high",
+        blurb: "Guess drunk songs or high songs from a wasted first listen. Skip and the mix sobers up.",
         accent: "var(--cluetune-pink)",
       },
       {
@@ -142,7 +142,7 @@ const EN: LocaleTranslation = {
       "Titles in the real world are messy — remasters, featured artists, punctuation. Cluetune treats the title alone, artist and title in either order, and reasonable typos as the same answer.",
       "The daily puzzle is the same clip for every player and resets at midnight in your timezone. A skip buys the next rung of audio. Miss all six and the track is revealed with links to Spotify, Apple Music and YouTube.",
       "Clips stream from rights holders' preview services. Unlimited also draws current hits from iTunes and Deezer charts. None of that requires a streaming login.",
-      "Done with the daily? Unlimited is Cluetune's Songless unlimited mode: no cooldown, live streak, and filters for genre, decade and obscurity. Sped-Up, Lyrics Guess and Genre Gauntlet add more ways to play.",
+      "Done with the daily? Unlimited is Cluetune's Songless unlimited mode: no cooldown, live streak, and filters for genre, decade and obscurity. Drunk mode (also called high mode — guess drunk songs or high songs from warped clips), Lyrics Guess and Genre Gauntlet add more ways to play.",
       "Land on Cluetune, press play, type a title. Challenge a friend with a link that pins the exact clip you just heard. Cluetune is a song guess game first and a daily ritual second.",
     ],
     questionsHeading: "Questions",
@@ -163,7 +163,7 @@ const ES: LocaleTranslation = {
     description:
       "Cluetune es un juego gratuito para adivinar canciones online. ¿Qué canción es? Escucha 1 segundo y adivínala — quiz de música diario y modo ilimitado sin cuenta.",
     keywords:
-      "adivina la canción, juego de adivinar canciones, quiz de música, trivial de música, qué canción es, adivinar canciones online, juego musical, heardle español, songless",
+      "adivina la canción, juego de adivinar canciones, quiz de música, trivial de música, qué canción es, adivinar canciones online, juego musical, heardle español, songless, drunk mode, high mode, modo borracho, adivinar canciones borrachas",
     h1: "Cluetune — adivina la canción en 1 segundo",
   },
   hero: {
@@ -185,10 +185,10 @@ const ES: LocaleTranslation = {
         featured: true,
       },
       {
-        href: "/sped-up",
-        name: "Acelerado",
-        meta: "1.35×",
-        blurb: "Con el tono y tempo alterados, como en tu feed de vídeos.",
+        href: "/drunk",
+        name: "Drunk",
+        meta: "Drunk / high",
+        blurb: "Adivina canciones borrachas o high con la primera escucha destrozada. Salta y la mezcla se aclara.",
         accent: "var(--cluetune-pink)",
       },
       {
@@ -251,7 +251,7 @@ const ES: LocaleTranslation = {
       "Los títulos reales son caóticos — remasterizaciones, artistas invitados, puntuación. Cluetune acepta solo el título, artista y título en cualquier orden, y errores razonables de escritura.",
       "El puzzle diario es el mismo clip para todos y se reinicia a medianoche en tu zona horaria. Saltar compra el siguiente escalón de audio. Si fallas las seis, se revela la canción con enlaces a Spotify, Apple Music y YouTube.",
       "Los clips se transmiten desde los servicios de vista previa de los titulares de derechos. Ilimitado también incluye éxitos actuales de iTunes y Deezer.",
-      "¿Terminaste el diario? Ilimitado es el modo sin límite: sin espera, racha en vivo y filtros por género, década y dificultad. Acelerado, Letra y Desafío de género añaden más formas de jugar.",
+      "¿Terminaste el diario? Ilimitado es el modo sin límite: sin espera, racha en vivo y filtros por género, década y dificultad. Modo Drunk (también high — adivina canciones borrachas o high con clips distorsionados), Letra y Desafío de género añaden más formas de jugar.",
       "Entra en Cluetune, pulsa play, escribe un título. Reta a un amigo con un enlace al clip exacto. Cluetune es un juego para adivinar la canción primero y un ritual diario después.",
     ],
     questionsHeading: "Preguntas",
@@ -274,11 +274,19 @@ const ES: LocaleTranslation = {
     },
     {
       q: "¿Es un quiz de música gratuito?",
-      a: "Sí. Cluetune es un trivial de música gratuito en el navegador. Diario, ilimitado, acelerado, letra y desafío de género — todo sin registro.",
+      a: "Sí. Cluetune es un trivial de música gratuito en el navegador. Diario, ilimitado, modo drunk / high, letra y desafío de género — todo sin registro.",
     },
     {
       q: "¿Puedo jugar varias veces?",
       a: "Sí. Tras el diario, abre Ilimitado para rondas sin fin. Filtra por género, década o dificultad.",
+    },
+    {
+      q: "¿Qué es el modo drunk / high?",
+      a: "El modo drunk (también high) distorsiona los clips con pitch, ralentizado, eco o ahogado. Adivinas canciones borrachas o high en la primera escucha; salta y la mezcla se aclara. Gratis en /drunk.",
+    },
+    {
+      q: "¿Cómo adivinar canciones borrachas o high?",
+      a: "Abre el modo Drunk en Cluetune. El primer segundo es el más duro; cada salto aclara los efectos. Seis intentos como el Diario, luego la siguiente pista.",
     },
     {
       q: "¿Necesito una cuenta?",
@@ -293,7 +301,7 @@ const JA: LocaleTranslation = {
     description:
       "Cluetuneは無料の歌当てゲーム。1秒のイントロから曲名を当てる音楽クイズ。毎日のパズルと無制限モード、アカウント不要。",
     keywords:
-      "イントロドン, 曲当てクイズ, 音楽クイズ, 歌当てゲーム, 曲当てゲーム, 音楽当てゲーム, イントロ当て, heardle 日本語, songless",
+      "イントロドン, 曲当てクイズ, 音楽クイズ, 歌当てゲーム, 曲当てゲーム, 音楽当てゲーム, イントロ当て, heardle 日本語, songless, drunk mode, high mode",
     h1: "Cluetune — 1秒で曲当てクイズ",
   },
   hero: {
@@ -315,10 +323,10 @@ const JA: LocaleTranslation = {
         featured: true,
       },
       {
-        href: "/sped-up",
-        name: "スピードアップ",
-        meta: "1.35×",
-        blurb: "ピッチとテンポを上げたバージョン。ショート動画風の音。",
+        href: "/drunk",
+        name: "Drunk",
+        meta: "Drunk / high",
+        blurb: "酔った最初の再生から曲を当てる。スキップするとミックスがクリアに。",
         accent: "var(--cluetune-pink)",
       },
       {
@@ -381,7 +389,7 @@ const JA: LocaleTranslation = {
       "曲名は現実世界では複雑——リマスター、フィーチャリング、記号の違い。Cluetuneは曲名のみ、順不同の「アーティスト＋曲名」、軽いタイプミスを正解として扱います。",
       "デイリーパズルは全員同じクリップで、現地時間の深夜にリセット。スキップは次の段階の音声を得る手段。6回外すと曲が表示され、Spotify・Apple Music・YouTubeへのリンクが出ます。",
       "クリップは権利者のプレビューサービスから配信。無制限モードはiTunesとDeezerのチャートからも曲を取得します。",
-      "デイリーが終わったら無制限モードへ。待ち時間なし、連勝記録、ジャンル・年代・難易度フィルター付き。スピードアップ、歌詞当て、ジャンルチャレンジも用意。",
+      "デイリーが終わったら無制限モードへ。待ち時間なし、連勝記録、ジャンル・年代・難易度フィルター付き。Drunkモード（high mode — 歪んだクリップから曲当て）、歌詞当て、ジャンルチャレンジも用意。",
       "Cluetuneを開いて再生、曲名を入力するだけ。聞いたクリップのリンクで友達に挑戦。曲当てゲームとして、そして毎日の習慣として楽しめます。",
     ],
     questionsHeading: "よくある質問",
@@ -408,7 +416,11 @@ const JA: LocaleTranslation = {
     },
     {
       q: "Songlessのようなゲームですか？",
-      a: "はい。CluetuneはSonglessやHeardleと同じ形式の歌当てゲームで、デイリーと無制限モードに加え、スピードアップや歌詞当てもあります。",
+      a: "はい。CluetuneはSonglessやHeardleと同じ形式の歌当てゲームで、デイリーと無制限モードに加え、Drunk / Highモードや歌詞当てもあります。",
+    },
+    {
+      q: "Drunk mode / High modeとは？",
+      a: "クリップがピッチずれ・スロー・エコーなどで歪む曲当てモードです。最初がいちばん歪み、スキップでクリアに。/drunk で無料・アカウント不要。",
     },
     {
       q: "アカウントは必要ですか？",
@@ -423,7 +435,7 @@ const FR: LocaleTranslation = {
     description:
       "Cluetune est un jeu gratuit pour deviner la chanson en ligne. Écoutez 1 seconde et trouvez le titre — quiz musical quotidien et mode illimité sans compte.",
     keywords:
-      "devine la chanson, jeu deviner chanson, quiz musical, quiz musique, blind test musique, jeu musical en ligne, heardle français, songless",
+      "devine la chanson, jeu deviner chanson, quiz musical, quiz musique, blind test musique, jeu musical en ligne, heardle français, songless, drunk mode, high mode, mode bourré",
     h1: "Cluetune — devine la chanson en 1 seconde",
   },
   hero: {
@@ -445,10 +457,10 @@ const FR: LocaleTranslation = {
         featured: true,
       },
       {
-        href: "/sped-up",
-        name: "Accéléré",
-        meta: "1.35×",
-        blurb: "Ton et tempo modifiés, comme sur votre fil d'actualité.",
+        href: "/drunk",
+        name: "Drunk",
+        meta: "Drunk / high",
+        blurb: "Devinez des chansons saoules ou high dès la première écoute gâchée. Passez et le mix se clarifie.",
         accent: "var(--cluetune-pink)",
       },
       {
@@ -511,7 +523,7 @@ const FR: LocaleTranslation = {
       "Les titres réels sont chaotiques — remasters, featurings, ponctuation. Cluetune accepte le titre seul, artiste et titre dans n'importe quel ordre, et des fautes raisonnables.",
       "Le puzzle quotidien est le même extrait pour tous, réinitialisé à minuit dans votre fuseau horaire. Passer achète le palier suivant. Six erreurs et la piste est révélée avec des liens Spotify, Apple Music et YouTube.",
       "Les extraits proviennent des services de prévisualisation des détenteurs de droits. Illimité inclut aussi les hits actuels d'iTunes et Deezer.",
-      "Terminé le quotidien ? Illimité est le mode sans limite : pas d'attente, série en direct, filtres par genre, décennie et difficulté.",
+      "Terminé le quotidien ? Illimité est le mode sans limite : pas d'attente, série en direct, filtres par genre, décennie et difficulté. Mode Drunk (aussi high — chansons saoules ou high sur clips distordus), Paroles et Genre Gauntlet ajoutent d'autres façons de jouer.",
       "Ouvrez Cluetune, appuyez sur lecture, tapez un titre. Défiez un ami avec un lien vers l'extrait exact. Cluetune est un quiz musical d'abord, un rituel quotidien ensuite.",
     ],
     questionsHeading: "Questions",
@@ -537,6 +549,10 @@ const FR: LocaleTranslation = {
       a: "Oui. Après le quotidien, ouvrez Illimité pour des manches sans fin avec filtres par genre, décennie et difficulté.",
     },
     {
+      q: "Qu'est-ce que le mode drunk / high ?",
+      a: "Le mode drunk (aussi high) distord les extraits : pitch, ralentissement, écho ou étouffement. Vous devinez des chansons saoules ou high dès la première écoute ; passez pour dégriser. Gratuit sur /drunk.",
+    },
+    {
       q: "Faut-il un compte ?",
       a: "Non. Chaque mode fonctionne dès le chargement de la page. Les séries restent dans ce navigateur.",
     },
@@ -553,7 +569,7 @@ const DE: LocaleTranslation = {
     description:
       "Cluetune ist ein kostenloses Musikquiz online. Song erraten ab 1 Sekunde — tägliches Rätsel und unbegrenzter Modus ohne Konto. Musik Intro Quiz für alle.",
     keywords:
-      "musik quiz, musikquiz, lieder erraten, song erraten, musik intro quiz, musik erraten spiel, heardle deutsch, songless, musik raten online",
+      "musik quiz, musikquiz, lieder erraten, song erraten, musik intro quiz, musik erraten spiel, heardle deutsch, songless, musik raten online, drunk mode, high mode",
     h1: "Cluetune — Song erraten ab 1 Sekunde",
   },
   hero: {
@@ -575,10 +591,10 @@ const DE: LocaleTranslation = {
         featured: true,
       },
       {
-        href: "/sped-up",
-        name: "Beschleunigt",
-        meta: "1.35×",
-        blurb: "Tonhöhe und Tempo verändert — wie in deinem For-You-Feed.",
+        href: "/drunk",
+        name: "Drunk",
+        meta: "Drunk / high",
+        blurb: "Errate betrunkene oder high Songs beim chaotischen ersten Hören. Skippen und der Mix nüchtert sich.",
         accent: "var(--cluetune-pink)",
       },
       {
@@ -641,7 +657,7 @@ const DE: LocaleTranslation = {
       "Echte Titel sind chaotisch — Remaster, Features, Interpunktion. Cluetune akzeptiert nur den Titel, Künstler und Titel in beliebiger Reihenfolge und vertretbare Tippfehler.",
       "Das Tagesrätsel ist für alle gleich und setzt sich um Mitternacht in deiner Zeitzone zurück. Überspringen kauft die nächste Stufe. Nach sechs Fehlern wird der Track mit Links zu Spotify, Apple Music und YouTube enthüllt.",
       "Clips streamen von den Vorschaudiensten der Rechteinhaber. Unbegrenzt zieht auch aktuelle Hits von iTunes und Deezer.",
-      "Tägliches fertig? Unbegrenzt ist der Songless-unlimited-Modus: keine Wartezeit, Live-Serie, Filter nach Genre, Jahrzehnt und Schwierigkeit.",
+      "Tägliches fertig? Unbegrenzt ist der Songless-unlimited-Modus: keine Wartezeit, Live-Serie, Filter nach Genre, Jahrzehnt und Schwierigkeit. Drunk-Modus (auch High — betrunkene oder high Songs aus verzerrten Clips), Songtext und Genre Gauntlet bieten mehr Spielarten.",
       "Öffne Cluetune, drücke Play, tippe einen Titel. Fordere einen Freund mit dem exakten Clip heraus. Cluetune ist ein Musikquiz zum Song erraten — zuerst Spiel, dann Ritual.",
     ],
     questionsHeading: "Fragen",
@@ -671,6 +687,10 @@ const DE: LocaleTranslation = {
       a: "Ja. Nach dem Täglichen öffne Unbegrenzt für endlose Runden mit Genre-, Jahrzehnt- und Schwierigkeitsfiltern.",
     },
     {
+      q: "Was ist Drunk Mode / High Mode?",
+      a: "Drunk Mode (auch High Mode) verzerrt Clips mit Pitch, Slowdown, Echo oder Dämpfung. Du errätst betrunkene oder high Songs beim ersten Hören; Skippen nüchtert den Mix. Kostenlos unter /drunk.",
+    },
+    {
       q: "Brauche ich ein Konto?",
       a: "Nein. Jeder Modus funktioniert sofort. Serien werden in diesem Browser gespeichert.",
     },
@@ -683,7 +703,7 @@ const PT: LocaleTranslation = {
     description:
       "Cluetune é um quiz de música gratuito online. Qual é a música? Ouça 1 segundo e adivinhe — desafio diário e modo ilimitado sem conta.",
     keywords:
-      "qual é a música, adivinhe a música, adivinhar a música, quiz de música, jogo de adivinhar música, jogo musical online, heardle português, songless",
+      "qual é a música, adivinhe a música, adivinhar a música, quiz de música, jogo de adivinhar música, jogo musical online, heardle português, songless, drunk mode, high mode, modo bêbado",
     h1: "Cluetune — adivinhe a música em 1 segundo",
   },
   hero: {
@@ -705,10 +725,10 @@ const PT: LocaleTranslation = {
         featured: true,
       },
       {
-        href: "/sped-up",
-        name: "Acelerado",
-        meta: "1.35×",
-        blurb: "Tom e tempo alterados, como no seu feed de vídeos.",
+        href: "/drunk",
+        name: "Drunk",
+        meta: "Drunk / high",
+        blurb: "Adivinha músicas bêbadas ou high na primeira escuta destruída. Salta e a mistura fica sóbria.",
         accent: "var(--cluetune-pink)",
       },
       {
@@ -771,7 +791,7 @@ const PT: LocaleTranslation = {
       "Títulos reais são caóticos — remasters, participações, pontuação. Cluetune aceita só o título, artista e título em qualquer ordem e erros razoáveis.",
       "O puzzle diário é o mesmo clip para todos e reinicia à meia-noite no seu fuso horário. Pular compra o próximo degrau. Seis erros e a faixa é revelada com links para Spotify, Apple Music e YouTube.",
       "Os clips vêm dos serviços de pré-visualização dos detentores de direitos. Ilimitado também inclui hits atuais do iTunes e Deezer.",
-      "Terminou o diário? Ilimitado é o modo sem limite: sem espera, sequência ao vivo, filtros por género, década e dificuldade.",
+      "Terminou o diário? Ilimitado é o modo sem limite: sem espera, sequência ao vivo, filtros por género, década e dificuldade. Modo Drunk (também high — músicas bêbadas ou high com clipes distorcidos), Letra e Desafio de género acrescentam mais formas de jogar.",
       "Abra o Cluetune, pressione play, digite um título. Desafie um amigo com o link do clip exato. Cluetune é um jogo de adivinhar música primeiro, ritual diário depois.",
     ],
     questionsHeading: "Perguntas",
@@ -794,11 +814,15 @@ const PT: LocaleTranslation = {
     },
     {
       q: "É um quiz de música gratuito?",
-      a: "Sim. Cluetune é um quiz de música gratuito no navegador. Diário, ilimitado, acelerado, letra e desafio de género — tudo sem cadastro.",
+      a: "Sim. Cluetune é um quiz de música gratuito no navegador. Diário, ilimitado, modo drunk / high, letra e desafio de género — tudo sem cadastro.",
     },
     {
       q: "Posso jogar várias vezes?",
       a: "Sim. Após o diário, abra Ilimitado para rodadas sem fim com filtros por género, década e dificuldade.",
+    },
+    {
+      q: "O que é o modo drunk / high?",
+      a: "O modo drunk (também high) distorce os clipes com pitch, lentidão, eco ou abafamento. Adivinhas músicas bêbadas ou high na primeira escuta; salta para ficar sóbrio. Grátis em /drunk.",
     },
     {
       q: "Preciso de uma conta?",
@@ -813,7 +837,7 @@ const KO: LocaleTranslation = {
     description:
       "Cluetune은 무료 온라인 노래 맞히기 게임입니다. 1초 인트로로 곡을 맞혀 보세요. 매일 퍼즐과 무제한 모드, 계정 불필요.",
     keywords:
-      "노래 맞히기, 음악 퀴즈, 곡 맞히기 게임, 인트로 퀴즈, 음악 맞히기, 노래 퀴즈 게임, heardle 한국어, songless",
+      "노래 맞히기, 음악 퀴즈, 곡 맞히기 게임, 인트로 퀴즈, 음악 맞히기, 노래 퀴즈 게임, heardle 한국어, songless, drunk mode, high mode",
     h1: "Cluetune — 1초 노래 맞히기",
   },
   hero: {
@@ -835,10 +859,10 @@ const KO: LocaleTranslation = {
         featured: true,
       },
       {
-        href: "/sped-up",
-        name: "스피드업",
-        meta: "1.35×",
-        blurb: "피치와 템포를 올린 버전. 숏폼 영상 느낌.",
+        href: "/drunk",
+        name: "Drunk",
+        meta: "Drunk / high",
+        blurb: "망가진 첫 재생으로 취한/하이 곡을 맞히세요. 스킵하면 믹스가 맑아집니다.",
         accent: "var(--cluetune-pink)",
       },
       {
@@ -901,7 +925,7 @@ const KO: LocaleTranslation = {
       "실제 곡 제목은 복잡합니다 — 리마스터, 피처링, 기호 차이. Cluetune은 제목만, 순서 무관한 아티스트+제목, 가벼운 오타를 정답으로 처리합니다.",
       "데일리 퍼즐은 모두 같은 클립이며 현지 시간 자정에 리셋됩니다. 스킵은 다음 단계 오디오를 얻는 방법. 6번 틀리면 Spotify, Apple Music, YouTube 링크와 함께 공개됩니다.",
       "클립은 권리자의 미리듣기 서비스에서 스트리밍됩니다. 무제한 모드는 iTunes와 Deezer 차트의 최신 히트도 포함합니다.",
-      "데일리가 끝났나요? 무제한 모드는 대기 없이 연승 기록과 장르·연대·난이도 필터를 제공합니다.",
+      "데일리가 끝났나요? 무제한 모드는 대기 없이 연승 기록과 장르·연대·난이도 필터를 제공합니다. Drunk 모드(high — 왜곡된 클립으로 취한/하이 곡 맞히기), 가사 맞히기, 장르 건틀릿도 있습니다.",
       "Cluetune을 열고 재생, 곡명 입력. 들은 클립 링크로 친구에게 도전하세요. 노래 맞히기 게임이자 일상의 음악 퀴즈입니다.",
     ],
     questionsHeading: "자주 묻는 질문",
@@ -931,6 +955,10 @@ const KO: LocaleTranslation = {
       a: "네. 공유 데일리 퍼즐, 무제한 모드, 1~16초 클립 사다리가 있는 같은 형식의 곡 맞히기 게임입니다.",
     },
     {
+      q: "Drunk mode / High mode란?",
+      a: "클립이 피치·슬로우·에코 등으로 왜곡되는 곡 맞히기 모드입니다. 첫 재생이 가장 심하고, 스킵하면 맑아집니다. /drunk에서 무료, 계정 불필요.",
+    },
+    {
       q: "계정이 필요한가요?",
       a: "아니요. 페이지를 열면 바로 플레이할 수 있습니다. 연승 기록은 이 브라우저에 저장됩니다.",
     },
@@ -943,7 +971,7 @@ const IT: LocaleTranslation = {
     description:
       "Cluetune è un gioco gratuito per indovinare la canzone online. Ascolta 1 secondo e indovina il titolo — quiz musicale giornaliero e modalità illimitata senza account.",
     keywords:
-      "indovina la canzone, gioco indovina canzone, quiz musicale, quiz canzoni, gioco musicale online, heardle italiano, songless, blind test musica",
+      "indovina la canzone, gioco indovina canzone, quiz musicale, quiz canzoni, gioco musicale online, heardle italiano, songless, blind test musica, drunk mode, high mode",
     h1: "Cluetune — indovina la canzone in 1 secondo",
   },
   hero: {
@@ -965,10 +993,10 @@ const IT: LocaleTranslation = {
         featured: true,
       },
       {
-        href: "/sped-up",
-        name: "Accelerato",
-        meta: "1.35×",
-        blurb: "Tono e tempo modificati, come nel tuo feed video.",
+        href: "/drunk",
+        name: "Drunk",
+        meta: "Drunk / high",
+        blurb: "Indovina canzoni ubriache o high al primo ascolto rovinato. Salta e il mix si schiarisce.",
         accent: "var(--cluetune-pink)",
       },
       {
@@ -1031,7 +1059,7 @@ const IT: LocaleTranslation = {
       "I titoli reali sono caotici — remaster, featuring, punteggiatura. Cluetune accetta solo il titolo, artista e titolo in qualsiasi ordine e errori ragionevoli.",
       "Il puzzle giornaliero è lo stesso clip per tutti e si resetta a mezzanotte nel tuo fuso orario. Saltare compra il gradino successivo. Sei errori e il brano è rivelato con link a Spotify, Apple Music e YouTube.",
       "I clip provengono dai servizi di anteprima dei titolari dei diritti. Illimitato include anche hit attuali da iTunes e Deezer.",
-      "Finito il giornaliero? Illimitato è la modalità senza limiti: nessuna attesa, serie live, filtri per genere, decennio e difficoltà.",
+      "Finito il giornaliero? Illimitato è la modalità senza limiti: nessuna attesa, serie live, filtri per genere, decennio e difficoltà. Modalità Drunk (anche high — canzoni ubriache o high da clip distorti), Testo e Genre Gauntlet aggiungono altri modi di giocare.",
       "Apri Cluetune, premi play, digita un titolo. Sfida un amico con il link del clip esatto. Cluetune è un quiz musicale prima, un rituale quotidiano dopo.",
     ],
     questionsHeading: "Domande",
@@ -1057,6 +1085,10 @@ const IT: LocaleTranslation = {
       a: "Sì. Dopo il giornaliero, apri Illimitato per round senza fine con filtri per genere, decennio e difficoltà.",
     },
     {
+      q: "Cos'è la modalità drunk / high?",
+      a: "La modalità drunk (anche high) distorce i clip con pitch, rallentamento, eco o ovattamento. Indovini canzoni ubriache o high al primo ascolto; salta per smaltire. Gratis su /drunk.",
+    },
+    {
       q: "Serve un account?",
       a: "No. Ogni modalità funziona al caricamento della pagina. Le serie restano in questo browser.",
     },
@@ -1073,7 +1105,7 @@ const RU: LocaleTranslation = {
     description:
       "Cluetune — бесплатная музыкальная викторина. Угадай песню по 1 секунде — ежедневная головоломка и безлимитный режим без аккаунта.",
     keywords:
-      "угадай мелодию, угадай песню, музыкальный квиз, музыкальная викторина, угадай песню по интро, игра угадай песню, heardle русский, songless",
+      "угадай мелодию, угадай песню, музыкальный квиз, музыкальная викторина, угадай песню по интро, игра угадай песню, heardle русский, songless, drunk mode, high mode",
     h1: "Cluetune — угадай песню за 1 секунду",
   },
   hero: {
@@ -1095,10 +1127,10 @@ const RU: LocaleTranslation = {
         featured: true,
       },
       {
-        href: "/sped-up",
-        name: "Ускоренный",
-        meta: "1.35×",
-        blurb: "Изменённые тон и темп — как в ленте коротких видео.",
+        href: "/drunk",
+        name: "Drunk",
+        meta: "Drunk / high",
+        blurb: "Угадай пьяные или high песни с хаотичного первого прослушивания. Пропуск проясняет микс.",
         accent: "var(--cluetune-pink)",
       },
       {
@@ -1161,7 +1193,7 @@ const RU: LocaleTranslation = {
       "Реальные названия хаотичны — ремастеры, фиты, пунктуация. Cluetune принимает только название, артиста и название в любом порядке и разумные опечатки.",
       "Ежедневная головоломка — один клип для всех, сброс в полночь по вашему часовому поясу. Пропуск покупает следующую ступень. Шесть ошибок — трек раскрывается со ссылками на Spotify, Apple Music и YouTube.",
       "Клипы стримятся с превью-сервисов правообладателей. Безлимит также включает актуальные хиты из чартов iTunes и Deezer.",
-      "Ежедневное пройдено? Безлимит — режим без ожидания, живая серия, фильтры по жанру, десятилетию и сложности.",
+      "Ежедневное пройдено? Безлимит — режим без ожидания, живая серия, фильтры по жанру, десятилетию и сложности. Режим Drunk (также high — пьяные или high песни по искажённым клипам), Текст и Genre Gauntlet добавляют другие способы игры.",
       "Откройте Cluetune, нажмите play, введите название. Бросьте вызов другу ссылкой на точный клип. Cluetune — музыкальная викторина в первую очередь, ежедневный ритуал — во вторую.",
     ],
     questionsHeading: "Вопросы",
@@ -1185,6 +1217,10 @@ const RU: LocaleTranslation = {
     {
       q: "Можно играть много раз?",
       a: "Да. После ежедневного откройте Безлимит для бесконечных раундов с фильтрами по жанру, десятилетию и сложности.",
+    },
+    {
+      q: "Что такое drunk mode / high mode?",
+      a: "Drunk mode (также high) искажает клипы: сдвиг тона, замедление, эхо или глушение. Угадываешь пьяные или high песни с первого прослушивания; пропуск отрезвляет. Бесплатно на /drunk.",
     },
     {
       q: "Нужен ли аккаунт?",
@@ -1214,7 +1250,7 @@ export function getTranslation(locale: LocaleCode): LocaleTranslation {
 }
 
 export function faqJsonLdForLocale(locale: LocaleCode) {
-  const faqs = getTranslation(locale).faqs;
+  const faqs = getTranslation(locale).faqs.slice(0, 8);
   return {
     "@context": "https://schema.org",
     "@type": "FAQPage",
@@ -1223,7 +1259,7 @@ export function faqJsonLdForLocale(locale: LocaleCode) {
       name: faq.q,
       acceptedAnswer: {
         "@type": "Answer",
-        text: `<p>${faq.a}</p>`,
+        text: `<p>${faq.a.length > 160 ? `${faq.a.slice(0, 157)}…` : faq.a}</p>`,
       },
     })),
   };

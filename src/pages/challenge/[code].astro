@@ -1,5 +1,5 @@
 ---
-import GameShell from "../../components/game/GameShell";
+import GameShellMount from "../../components/GameShellMount.astro";
 import MeshGradient from "../../components/MeshGradient.astro";
 import Layout from "../../layouts/Layout.astro";
 import { getTrack } from "../../lib/catalog";
@@ -43,8 +43,7 @@ const headline = solved
       </header>
 
       <div class="mx-auto max-w-2xl">
-        <GameShell
-          client:load
+        <GameShellMount
           mode={payload.m}
           lockedTrackId={payload.t}
           challengerAttempt={payload.a}

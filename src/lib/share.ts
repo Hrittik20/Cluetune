@@ -41,10 +41,36 @@ export function encodeChallenge(payload: ChallengePayload): string {
 
 export function decodeChallenge(code: string): ChallengePayload | null {
   try {
-    const parsed = JSON.parse(new TextDecoder().decode(fromBase64Url(code))) as ChallengePayload;
+    const parsed = JSON.parse(new TextDecoder().decode(fromBase64Url(code))) as {
+      t?: unknown;
+      m?: unknown;
+      a?: unknown;
+      s?: unknown;
+      n?: unknown;
+    };
     if (typeof parsed?.t !== "string" || typeof parsed?.m !== "string") return null;
     if (typeof parsed.a !== "number" || typeof parsed.s !== "number") return null;
-    return parsed;
+
+    // Legacy Sped-Up / Faded challenges keep working under Drunk.
+    const mode =
+      parsed.m === "sped-up" || parsed.m === "faded" ? "drunk" : parsed.m;
+    if (
+      mode !== "daily" &&
+      mode !== "unlimited" &&
+      mode !== "drunk" &&
+      mode !== "lyric-flip" &&
+      mode !== "gauntlet"
+    ) {
+      return null;
+    }
+
+    return {
+      t: parsed.t,
+      m: mode,
+      a: parsed.a,
+      s: parsed.s,
+      ...(typeof parsed.n === "string" ? { n: parsed.n } : {}),
+    };
   } catch {
     return null;
   }
@@ -70,7 +96,7 @@ export function challengeFromRound(state: RoundState, name?: string): ChallengeP
 const MODE_LABELS: Record<GameMode, string> = {
   daily: "Daily",
   unlimited: "Unlimited",
-  "sped-up": "Sped-Up",
+  "drunk": "Drunk / High",
   "lyric-flip": "Lyrics",
   gauntlet: "Gauntlet",
 };

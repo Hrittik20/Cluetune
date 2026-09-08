@@ -39,7 +39,7 @@ export interface Track {
   deezerId?: number;
 }
 
-export type GameMode = "daily" | "unlimited" | "sped-up" | "lyric-flip" | "gauntlet";
+export type GameMode = "daily" | "unlimited" | "drunk" | "lyric-flip" | "gauntlet";
 
 export type GuessVerdict = "correct" | "close" | "wrong" | "skip";
 

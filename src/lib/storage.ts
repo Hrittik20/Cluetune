@@ -1,4 +1,5 @@
 import { EMPTY_SESSION, type SessionStats } from "./game";
+import { DRUNK_START_LEVEL, type DrunkLevel } from "./audioFx";
 import type { GameMode, Guess, ModeFilters } from "./types";
 
 /**
@@ -38,6 +39,8 @@ export interface PersistedState {
     /** Opt-out for the glitch layer, independent of prefers-reduced-motion. */
     reducedGlitch: boolean;
     hasPlayed: boolean;
+    /** Drunk mode hangover — survives refresh mid-session. */
+    drunkBuzz: DrunkLevel;
   };
 }
 
@@ -52,6 +55,7 @@ export function emptyState(): PersistedState {
       filters: { genres: [], decades: [], difficulty: [1, 3] },
       reducedGlitch: false,
       hasPlayed: false,
+      drunkBuzz: DRUNK_START_LEVEL,
     },
   };
 }
@@ -70,18 +74,37 @@ export function loadState(): PersistedState {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return emptyState();
 
-    const parsed = JSON.parse(raw) as Partial<PersistedState>;
+    const parsed = JSON.parse(raw) as Partial<PersistedState> & {
+      sessions?: Partial<Record<GameMode | "sped-up" | "faded", SessionStats>>;
+      prefs?: Partial<PersistedState["prefs"]> & { fadedBuzz?: unknown };
+    };
     if (parsed.version !== 1) return emptyState();
 
     // Merge against a fresh blob so fields added in later builds are present.
     const base = emptyState();
+    const sessions = { ...base.sessions, ...parsed.sessions } as Partial<
+      Record<GameMode | "sped-up" | "faded", SessionStats>
+    >;
+
+    // Legacy mode keys → Drunk.
+    if (!sessions.drunk && sessions.faded) sessions.drunk = sessions.faded;
+    if (!sessions.drunk && sessions["sped-up"]) sessions.drunk = sessions["sped-up"];
+    delete sessions.faded;
+    delete sessions["sped-up"];
+
+    const legacyBuzz = parsed.prefs?.drunkBuzz ?? parsed.prefs?.fadedBuzz;
+
     const merged = {
       ...base,
       ...parsed,
       playerId: parsed.playerId || base.playerId,
       daily: { ...base.daily, ...parsed.daily },
-      sessions: { ...base.sessions, ...parsed.sessions },
-      prefs: { ...base.prefs, ...parsed.prefs },
+      sessions: sessions as Partial<Record<GameMode, SessionStats>>,
+      prefs: {
+        ...base.prefs,
+        ...parsed.prefs,
+        drunkBuzz: normalizeDrunkBuzz(legacyBuzz),
+      },
     };
 
     // Previous default was the full 1–5 window, which dealt too many deep cuts.
@@ -101,6 +124,13 @@ export function loadState(): PersistedState {
     // Corrupt or quota-blocked storage should never break play.
     return emptyState();
   }
+}
+
+function normalizeDrunkBuzz(value: unknown): DrunkLevel {
+  if (typeof value === "number" && value >= 0 && value <= 5 && Number.isInteger(value)) {
+    return value as DrunkLevel;
+  }
+  return DRUNK_START_LEVEL;
 }
 
 export function saveState(state: PersistedState): void {
@@ -158,6 +188,16 @@ export function putSession(mode: GameMode, session: SessionStats): PersistedStat
   return updateState((draft) => {
     draft.sessions[mode] = session;
     draft.prefs.hasPlayed = true;
+  });
+}
+
+export function getDrunkBuzz(): DrunkLevel {
+  return loadState().prefs.drunkBuzz;
+}
+
+export function putDrunkBuzz(level: DrunkLevel): PersistedState {
+  return updateState((draft) => {
+    draft.prefs.drunkBuzz = level;
   });
 }
 

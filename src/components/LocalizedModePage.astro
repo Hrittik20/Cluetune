@@ -1,11 +1,13 @@
 ---
+import GamePrefetch from "./GamePrefetch.astro";
 import GameShellFrame from "./GameShellFrame.astro";
+import GameShellMount from "./GameShellMount.astro";
 import MeshGradient from "./MeshGradient.astro";
 import ModeSeoSection from "./ModeSeoSection.astro";
-import GameShell from "./game/GameShell";
 import Layout from "../layouts/Layout.astro";
 import { LOCALES, type LocaleCode, getModeHreflangs, localizedPath } from "../i18n/config";
 import { type ModeSlug, getModePageCopy } from "../i18n/mode-pages";
+import { faqJsonLd } from "../lib/faqs";
 
 interface Props {
   locale: LocaleCode;
@@ -18,27 +20,40 @@ const localeConfig = LOCALES[locale];
 const gameMode = slug === "lyrics" ? "lyric-flip" : slug;
 const showFilters = true;
 const continuous = true;
+const drunkFaqs = slug === "drunk" ? copy.faqs : undefined;
 ---
 
 <Layout
   title={copy.title}
   description={copy.description}
+  keywords={copy.keywords}
   lang={localeConfig.hreflang}
   ogLocale={localeConfig.ogLocale}
   hreflangs={getModeHreflangs(`/${slug}`)}
+  faqJsonLd={drunkFaqs ? faqJsonLd(drunkFaqs) : undefined}
 >
+  <GamePrefetch mode={gameMode} count={3} />
+
   <section class="relative isolate">
     <MeshGradient intensity="soft" />
 
     <div class="page-shell relative pb-10 pt-3 sm:pb-16 sm:pt-5">
       <header class="mx-auto mb-3 flex max-w-2xl flex-col items-center gap-1.5 text-center sm:mb-4">
-        <p class="badge">{copy.badge}</p>
+        {
+          slug === "drunk" ? (
+            <p class="badge">
+              <span>{copy.badge}</span>
+              <span class="badge-new">New</span>
+            </p>
+          ) : (
+            <p class="badge">{copy.badge}</p>
+          )
+        }
         <h1 class="sr-only">{copy.h1}</h1>
       </header>
 
       <GameShellFrame>
-        <GameShell
-          client:load
+        <GameShellMount
           mode={gameMode}
           continuous={continuous}
           showFilters={showFilters}
@@ -49,26 +64,46 @@ const continuous = true;
 
   <ModeSeoSection locale={locale} slug={slug} />
 
+  {
+    drunkFaqs && copy.faqHeading ? (
+      <section class="page-shell pb-12" aria-labelledby="drunk-faq-heading">
+        <article class="mx-auto flex max-w-prose flex-col gap-6">
+          <h2 id="drunk-faq-heading" class="text-display-lg text-ink">
+            {copy.faqHeading}
+          </h2>
+          <dl class="flex flex-col gap-6">
+            {drunkFaqs.map((faq) => (
+              <div class="flex flex-col gap-2">
+                <dt class="text-display-sm text-ink">{faq.q}</dt>
+                <dd class="text-body-md text-body">{faq.a}</dd>
+              </div>
+            ))}
+          </dl>
+        </article>
+      </section>
+    ) : null
+  }
+
   <nav class="page-shell pb-12" aria-label="Language">
-        <p class="eyebrow mb-3">Language</p>
-        <ul class="flex flex-wrap gap-x-5 gap-y-2">
-          {
-            Object.values(LOCALES).map((entry) => (
-              <li>
-                <a
-                  href={localizedPath(entry.code, `/${slug}`)}
-                  hreflang={entry.hreflang}
-                  class:list={[
-                    "text-body-sm underline underline-offset-4",
-                    entry.code === locale ? "text-ink" : "text-link",
-                  ]}
-                  aria-current={entry.code === locale ? "page" : undefined}
-                >
-                  {entry.label}
-                </a>
-              </li>
-            ))
-          }
-        </ul>
-      </nav>
+    <p class="eyebrow mb-3">Language</p>
+    <ul class="flex flex-wrap gap-x-5 gap-y-2">
+      {
+        Object.values(LOCALES).map((entry) => (
+          <li>
+            <a
+              href={localizedPath(entry.code, `/${slug}`)}
+              hreflang={entry.hreflang}
+              class:list={[
+                "text-body-sm underline underline-offset-4",
+                entry.code === locale ? "text-ink" : "text-link",
+              ]}
+              aria-current={entry.code === locale ? "page" : undefined}
+            >
+              {entry.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </nav>
 </Layout>

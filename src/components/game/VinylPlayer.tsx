@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { VINYL_DISC_CLASS } from "../../lib/vinylUi";
 
 export interface VinylPlayerProps {
   playing: boolean;
@@ -140,7 +141,9 @@ export function VinylPlayer({
   return (
     <canvas
       ref={canvasRef}
-      className="aspect-square w-[min(100%,11rem)] touch-none select-none sm:w-full sm:max-w-[min(52vw,15rem)]"
+      width={176}
+      height={176}
+      className={`${VINYL_DISC_CLASS} touch-none select-none`}
       role="img"
       aria-label={
         playing

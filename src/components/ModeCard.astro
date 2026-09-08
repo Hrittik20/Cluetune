@@ -9,6 +9,7 @@ interface Props {
 }
 
 const { href, name, blurb, meta, accent = "var(--cluetune-cyan)", featured = false } = Astro.props;
+const isDrunk = href.replace(/\/$/, "").endsWith("/drunk");
 ---
 
 <a
@@ -25,7 +26,10 @@ const { href, name, blurb, meta, accent = "var(--cluetune-cyan)", featured = fal
   ></span>
 
   <div class="flex items-baseline justify-between gap-3">
-    <h3 class="text-display-sm text-ink">{name}</h3>
+    <h3 class="flex items-center gap-2 text-display-sm text-ink">
+      <span class:list={[isDrunk && "label-drunk"]}>{name}</span>
+      {isDrunk ? <span class="badge-new">New</span> : null}
+    </h3>
     <span class="eyebrow shrink-0">{meta}</span>
   </div>
 
