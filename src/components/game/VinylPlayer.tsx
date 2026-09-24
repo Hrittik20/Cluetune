@@ -49,6 +49,8 @@ export function VinylPlayer({
   const scratchRef = useRef(0);
   const artworkRef = useRef<HTMLImageElement | null>(null);
   const lastFrameRef = useRef<number>(0);
+  /** Schedules a frame. The loop only keeps running while the disc is animating. */
+  const kickRef = useRef<() => void>(() => {});
 
   // Latest props for the animation loop, so it never needs to be re-created.
   const propsRef = useRef({ playing, positionMs, unlockedMs, totalMs, revealArtwork, reducedGlitch });
@@ -66,6 +68,7 @@ export function VinylPlayer({
     image.src = artworkUrl;
     image.onload = () => {
       artworkRef.current = image;
+      kickRef.current();
     };
 
     return () => {
@@ -96,13 +99,15 @@ export function VinylPlayer({
       canvas.width = Math.round(rect.width * dpr);
       canvas.height = Math.round(rect.width * dpr);
       context.setTransform(dpr, 0, 0, dpr, 0, 0);
+      kick();
     };
 
-    resize();
-    const observer = new ResizeObserver(resize);
-    observer.observe(canvas);
+    const kick = () => {
+      if (frameRef.current == null) frameRef.current = requestAnimationFrame(render);
+    };
 
     const render = (now: number) => {
+      frameRef.current = null;
       const delta = lastFrameRef.current ? Math.min(now - lastFrameRef.current, 64) : 16;
       lastFrameRef.current = now;
 
@@ -125,18 +130,30 @@ export function VinylPlayer({
         artwork: artworkRef.current,
       });
 
-      frameRef.current = requestAnimationFrame(render);
+      if (current.playing || scratchRef.current > 0) {
+        frameRef.current = requestAnimationFrame(render);
+      } else {
+        lastFrameRef.current = 0;
+      }
     };
 
-    frameRef.current = requestAnimationFrame(render);
+    kickRef.current = kick;
+    resize();
+    const observer = new ResizeObserver(resize);
+    observer.observe(canvas);
 
     return () => {
+      kickRef.current = () => {};
       observer.disconnect();
       if (frameRef.current != null) cancelAnimationFrame(frameRef.current);
       frameRef.current = null;
       lastFrameRef.current = 0;
     };
   }, [readLevels]);
+
+  useEffect(() => {
+    kickRef.current();
+  }, [playing, positionMs, unlockedMs, totalMs, revealArtwork, reducedGlitch, scratchKey]);
 
   return (
     <canvas

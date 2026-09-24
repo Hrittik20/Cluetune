@@ -50,13 +50,13 @@ export function GameShellSkeleton({
         </svg>
 
         {lyricsMode ? (
-          <div className="card-soft flex w-full flex-col gap-3 p-6">
+          <div className="card-soft order-3 flex w-full flex-col gap-3 p-6">
             <div className="h-4 w-3/4 rounded bg-canvas-soft-2" />
             <div className="h-4 w-full rounded bg-canvas-soft-2" />
             <div className="h-4 w-5/6 rounded bg-canvas-soft-2" />
           </div>
         ) : (
-          <div className="h-3 w-full rounded-full bg-canvas-soft-2" aria-hidden="true" />
+          <div className="order-3 h-3 w-full rounded-full bg-canvas-soft-2" aria-hidden="true" />
         )}
       </div>
 

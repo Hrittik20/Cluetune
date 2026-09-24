@@ -517,7 +517,7 @@ export default function GameShell(props: GameShellProps) {
             </div>
           )}
 
-          <div className={showNextCta ? undefined : "order-2 md:order-1"}>
+          <div className={`flex w-full justify-center ${showNextCta ? "" : "order-2 md:order-1"}`}>
             <VinylPlayer
               playing={audio.playing}
               positionMs={audio.positionMs}
@@ -554,17 +554,17 @@ export default function GameShell(props: GameShellProps) {
           ) : null}
 
           {audio.error ? (
-            <p role="status" className="text-body-sm text-tone-wrong">
+            <p role="status" className="order-3 text-body-sm text-tone-wrong">
               {audio.error}
             </p>
           ) : null}
 
           {mode === "drunk" && buzzNote && !showNextCta ? (
-            <p className="text-caption text-mute">{buzzNote}</p>
+            <p className="order-3 text-caption text-mute">{buzzNote}</p>
           ) : null}
 
           {lyricsMode ? null : (
-            <div className="w-full">
+            <div className="order-3 w-full">
               <ClipLadderBar
                 ladder={ladder}
                 total={totalMs}
