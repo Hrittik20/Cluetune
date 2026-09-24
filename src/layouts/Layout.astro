@@ -48,7 +48,8 @@ const {
 } = Astro.props;
 
 const pageTitle = title ? `${title} · ${SITE.name}` : `${SITE.name} — ${SITE.tagline}`;
-const canonical = new URL(Astro.url.pathname, SITE.url);
+const canonicalPath = Astro.url.pathname.replace(/(\/index)?\.html$/, "").replace(/\/+$/, "") || "/";
+const canonical = new URL(canonicalPath, SITE.url);
 const ogImage = new URL(image, SITE.url).href;
 const extraSchema = schema ? (Array.isArray(schema) ? schema : [schema]) : [];
 
@@ -196,15 +197,7 @@ const jsonLd = {
         }
       }
     </style>
-    <link
-      rel="stylesheet"
-      href={globalStylesHref}
-      media="print"
-      onload="this.media='all'"
-    />
-    <noscript>
-      <link rel="stylesheet" href={globalStylesHref} />
-    </noscript>
+    <link rel="stylesheet" href={globalStylesHref} />
     <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
     <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com" />
     {noindex ? <meta name="robots" content="noindex, nofollow" /> : <meta name="robots" content="index, follow" />}

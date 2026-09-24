@@ -8,7 +8,7 @@ export function getStaticPaths() {
 
 const { lang } = Astro.params;
 
-if (!isValidLocale(lang) || lang === "en") {
+if (!isValidLocale(lang)) {
   return Astro.redirect("/");
 }
 ---

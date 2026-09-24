@@ -8,7 +8,7 @@
   "scripts": {
     "dev": "astro dev",
     "og:generate": "node scripts/generate-og.mjs",
-    "prebuild": "npm run og:generate",
+    "prebuild": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\" && npm run og:generate",
     "build": "astro build",
     "preview": "astro preview",
     "deploy": "astro build && wrangler deploy",
