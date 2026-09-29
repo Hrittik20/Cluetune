@@ -3,6 +3,8 @@ import type { AudioFxPreset } from "../../lib/audioFx";
 
 export interface AudioClipState {
   ready: boolean;
+  /** An element exists for the current source, so play() works even before it has buffered. */
+  canPlay: boolean;
   playing: boolean;
   /** Current head position within the clip, in milliseconds. */
   positionMs: number;
@@ -29,6 +31,39 @@ export interface UseAudioClipResult extends AudioClipState {
 }
 
 const BIN_COUNT = 48;
+
+/**
+ * Clips are ~0.5 MB. Buffering one during page load competes with first paint
+ * on mobile networks, so elements start with preload="none" and switch to
+ * "auto" on the first interaction or shortly after load, whichever is first.
+ */
+let preloadAllowed = false;
+const preloadListeners = new Set<() => void>();
+
+function allowPreload(): void {
+  if (preloadAllowed) return;
+  preloadAllowed = true;
+  for (const listener of preloadListeners) listener();
+  preloadListeners.clear();
+}
+
+if (typeof window !== "undefined") {
+  for (const type of ["pointerdown", "keydown", "touchstart", "scroll"]) {
+    window.addEventListener(type, allowPreload, { capture: true, passive: true, once: true });
+  }
+  const arm = () => window.setTimeout(allowPreload, 3000);
+  if (document.readyState === "complete") arm();
+  else window.addEventListener("load", arm, { once: true });
+}
+
+function onPreloadAllowed(listener: () => void): () => void {
+  if (preloadAllowed) {
+    listener();
+    return () => undefined;
+  }
+  preloadListeners.add(listener);
+  return () => preloadListeners.delete(listener);
+}
 
 const CLEAN_FX: AudioFxPreset = {
   rate: 1,
@@ -89,6 +124,7 @@ export function useAudioClip(src: string | null, fx: AudioFxPreset | null = null
 
   const [state, setState] = useState<AudioClipState>({
     ready: false,
+    canPlay: false,
     playing: false,
     positionMs: 0,
     durationMs: 0,
@@ -210,7 +246,7 @@ export function useAudioClip(src: string | null, fx: AudioFxPreset | null = null
 
     if (!src) {
       audioRef.current = null;
-      setState({ ready: false, playing: false, positionMs: 0, durationMs: 0, error: null, reactive: false });
+      setState({ ready: false, canPlay: false, playing: false, positionMs: 0, durationMs: 0, error: null, reactive: false });
       return;
     }
 
@@ -220,7 +256,7 @@ export function useAudioClip(src: string | null, fx: AudioFxPreset | null = null
       teardownGraph();
       const audio = new Audio();
       if (withCors) audio.crossOrigin = "anonymous";
-      audio.preload = "auto";
+      audio.preload = preloadAllowed ? "auto" : "none";
       audio.src = src;
       applyRate(audio, fxRef.current.rate, fxRef.current.wobbleDepth > 0.05);
 
@@ -256,12 +292,21 @@ export function useAudioClip(src: string | null, fx: AudioFxPreset | null = null
       });
 
       audioRef.current = audio;
+      setState((prev) => ({ ...prev, canPlay: true }));
     };
 
     build(true);
 
+    const stopWaiting = onPreloadAllowed(() => {
+      const audio = audioRef.current;
+      if (disposed || !audio || audio.preload === "auto") return;
+      audio.preload = "auto";
+      if (audio.paused && audio.readyState === HTMLMediaElement.HAVE_NOTHING) audio.load();
+    });
+
     return () => {
       disposed = true;
+      stopWaiting();
       stopLoop();
       audioRef.current?.pause();
       audioRef.current = null;
@@ -379,6 +424,8 @@ export function useAudioClip(src: string | null, fx: AudioFxPreset | null = null
       const audio = audioRef.current;
       if (!audio) return;
 
+      allowPreload();
+      audio.preload = "auto";
       ensureGraph();
       void contextRef.current?.resume();
 

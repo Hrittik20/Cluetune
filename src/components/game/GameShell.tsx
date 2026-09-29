@@ -551,7 +551,7 @@ export default function GameShell(props: GameShellProps) {
                 type="button"
                 className="btn btn-primary btn-lg min-w-0 flex-1 shadow-level-2 sm:min-w-40 sm:flex-none"
                 onClick={() => audio.toggle(unlocked)}
-                disabled={!audio.ready && !audio.error}
+                disabled={!audio.canPlay && !audio.error}
               >
                 {audio.playing ? "Pause" : `Play ${(unlocked / 1000).toFixed(0)}s`}
               </button>
@@ -587,7 +587,7 @@ export default function GameShell(props: GameShellProps) {
                 className="btn btn-secondary btn-icon"
                 aria-label={audio.playing ? "Pause the clip" : "Replay the full clip"}
                 onClick={() => audio.toggle(totalMs)}
-                disabled={!audio.ready && !audio.error}
+                disabled={!audio.canPlay && !audio.error}
               >
                 {audio.playing ? <PauseIcon /> : <PlayIcon />}
               </button>
