@@ -10,7 +10,8 @@ import {
 import { dailyTrack, isValidDateKey, localDateKey, puzzleNumber, shuffleDeterministic } from "../../lib/daily";
 import { getCachedChartCatalog, fetchChartCatalog, lookupChartTrack } from "../../lib/providers/charts";
 import { fetchLyricSnippet } from "../../lib/providers/lyrics";
-import { proxyAudioForClient } from "../../lib/providers/proxy";
+import { readEdge, writeEdge } from "../../lib/providers/edge-cache";
+import { proxyAudioForClient, shouldProxyAudio } from "../../lib/providers/proxy";
 import { resolvePlayable, resolveTrack } from "../../lib/providers/resolver";
 import type { Decade, Difficulty, GameMode, Genre, ModeFilters, ResolvedTrack, Track } from "../../lib/types";
 
@@ -47,6 +48,13 @@ async function dailyRound(url: URL, request: Request): Promise<Response> {
   const requested = url.searchParams.get("date") ?? "";
   const dateKey = isValidDateKey(requested) ? requested : localDateKey();
 
+  // Everyone gets the same daily, so one resolve per colo covers all players.
+  // Proxied refs are stable; raw Deezer URLs are signed and expire, so keep those short.
+  const proxied = shouldProxyAudio(request);
+  const cacheKey = `round/daily/${dateKey}/${proxied ? "proxy" : "direct"}`;
+  const cached = await readEdge(cacheKey);
+  if (cached) return cached;
+
   // Walk forward through the deterministic order until something is playable,
   // so a provider gap never leaves the day with no puzzle at all.
   const ordered = rotate(
@@ -61,7 +69,7 @@ async function dailyRound(url: URL, request: Request): Promise<Response> {
 
   if (!resolved) return json({ error: "No playable track for today." }, 503);
 
-  return respond(
+  const response = respond(
     request,
     {
       mode: "daily",
@@ -70,8 +78,9 @@ async function dailyRound(url: URL, request: Request): Promise<Response> {
       rounds: [resolved],
     },
     200,
-    "public, max-age=300, s-maxage=3600",
+    "public, max-age=300",
   );
+  return writeEdge(cacheKey, response, proxied ? 3600 : 300);
 }
 
 async function gauntletRound(url: URL, request: Request): Promise<Response> {

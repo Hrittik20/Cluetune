@@ -62,10 +62,36 @@ function takePrefetchedRounds(
   if (!payload || payload.mode !== mode) return null;
   if (mode === "daily" && payload.date && dateKey && payload.date !== dateKey) return null;
   bag.__CLUETUNE_ROUND__ = undefined;
-  return payload.promise.then((data) => {
-    if (data.error) throw new Error(data.error);
-    return data.rounds ?? [];
-  });
+  // A failed prefetch falls through to a normal fetch rather than an error screen.
+  return payload.promise.then(
+    (data) => (data.error ? [] : (data.rounds ?? [])),
+    () => [],
+  );
+}
+
+/** Server hiccups (provider rate limits, 5xx) and dropped connections are worth retrying. */
+class RoundError extends Error {
+  constructor(
+    message: string,
+    readonly retryable: boolean,
+  ) {
+    super(message);
+  }
+}
+
+const RETRY_DELAYS_MS = [1500, 4000];
+
+async function withRetry<T>(load: () => Promise<T>, signal?: AbortSignal): Promise<T> {
+  for (let attempt = 0; ; attempt++) {
+    try {
+      return await load();
+    } catch (error) {
+      const delay = RETRY_DELAYS_MS[attempt];
+      if (delay == null || signal?.aborted || !(error instanceof RoundError) || !error.retryable) throw error;
+      await new Promise((resolve) => window.setTimeout(resolve, delay));
+      if (signal?.aborted) throw new DOMException("Aborted", "AbortError");
+    }
+  }
 }
 
 export interface GameShellProps {
@@ -215,15 +241,23 @@ export default function GameShell(props: GameShellProps) {
       if (signal) signal.addEventListener("abort", () => controller.abort(), { once: true });
 
       try {
-        const response = await fetch(`/api/round?${params}`, { signal: controller.signal });
-        const data = (await response.json()) as { rounds?: ResolvedTrack[]; error?: string };
+        let response: Response;
+        try {
+          response = await fetch(`/api/round?${params}`, { signal: controller.signal });
+        } catch (error) {
+          if ((error as Error).name === "AbortError") throw error;
+          throw new RoundError("Couldn't reach Cluetune. Check your connection and try again.", true);
+        }
 
-        if (!response.ok) throw new Error(data.error ?? "Could not load a round.");
+        const data = (await response.json().catch(() => ({}))) as { rounds?: ResolvedTrack[]; error?: string };
+        if (!response.ok) {
+          throw new RoundError(data.error ?? "Could not load a round.", response.status >= 500);
+        }
         return data.rounds ?? [];
       } catch (error) {
         if ((error as Error).name === "AbortError") {
           if (signal?.aborted) throw error;
-          throw new Error("Loading took too long. Check your connection and try again.");
+          throw new RoundError("Loading took too long. Check your connection and try again.", false);
         }
         throw error;
       } finally {
@@ -245,7 +279,7 @@ export default function GameShell(props: GameShellProps) {
     void (async () => {
       try {
         const wanted = mode === "gauntlet" ? GAUNTLET_LENGTH : continuous ? 3 : 1;
-        const rounds = await fetchRounds(wanted, controller.signal);
+        const rounds = await withRetry(() => fetchRounds(wanted, controller.signal), controller.signal);
 
         if (controller.signal.aborted) return;
         if (!rounds.length) throw new Error("No playable tracks matched. Try widening your filters.");
@@ -285,6 +319,21 @@ export default function GameShell(props: GameShellProps) {
 
     return () => controller.abort();
   }, [fetchRounds, mode, continuous, dateKey]);
+
+  // Phones drop connections and background tabs; recover without a tap.
+  useEffect(() => {
+    if (status !== "error" || current) return;
+
+    const retry = () => {
+      if (document.visibilityState === "visible") setFilters((value) => ({ ...value }));
+    };
+    window.addEventListener("online", retry);
+    document.addEventListener("visibilitychange", retry);
+    return () => {
+      window.removeEventListener("online", retry);
+      document.removeEventListener("visibilitychange", retry);
+    };
+  }, [status, current]);
 
   // Daily countdown ticker.
   useEffect(() => {
@@ -400,7 +449,7 @@ export default function GameShell(props: GameShellProps) {
 
     setStatus("loading");
     try {
-      const more = await fetchRounds(3);
+      const more = await withRetry(() => fetchRounds(3));
       const [first, ...remaining] = more;
       if (!first) throw new Error("No more playable tracks right now.");
 

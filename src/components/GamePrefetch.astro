@@ -1,7 +1,9 @@
 ---
 /**
- * Warm the round API. Desktop starts immediately (helps LCP after hydrate);
- * mobile waits until load/idle so Slow-4G bandwidth stays free for CSS/fonts.
+ * Starts the round request while the page is still parsing so the game island
+ * can pick it up on hydrate. It must start before the island hydrates on every
+ * viewport: a late start makes the island fetch on its own and the prefetch
+ * then fires a second, wasted request against the audio providers.
  */
 interface Props {
   mode?: string;
@@ -22,35 +24,17 @@ const { mode = "daily", count = mode === "daily" ? 1 : 3 } = Astro.props;
       String(d.getDate()).padStart(2, "0");
     window.__CLUETUNE_DATE__ = key;
 
-    var start = function () {
-      if (window.__CLUETUNE_ROUND__) return;
-      var params = new URLSearchParams({ mode: mode, count: String(count) });
-      if (mode === "daily") params.set("date", key);
-      var url = "/api/round?" + params.toString();
-      var promise = fetch(url, { credentials: "same-origin" }).then(function (response) {
-        return response.json();
-      });
-      window.__CLUETUNE_ROUND__ = { mode: mode, date: key, promise: promise };
-    };
-
-    var desktop = false;
-    try {
-      desktop = window.matchMedia("(min-width: 768px)").matches;
-    } catch (e) {}
-
-    if (desktop) {
-      start();
-      return;
-    }
-
-    if (document.readyState === "complete") {
-      if ("requestIdleCallback" in window) requestIdleCallback(start, { timeout: 1200 });
-      else setTimeout(start, 200);
-    } else {
-      window.addEventListener("load", function () {
-        if ("requestIdleCallback" in window) requestIdleCallback(start, { timeout: 1200 });
-        else setTimeout(start, 200);
-      });
-    }
+    if (window.__CLUETUNE_ROUND__) return;
+    var params = new URLSearchParams({ mode: mode, count: String(count) });
+    if (mode === "daily") params.set("date", key);
+    var promise = fetch("/api/round?" + params.toString(), { credentials: "same-origin" }).then(
+      function (response) {
+        return response.json().then(function (data) {
+          if (!response.ok && !data.error) data.error = "Could not load a round.";
+          return data;
+        });
+      },
+    );
+    window.__CLUETUNE_ROUND__ = { mode: mode, date: key, promise: promise };
   })();
 </script>
