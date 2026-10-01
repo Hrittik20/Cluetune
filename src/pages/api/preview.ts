@@ -3,7 +3,8 @@ import { getTrack as getCatalogTrack } from "../../lib/catalog";
 import { lookupChartTrack } from "../../lib/providers/charts";
 import { readEdge, writeEdge } from "../../lib/providers/edge-cache";
 import { lookupDeezerById } from "../../lib/providers/deezer";
-import { lookupByIsrc, lookupItunesById } from "../../lib/providers/itunes";
+import { lookupByIsrc } from "../../lib/providers/itunes";
+import { itunesPin } from "../../lib/providers/itunes-pins";
 import { lookupSpotifyTrack } from "../../lib/providers/spotify";
 
 export const prerender = false;
@@ -35,10 +36,7 @@ export const GET: APIRoute = async ({ url }) => {
     previewUrl = deezer?.previewUrl;
   }
 
-  if (!previewUrl && track.itunesId) {
-    const itunes = await lookupItunesById(track.itunesId).catch(() => null);
-    previewUrl = itunes?.previewUrl;
-  }
+  previewUrl ??= itunesPin(track.id)?.previewUrl;
 
   if (!previewUrl) {
     const spotify = await lookupSpotifyTrack(track.title, track.artist).catch(() => null);

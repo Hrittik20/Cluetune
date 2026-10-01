@@ -37,11 +37,6 @@ export interface Track {
    * endpoint is IP-restricted) instead of falling through to a search.
    */
   deezerId?: number;
-  /**
-   * Pre-stored iTunes track ID, looked up via `/lookup?id=`. Backstops
-   * `deezerId` when Deezer withholds previews from the Worker's egress region.
-   */
-  itunesId?: number;
 }
 
 export type GameMode = "daily" | "unlimited" | "drunk" | "lyric-flip" | "gauntlet";

@@ -1,7 +1,8 @@
 import type { AudioSource, ResolvedTrack, Track } from "../types";
 import { TtlCache } from "./cache";
 import { findDeezerPreview, lookupDeezerById } from "./deezer";
-import { findItunesPreview, lookupByIsrc, lookupItunesById } from "./itunes";
+import { findItunesPreview, lookupByIsrc } from "./itunes";
+import { itunesPin } from "./itunes-pins";
 import { lookupSpotifyTrack } from "./spotify";
 import { findYouTubeVideo, youtubeClipFallbackEnabled } from "./youtube";
 
@@ -38,6 +39,21 @@ export async function resolveTrack(track: Track): Promise<ResolvedTrack> {
 }
 
 async function resolveUncached(track: Track): Promise<ResolvedTrack> {
+  // Pinned previews need no provider call. Deezer withholds previews from
+  // some Worker egress regions (India) and Apple 403s Worker IPs, so this is
+  // the only path that cannot be taken away at request time.
+  const pin = itunesPin(track.id);
+  if (pin) {
+    return {
+      track,
+      source: audioSource(pin.previewUrl, "itunes", {
+        artworkUrl: pin.artworkUrl,
+        durationMs: pin.durationMs,
+        attribution: "Preview via Apple Music",
+      }),
+    };
+  }
+
   // Fast path: a pre-stored Deezer ID skips iTunes/Deezer search entirely.
   // Those search endpoints are blocked from Cloudflare IPs and each miss costs
   // 3.5 s — on a cold Worker that alone blows the 30 s wall clock.
@@ -51,23 +67,6 @@ async function resolveUncached(track: Track): Promise<ResolvedTrack> {
           artworkUrl: spotify?.artworkUrl ?? deezerDirect.artworkUrl,
           durationMs: deezerDirect.durationMs,
           attribution: "Preview via Deezer",
-        }),
-      };
-    }
-  }
-
-  // Deezer withholds previews (`readable: false`) from some egress regions,
-  // India included, so a stored iTunes ID is the second one-hop path.
-  if (track.itunesId) {
-    const itunesDirect = await lookupItunesById(track.itunesId).catch(() => null);
-    if (itunesDirect?.previewUrl) {
-      const spotify = await lookupSpotifyTrack(track.title, track.artist).catch(() => null);
-      return {
-        track,
-        source: audioSource(itunesDirect.previewUrl, "itunes", {
-          artworkUrl: spotify?.artworkUrl ?? itunesDirect.artworkUrl,
-          durationMs: itunesDirect.durationMs,
-          attribution: "Preview via Apple Music",
         }),
       };
     }
@@ -187,12 +186,13 @@ export async function resolvePlayable(
   return playable;
 }
 
-/** Tracks with a baked-in provider ID resolve in one hop; try them first. */
+/** Pinned tracks resolve offline and Deezer-ID tracks in one hop; try them first. */
 function preferResolvable(tracks: Track[]): Track[] {
+  const pinned: Track[] = [];
   const fast: Track[] = [];
   const slow: Track[] = [];
   for (const track of tracks) {
-    (track.deezerId || track.itunesId ? fast : slow).push(track);
+    (itunesPin(track.id) ? pinned : track.deezerId ? fast : slow).push(track);
   }
-  return [...fast, ...slow];
+  return [...pinned, ...fast, ...slow];
 }

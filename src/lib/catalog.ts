@@ -1,8 +1,4 @@
-import itunesIds from "./itunes-ids.json";
 import type { Decade, Difficulty, Genre, ModeFilters, Track } from "./types";
-
-/** Written by scripts/fetch-itunes-ids.mts. */
-const ITUNES_IDS: Record<string, number | undefined> = itunesIds;
 
 /**
  * The seed pool. Every mode (Daily, Unlimited, Drunk, Lyrics Guess, Gauntlet)
@@ -424,18 +420,7 @@ function t(
   difficulty: Difficulty,
   deezerId?: number,
 ): Track {
-  const itunesId = ITUNES_IDS[id];
-  return {
-    id,
-    title,
-    artist,
-    album,
-    year,
-    genres,
-    difficulty,
-    ...(deezerId ? { deezerId } : {}),
-    ...(itunesId ? { itunesId } : {}),
-  };
+  return { id, title, artist, album, year, genres, difficulty, ...(deezerId ? { deezerId } : {}) };
 }
 
 export const CATALOG_BY_ID = new Map(CATALOG.map((track) => [track.id, track]));

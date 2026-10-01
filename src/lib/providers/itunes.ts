@@ -115,31 +115,6 @@ export async function lookupByIsrc(isrc: string): Promise<ItunesResult | null> {
   return results.find((result) => result.previewUrl) ?? null;
 }
 
-/** Direct lookup by a pre-stored iTunes track ID; one request, no search. */
-export async function lookupItunesById(id: number): Promise<ItunesResult | null> {
-  if (itunesDisabled()) return null;
-  const results = await cache.wrapIf(
-    `id:${id}`,
-    async () => {
-      try {
-        const response = await fetchWithTimeout(`${LOOKUP_URL}?id=${id}&entity=song`);
-        if (!response.ok) {
-          tripItunes(response.status);
-          return [];
-        }
-
-        const data = (await response.json()) as { results?: ItunesApiTrack[] };
-        return (data.results ?? []).map(mapResult);
-      } catch {
-        return [];
-      }
-    },
-    (items) => items.length > 0,
-  );
-
-  return results.find((result) => result.previewUrl) ?? null;
-}
-
 /**
  * Finds the entry that actually matches the requested artist, not just the
  * first result — iTunes readily returns karaoke covers and tribute-band
