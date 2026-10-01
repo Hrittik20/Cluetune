@@ -1,7 +1,7 @@
 import type { AudioSource, ResolvedTrack, Track } from "../types";
 import { TtlCache } from "./cache";
 import { findDeezerPreview, lookupDeezerById } from "./deezer";
-import { findItunesPreview, lookupByIsrc } from "./itunes";
+import { findItunesPreview, lookupByIsrc, lookupItunesById } from "./itunes";
 import { lookupSpotifyTrack } from "./spotify";
 import { findYouTubeVideo, youtubeClipFallbackEnabled } from "./youtube";
 
@@ -51,6 +51,23 @@ async function resolveUncached(track: Track): Promise<ResolvedTrack> {
           artworkUrl: spotify?.artworkUrl ?? deezerDirect.artworkUrl,
           durationMs: deezerDirect.durationMs,
           attribution: "Preview via Deezer",
+        }),
+      };
+    }
+  }
+
+  // Deezer withholds previews (`readable: false`) from some egress regions,
+  // India included, so a stored iTunes ID is the second one-hop path.
+  if (track.itunesId) {
+    const itunesDirect = await lookupItunesById(track.itunesId).catch(() => null);
+    if (itunesDirect?.previewUrl) {
+      const spotify = await lookupSpotifyTrack(track.title, track.artist).catch(() => null);
+      return {
+        track,
+        source: audioSource(itunesDirect.previewUrl, "itunes", {
+          artworkUrl: spotify?.artworkUrl ?? itunesDirect.artworkUrl,
+          durationMs: itunesDirect.durationMs,
+          attribution: "Preview via Apple Music",
         }),
       };
     }
@@ -170,12 +187,12 @@ export async function resolvePlayable(
   return playable;
 }
 
-/** Tracks with a baked-in Deezer ID resolve in one hop; try them first. */
+/** Tracks with a baked-in provider ID resolve in one hop; try them first. */
 function preferResolvable(tracks: Track[]): Track[] {
   const fast: Track[] = [];
   const slow: Track[] = [];
   for (const track of tracks) {
-    (track.deezerId ? fast : slow).push(track);
+    (track.deezerId || track.itunesId ? fast : slow).push(track);
   }
   return [...fast, ...slow];
 }

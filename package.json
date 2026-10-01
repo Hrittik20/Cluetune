@@ -16,6 +16,7 @@
     "catalog:report": "node scripts/catalog-report.mjs",
     "deezer:fetch": "npx tsx scripts/fetch-deezer-ids.mts",
     "deezer:apply": "npx tsx scripts/apply-deezer-patch.mts",
+    "itunes:fetch": "npx tsx scripts/fetch-itunes-ids.mts",
     "astro": "astro"
   },
   "dependencies": {
