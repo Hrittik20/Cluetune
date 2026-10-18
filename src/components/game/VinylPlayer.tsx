@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import { VINYL_DISC_CLASS } from "../../lib/vinylUi";
 
 export interface VinylPlayerProps {
@@ -16,6 +16,8 @@ export interface VinylPlayerProps {
   /** Hides the artwork until the round resolves. */
   revealArtwork: boolean;
   reducedGlitch?: boolean;
+  /** Overlays positioned against the disc, e.g. the difficulty sticker. */
+  children?: ReactNode;
 }
 
 const TAU = Math.PI * 2;
@@ -42,6 +44,7 @@ export function VinylPlayer({
   artworkUrl,
   revealArtwork,
   reducedGlitch = false,
+  children,
 }: VinylPlayerProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const frameRef = useRef<number | null>(null);
@@ -156,18 +159,21 @@ export function VinylPlayer({
   }, [playing, positionMs, unlockedMs, totalMs, revealArtwork, reducedGlitch, scratchKey]);
 
   return (
-    <canvas
-      ref={canvasRef}
-      width={176}
-      height={176}
-      className={`${VINYL_DISC_CLASS} touch-none select-none`}
-      role="img"
-      aria-label={
-        playing
-          ? `Playing clip, ${(positionMs / 1000).toFixed(1)} of ${(unlockedMs / 1000).toFixed(0)} seconds unlocked`
-          : `Clip paused, ${(unlockedMs / 1000).toFixed(0)} seconds unlocked`
-      }
-    />
+    <div className={`${VINYL_DISC_CLASS} relative`}>
+      <canvas
+        ref={canvasRef}
+        width={176}
+        height={176}
+        className="block size-full touch-none select-none rounded-full"
+        role="img"
+        aria-label={
+          playing
+            ? `Playing clip, ${(positionMs / 1000).toFixed(1)} of ${(unlockedMs / 1000).toFixed(0)} seconds unlocked`
+            : `Clip paused, ${(unlockedMs / 1000).toFixed(0)} seconds unlocked`
+        }
+      />
+      {children}
+    </div>
   );
 }
 

@@ -8,6 +8,22 @@
     "binding": "ASSETS",
     "not_found_handling": "404-page"
   },
+  // Crowd results that drive per-song difficulty. Schema lives in migrations/.
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "cluetune",
+      "database_id": "ccdeea56-e47b-4ea0-9691-d665ca809ba4",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "ratelimits": [
+    {
+      "name": "RESULT_LIMITER",
+      "namespace_id": "1001",
+      "simple": { "limit": 30, "period": 60 }
+    }
+  ],
   "observability": {
     "enabled": true
   }

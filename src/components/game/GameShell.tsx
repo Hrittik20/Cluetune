@@ -11,9 +11,11 @@ import {
   recordRound,
   tilePattern,
   unlockedMs,
+  winningAttempt,
   type RoundState,
   type SessionStats,
 } from "../../lib/game";
+import { COUNTED_MODES, emptyStats, songTier, standing, withBaseline, type SongStats } from "../../lib/difficulty";
 import {
   DRUNK_LEVEL_LABELS,
   DRUNK_START_LEVEL,
@@ -32,6 +34,7 @@ import { GuessInput } from "./GuessInput";
 import { ClipLadderBar, GuessRows } from "./GuessRows";
 import { LyricsBoard } from "./LyricsBoard";
 import { SessionHud } from "./SessionHud";
+import { CrowdNote, DifficultySticker } from "./VinylAnnotations";
 import { VinylPlayer } from "./VinylPlayer";
 import { useAudioClip } from "./useAudioClip";
 
@@ -145,8 +148,12 @@ export default function GameShell(props: GameShellProps) {
   const [dateKey, setDateKey] = useState<string | null>(dateKeyProp ?? readPrefetchDateKey());
   const [buzzLevel, setBuzzLevel] = useState<DrunkLevel>(DRUNK_START_LEVEL);
   const [buzzNote, setBuzzNote] = useState<string | null>(null);
+  const [crowd, setCrowd] = useState<{ trackId: string; stats: SongStats } | null>(null);
 
   const puzzle = dateKey ? puzzleNumber(dateKey) : undefined;
+  const counted = COUNTED_MODES.has(mode);
+  /** Track whose result this tab already sent, so the reveal doesn't fetch it a second time. */
+  const submittedTrackRef = useRef<string | null>(null);
 
   /** Peak magnitudes captured while playing, for the share-card waveform. */
   const waveformRef = useRef<number[]>([]);
@@ -399,9 +406,54 @@ export default function GameShell(props: GameShellProps) {
           elapsedMs: (next.endedAt ?? 0) - (next.startedAt ?? 0),
         });
       }
+
+      // Sent after the saves above so the player id is already persisted.
+      if (counted) {
+        const trackId = next.track.id;
+        submittedTrackRef.current = trackId;
+        void fetch("/api/result", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ trackId, playerId: loadState().playerId, mode, attempt: winningAttempt(next) }),
+        })
+          .then((response) => (response.ok ? (response.json() as Promise<{ stats?: SongStats }>) : null))
+          .then((data) => setCrowd({ trackId, stats: data?.stats ?? emptyStats() }))
+          .catch(() => setCrowd({ trackId, stats: emptyStats() }));
+      }
     },
-    [audio, session, mode, dateKey, buzzLevel],
+    [audio, session, mode, dateKey, buzzLevel, counted],
   );
+
+  // The reveal note is hand-lettered. Fetch the face once the round is playable
+  // and the main thread is idle, so it never competes with first load or swaps in mid-scrawl.
+  useEffect(() => {
+    if (!counted || status !== "ready") return;
+    const load = () => void document.fonts?.load('1em "Permanent Marker"').catch(() => undefined);
+    if (typeof requestIdleCallback === "function") {
+      const handle = requestIdleCallback(load, { timeout: 4000 });
+      return () => cancelIdleCallback(handle);
+    }
+    const timer = window.setTimeout(load, 1500);
+    return () => window.clearTimeout(timer);
+  }, [counted, status]);
+
+  // Reveals restored from history (e.g. reopening a finished daily) were never
+  // submitted from this tab, so read the totals instead.
+  const finishedTrackId = round && round.status !== "playing" ? round.track.id : null;
+  useEffect(() => {
+    if (!counted || !finishedTrackId || submittedTrackRef.current === finishedTrackId) return;
+
+    let cancelled = false;
+    void fetch(`/api/song-stats?track=${encodeURIComponent(finishedTrackId)}`)
+      .then((response) => (response.ok ? (response.json() as Promise<{ stats?: SongStats }>) : null))
+      .catch(() => null)
+      .then((data) => {
+        if (!cancelled) setCrowd({ trackId: finishedTrackId, stats: data?.stats ?? emptyStats() });
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [counted, finishedTrackId]);
 
   const commitGuess = useCallback(
     (label: string) => {
@@ -506,6 +558,11 @@ export default function GameShell(props: GameShellProps) {
   const nextCtaLabel =
     mode === "gauntlet" ? `Round ${completedRounds + 1} of ${GAUNTLET_LENGTH}` : "Next Round";
   const showNextCta = finished && !gauntletComplete;
+  const tier = counted ? (current.tier ?? songTier(current.track.difficulty)) : undefined;
+  const crowdStanding =
+    finished && tier && crowd?.trackId === round.track.id
+      ? standing(withBaseline(crowd.stats, tier, round.track.id), winningAttempt(round))
+      : null;
 
   return (
     <div className="flex flex-col gap-2.5 sm:gap-5">
@@ -577,7 +634,10 @@ export default function GameShell(props: GameShellProps) {
               artworkUrl={current.source?.artworkUrl}
               revealArtwork={finished}
               reducedGlitch={reducedGlitch}
-            />
+            >
+              {tier ? <DifficultySticker key={round.track.id} tier={tier} /> : null}
+              {tier && crowdStanding ? <CrowdNote standing={crowdStanding} tier={tier} /> : null}
+            </VinylPlayer>
           </div>
 
           {showNextCta ? (

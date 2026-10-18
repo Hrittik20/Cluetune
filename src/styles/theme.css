@@ -159,6 +159,8 @@
 
   --font-sans: "Geist Variable", Inter, system-ui, -apple-system, sans-serif;
   --font-mono: "Geist Mono Variable", ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+  /* Only for scrawls on the record. Never for UI copy. */
+  --font-marker: "Permanent Marker", "Segoe Print", "Bradley Hand", cursive;
 
   /* Display sizes carry the aggressive negative tracking that defines the
      voice. Weight ceiling is 600 across the whole scale. */
@@ -223,6 +225,36 @@
 
   --animate-rise: rise 0.5s var(--ease-out-quint) both;
   --animate-tile-in: tile-in 0.34s var(--ease-out-quint) both;
+  /* `backwards`, not `both`: once landed, no animated transform is left behind
+     to keep the sticker on a soft, separately rasterised layer. */
+  --animate-stamp: stamp 0.45s var(--ease-out-quint) backwards;
+  --animate-scrawl: scrawl 0.9s var(--ease-out-quint) 0.15s both;
+
+  /* Sticker slapped onto the record: lands slightly oversized, then settles. */
+  @keyframes stamp {
+    0% {
+      opacity: 0;
+      scale: 1.5;
+    }
+    70% {
+      opacity: 1;
+      scale: 0.95;
+    }
+    100% {
+      opacity: 1;
+      scale: 1;
+    }
+  }
+
+  /* Marker note revealed left to right, as if being written. */
+  @keyframes scrawl {
+    from {
+      clip-path: inset(0 100% 0 0);
+    }
+    to {
+      clip-path: inset(0 -10% 0 0);
+    }
+  }
 
   @keyframes rise {
     from {

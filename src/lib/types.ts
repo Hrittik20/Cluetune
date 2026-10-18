@@ -1,3 +1,5 @@
+import type { DifficultyTier } from "./difficulty";
+
 export type Genre =
   | "pop"
   | "hip-hop"
@@ -89,6 +91,8 @@ export interface ResolvedTrack {
   lyrics?: LyricSnippet | null;
   /** Populated when every provider in the chain declined. */
   unavailableReason?: string;
+  /** Crowd difficulty, fixed when the round is served. Only set in counted modes. */
+  tier?: DifficultyTier;
 }
 
 export interface SearchSuggestion {

@@ -13,6 +13,8 @@ import { fetchLyricSnippet } from "../../lib/providers/lyrics";
 import { readEdge, writeEdge } from "../../lib/providers/edge-cache";
 import { proxyAudioForClient, shouldProxyAudio } from "../../lib/providers/proxy";
 import { resolvePlayable, resolveTrack } from "../../lib/providers/resolver";
+import { COUNTED_MODES, songTier, type SongStats } from "../../lib/difficulty";
+import { readSongStats } from "../../lib/song-stats";
 import type { Decade, Difficulty, GameMode, Genre, ModeFilters, ResolvedTrack, Track } from "../../lib/types";
 
 export const prerender = false;
@@ -69,7 +71,7 @@ async function dailyRound(url: URL, request: Request): Promise<Response> {
 
   if (!resolved) return json({ error: "No playable track for today." }, 503);
 
-  const response = respond(
+  const response = await respond(
     request,
     {
       mode: "daily",
@@ -228,14 +230,31 @@ async function attachLyrics(
   return found;
 }
 
-function respond(
+async function respond(
   request: Request,
-  body: Record<string, unknown> & { rounds?: ResolvedTrack[] },
+  body: Record<string, unknown> & { mode: GameMode; rounds?: ResolvedTrack[] },
   status = 200,
   cacheControl = "no-store",
-): Response {
-  if (body.rounds) body.rounds = proxyAudioForClient(body.rounds, request);
+): Promise<Response> {
+  if (body.rounds) {
+    body.rounds = proxyAudioForClient(body.rounds, request);
+    if (COUNTED_MODES.has(body.mode)) body.rounds = await withTiers(body.rounds);
+  }
   return json(body, status, cacheControl);
+}
+
+/** D1 may sit in a far-off region; a slow read must never hold up a round. */
+const TIER_READ_BUDGET_MS = 150;
+
+async function withTiers(rounds: ResolvedTrack[]): Promise<ResolvedTrack[]> {
+  const stats = await Promise.race([
+    readSongStats(rounds.map((round) => round.track.id)),
+    new Promise<Map<string, SongStats>>((resolve) => setTimeout(() => resolve(new Map()), TIER_READ_BUDGET_MS)),
+  ]);
+  return rounds.map((round) => ({
+    ...round,
+    tier: songTier(round.track.difficulty, stats.get(round.track.id)),
+  }));
 }
 
 function json(body: unknown, status = 200, cacheControl = "no-store"): Response {
