@@ -14,6 +14,9 @@ export interface GuessInputProps {
 }
 
 const DEBOUNCE_MS = 160;
+/** The server caps its own remote lookups; this only guards a stalled network. */
+const REQUEST_TIMEOUT_MS = 6000;
+const CACHE_LIMIT = 100;
 
 /**
  * The guess box. Implemented as an ARIA combobox rather than a datalist so the
@@ -39,6 +42,7 @@ export function GuessInput({
   const inputRef = useRef<HTMLInputElement | null>(null);
   const listRef = useRef<HTMLUListElement | null>(null);
   const blurTimer = useRef<number | null>(null);
+  const cache = useRef(new Map<string, SearchSuggestion[]>());
 
   const listId = useId();
   const optionId = useCallback((index: number) => `${listId}-option-${index}`, [listId]);
@@ -53,6 +57,15 @@ export function GuessInput({
       return;
     }
 
+    const cached = cache.current.get(trimmed.toLowerCase());
+    if (cached) {
+      setSuggestions(cached);
+      setActiveIndex(-1);
+      setSettledQuery(trimmed);
+      setLoading(false);
+      return;
+    }
+
     const controller = new AbortController();
     // Every state write below is gated on this. Without it, the aborted
     // request's `finally` resolves *after* the next effect has already set
@@ -61,7 +74,10 @@ export function GuessInput({
     let superseded = false;
     setLoading(true);
 
+    let timeout: number | undefined;
+
     const timer = window.setTimeout(async () => {
+      timeout = window.setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
       try {
         const response = await fetch(`/api/search?q=${encodeURIComponent(trimmed)}`, {
           signal: controller.signal,
@@ -72,11 +88,20 @@ export function GuessInput({
         const ranked = (data.suggestions ?? []).filter((suggestion) => scoreSuggestion(trimmed, suggestion) > 0);
         if (superseded) return;
 
+        if (response.headers.get("cache-control") !== "no-store") {
+          if (cache.current.size >= CACHE_LIMIT) {
+            const oldest = cache.current.keys().next();
+            if (!oldest.done) cache.current.delete(oldest.value);
+          }
+          cache.current.set(trimmed.toLowerCase(), ranked);
+        }
+
         setSuggestions(ranked);
         setActiveIndex(-1);
       } catch {
         if (!superseded) setSuggestions([]);
       } finally {
+        window.clearTimeout(timeout);
         if (!superseded) {
           setSettledQuery(trimmed);
           setLoading(false);
@@ -88,6 +113,7 @@ export function GuessInput({
       superseded = true;
       controller.abort();
       window.clearTimeout(timer);
+      window.clearTimeout(timeout);
     };
   }, [query]);
 

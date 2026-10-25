@@ -83,8 +83,9 @@ async function getToken(): Promise<string | null> {
   const cached = await tokenPromise;
   if (cached && cached.expiresAt > Date.now()) return cached.token;
 
-  // Single in-flight refresh, shared by concurrent callers.
-  tokenPromise = requestToken();
+  // Single in-flight refresh, shared by concurrent callers. A network failure
+  // must settle to null, or the rejected promise is replayed to every caller.
+  tokenPromise = requestToken().catch(() => null);
   return (await tokenPromise)?.token ?? null;
 }
 

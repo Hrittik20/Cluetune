@@ -36,10 +36,30 @@ export const GET: APIRoute = async ({ url }) => {
   const local = rank([...catalogSuggestions, ...EXTRA_SUGGESTIONS], query).slice(0, 8);
 
   const tokenCount = query.split(/\s+/).filter(Boolean).length;
-  const remote = tokenCount >= 6 ? [] : rank(await fetchRemote(query).catch(() => []), query);
+  const remote = tokenCount >= 6 ? [] : await withDeadline(fetchRemote(query), REMOTE_BUDGET_MS);
+  const suggestions = dedupe([...local, ...rank(remote ?? [], query)]).slice(0, 10);
 
-  return json({ suggestions: dedupe([...local, ...remote]).slice(0, 10) });
+  // A timed-out lookup keeps running and fills the provider cache, so the
+  // partial answer must not be cached in front of it.
+  return json({ suggestions }, 200, remote !== null);
 };
+
+/**
+ * Upper bound on remote lookups. Local matches are instant; without this a
+ * slow or stalled provider (token exchange, Spotify → iTunes fallback, a body
+ * that never finishes streaming) holds them hostage and the box spins forever.
+ */
+const REMOTE_BUDGET_MS = 2000;
+
+/** Resolves to null on timeout, and to an empty list on provider failure. */
+function withDeadline<T>(promise: Promise<T[]>, ms: number): Promise<T[] | null> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const deadline = new Promise<null>((resolve) => {
+    timer = setTimeout(() => resolve(null), ms);
+  });
+
+  return Promise.race([promise.catch(() => [] as T[]), deadline]).finally(() => clearTimeout(timer));
+}
 
 function rank(suggestions: SearchSuggestion[], query: string): SearchSuggestion[] {
   return suggestions
@@ -82,12 +102,12 @@ function dedupe(suggestions: SearchSuggestion[]): SearchSuggestion[] {
   });
 }
 
-function json(body: unknown, status = 200): Response {
+function json(body: unknown, status = 200, cacheable = true): Response {
   return new Response(JSON.stringify(body), {
     status,
     headers: {
       "content-type": "application/json; charset=utf-8",
-      "cache-control": "public, max-age=30, s-maxage=300",
+      "cache-control": cacheable ? "public, max-age=30, s-maxage=300" : "no-store",
     },
   });
 }
