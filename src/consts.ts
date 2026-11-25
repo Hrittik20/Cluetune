@@ -68,6 +68,7 @@ export interface NavItem {
 export const NAV_ITEMS: NavItem[] = [
   { href: "/", label: "Daily" },
   { href: "/unlimited", label: "Unlimited" },
+  { href: "/duel", label: "Duel" },
   { href: "/drunk", label: "Drunk" },
   { href: "/lyrics", label: "Lyrics" },
   { href: "/gauntlet", label: "Gauntlet" },

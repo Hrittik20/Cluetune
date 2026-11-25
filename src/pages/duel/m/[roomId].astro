@@ -1,0 +1,29 @@
+---
+import DuelShellMount from "../../../components/duel/DuelShellMount.astro";
+import Layout from "../../../layouts/Layout.astro";
+import { ROOM_ID_PATTERN } from "../../../server/duel/stubs";
+
+export const prerender = false;
+
+const roomId = Astro.params.roomId ?? "";
+const bot = import.meta.env.DEV && Astro.url.searchParams.get("bot") === "1";
+
+if (!ROOM_ID_PATTERN.test(roomId)) {
+  return Astro.redirect("/duel", 302);
+}
+---
+
+<Layout
+  title="Duel match"
+  description="Your Cluetune Duel match is ready. Guess the song against your rival."
+  noindex
+>
+  <section class="relative isolate">
+    <div class="page-shell relative pb-4 pt-2 sm:pb-16 sm:pt-5">
+      <header class="mx-auto mb-3 flex max-w-xl flex-col items-center text-center sm:mb-4">
+        <p class="eyebrow">Quick match</p>
+      </header>
+      <DuelShellMount roomId={roomId} bot={bot} />
+    </div>
+  </section>
+</Layout>

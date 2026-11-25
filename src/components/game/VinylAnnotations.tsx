@@ -1,19 +1,19 @@
 import { TIER_LABELS, type DifficultyTier, type Standing } from "../../lib/difficulty";
 
 const STICKER_TONE: Record<DifficultyTier, { face: string; caption: string }> = {
-  easy: { face: "bg-cyan text-[#04241c]", caption: "text-[#04241c]/70" },
-  medium: { face: "bg-amber text-[#2b2000]", caption: "text-[#2b2000]/70" },
-  hard: { face: "bg-coral text-white", caption: "text-white/80" },
-  expert: { face: "bg-pink text-white", caption: "text-white/80" },
-  impossible: { face: "bg-violet text-white", caption: "text-white/80" },
+  easy: { face: "bg-[var(--cluetune-sticker-easy)] text-[#052e1c]", caption: "text-[#052e1c]/70" },
+  medium: { face: "bg-[var(--cluetune-sticker-medium)] text-[#2b2000]", caption: "text-[#2b2000]/70" },
+  hard: { face: "bg-[var(--cluetune-sticker-hard)] text-[#2e1400]", caption: "text-[#2e1400]/70" },
+  expert: { face: "bg-[var(--cluetune-sticker-expert)] text-white", caption: "text-white/80" },
+  impossible: { face: "bg-[var(--cluetune-sticker-impossible)] text-white", caption: "text-white/70" },
 };
 
 const INK_TONE: Record<DifficultyTier, string> = {
-  easy: "var(--color-cyan)",
-  medium: "var(--color-amber)",
-  hard: "var(--color-coral)",
-  expert: "var(--color-pink)",
-  impossible: "var(--color-violet)",
+  easy: "var(--cluetune-sticker-easy)",
+  medium: "var(--cluetune-sticker-medium)",
+  hard: "var(--cluetune-sticker-hard)",
+  expert: "var(--cluetune-sticker-expert)",
+  impossible: "#ffffff",
 };
 
 /**
@@ -53,10 +53,10 @@ export function CrowdNote({ standing, tier }: { standing: Standing; tier: Diffic
   const { percent } = standing;
   const [headline, aside, sentence] =
     standing.kind === "beat"
-      ? [`beat ${percent}%`, "of players!", `You beat ${percent}% of players.`]
+      ? [`beat ${percent}%`, "of players", `You beat ${percent}% of players.`]
       : percent < 50
         ? [`only ${percent}%`, "got this one", `Only ${percent}% of players got this one.`]
-        : [`${percent}% got it`, "get the next one!", `${percent}% of players got this one.`];
+        : [`${percent}% got it`, "get the next one", `${percent}% of players got this one.`];
 
   return (
     <div className="pointer-events-none absolute inset-x-0 top-[64%] flex justify-center">

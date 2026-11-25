@@ -2,7 +2,6 @@
 import GamePrefetch from "./GamePrefetch.astro";
 import GameShellFrame from "./GameShellFrame.astro";
 import GameShellMount from "./GameShellMount.astro";
-import MeshGradient from "./MeshGradient.astro";
 import ModeSeoSection from "./ModeSeoSection.astro";
 import Layout from "../layouts/Layout.astro";
 import { LOCALES, type LocaleCode, getModeHreflangs, localizedPath } from "../i18n/config";
@@ -34,21 +33,10 @@ const drunkFaqs = slug === "drunk" ? copy.faqs : undefined;
 >
   <GamePrefetch mode={gameMode} count={3} />
 
-  <section class="relative isolate">
-    <MeshGradient intensity="soft" />
-
-    <div class="page-shell relative pb-10 pt-3 sm:pb-16 sm:pt-5">
+  <section>
+    <div class="page-shell pb-10 pt-3 sm:pb-16 sm:pt-5">
       <header class="mx-auto mb-3 flex max-w-2xl flex-col items-center gap-1.5 text-center sm:mb-4">
-        {
-          slug === "drunk" ? (
-            <p class="badge">
-              <span>{copy.badge}</span>
-              <span class="badge-new">New</span>
-            </p>
-          ) : (
-            <p class="badge">{copy.badge}</p>
-          )
-        }
+        <p class="badge">{copy.badge}</p>
         <h1 class="text-balance text-display-sm text-ink sm:text-display-md">{copy.h1}</h1>
       </header>
 
@@ -94,8 +82,8 @@ const drunkFaqs = slug === "drunk" ? copy.faqs : undefined;
               href={localizedPath(entry.code, `/${slug}`)}
               hreflang={entry.hreflang}
               class:list={[
-                "text-body-sm underline underline-offset-4",
-                entry.code === locale ? "text-ink" : "text-link",
+                "text-body-sm",
+                entry.code === locale ? "text-mute" : "text-link underline underline-offset-4",
               ]}
               aria-current={entry.code === locale ? "page" : undefined}
             >

@@ -22,11 +22,13 @@ export const CARD_WIDTH = 1080;
 export const CARD_HEIGHT = 1920;
 
 const VERDICT_FILL: Record<GuessVerdict, string> = {
-  correct: "#50e3c2",
-  close: "#f9cb28",
-  wrong: "#ff4d4d",
+  correct: "#4cc38a",
+  close: "#f2c94c",
+  wrong: "#e5484d",
   skip: "#33333c",
 };
+
+const PAPER = "#efe7d6";
 
 /**
  * Renders the vertical result card.
@@ -68,42 +70,43 @@ function drawBackground(context: CanvasRenderingContext2D) {
   context.fillStyle = "#08080a";
   context.fillRect(0, 0, CARD_WIDTH, CARD_HEIGHT);
 
-  // The brand mesh, at hero scale, as the card's only decoration.
-  const blobs: [number, number, number, string][] = [
-    [180, 420, 720, "rgba(0,124,240,0.5)"],
-    [900, 260, 640, "rgba(0,223,216,0.34)"],
-    [880, 1180, 780, "rgba(255,0,128,0.34)"],
-    [140, 1420, 700, "rgba(121,40,202,0.36)"],
-    [560, 1780, 640, "rgba(249,203,40,0.22)"],
-  ];
+  // The record the sleeve came out of, half-pulled behind the artwork.
+  const cx = CARD_WIDTH / 2 + 260;
+  const cy = 620;
+  const radius = 330;
 
   context.save();
-  context.globalCompositeOperation = "lighter";
-  for (const [x, y, radius, color] of blobs) {
-    const gradient = context.createRadialGradient(x, y, 0, x, y, radius);
-    gradient.addColorStop(0, color);
-    gradient.addColorStop(1, "rgba(0,0,0,0)");
-    context.fillStyle = gradient;
-    context.fillRect(0, 0, CARD_WIDTH, CARD_HEIGHT);
-  }
-  context.restore();
+  context.beginPath();
+  context.arc(cx, cy, radius, 0, Math.PI * 2);
+  context.fillStyle = "#121215";
+  context.fill();
 
-  // Knock the mesh back so type stays at full contrast over it.
-  context.fillStyle = "rgba(8,8,10,0.62)";
-  context.fillRect(0, 0, CARD_WIDTH, CARD_HEIGHT);
+  context.strokeStyle = "rgba(255,255,255,0.05)";
+  context.lineWidth = 2;
+  for (let r = radius * 0.4; r < radius * 0.96; r += 14) {
+    context.beginPath();
+    context.arc(cx, cy, r, 0, Math.PI * 2);
+    context.stroke();
+  }
+
+  context.beginPath();
+  context.arc(cx, cy, radius * 0.3, 0, Math.PI * 2);
+  context.fillStyle = PAPER;
+  context.fill();
+  context.restore();
 }
 
 function drawWordmark(context: CanvasRenderingContext2D, options: ShareCardOptions) {
   context.save();
   context.fillStyle = "#fafafa";
-  context.font = "600 44px Geist Variable, Inter, system-ui, sans-serif";
-  context.letterSpacing = "-1px";
+  context.font = "500 44px Geist Variable, Inter, system-ui, sans-serif";
+  context.letterSpacing = "-0.5px";
   context.fillText("Cluetune", 96, 190);
 
-  context.fillStyle = "rgba(250,250,250,0.55)";
+  context.fillStyle = "rgba(250,250,250,0.6)";
   context.font = "400 30px Geist Mono Variable, ui-monospace, monospace";
-  context.letterSpacing = "4px";
-  context.fillText(options.headline.toUpperCase(), 96, 248);
+  context.letterSpacing = "0px";
+  context.fillText(options.headline, 96, 248);
   context.restore();
 }
 
@@ -139,12 +142,14 @@ function drawArtwork(
   if (artwork) {
     context.drawImage(artwork, x, y, size, size);
   } else {
-    const gradient = context.createLinearGradient(x, y, x + size, y + size);
-    gradient.addColorStop(0, "#007cf0");
-    gradient.addColorStop(0.45, "#7928ca");
-    gradient.addColorStop(1, "#ff0080");
-    context.fillStyle = gradient;
+    // Plain card sleeve with a printed ring, as if the cover never shipped.
+    context.fillStyle = "#1a1a1f";
     context.fillRect(x, y, size, size);
+    context.beginPath();
+    context.arc(x + size / 2, y + size / 2, size * 0.32, 0, Math.PI * 2);
+    context.strokeStyle = "rgba(239,231,214,0.35)";
+    context.lineWidth = 3;
+    context.stroke();
   }
   context.restore();
 
@@ -187,17 +192,12 @@ function drawWaveform(context: CanvasRenderingContext2D, options: ShareCardOptio
   const samples = options.waveform.length >= 8 ? resample(options.waveform, bars) : seededWave(options.seed, bars);
 
   context.save();
+  context.fillStyle = PAPER;
   for (let i = 0; i < bars; i++) {
     const magnitude = Math.max(0.06, Math.min(1, samples[i] ?? 0));
     const height = magnitude * maxHeight;
     const x = left + i * barWidth;
 
-    const gradient = context.createLinearGradient(0, centerY - height, 0, centerY + height);
-    gradient.addColorStop(0, "#00dfd8");
-    gradient.addColorStop(0.5, "#50e3c2");
-    gradient.addColorStop(1, "#7928ca");
-
-    context.fillStyle = gradient;
     roundedRect(context, x + barWidth * 0.18, centerY - height, barWidth * 0.64, height * 2, barWidth * 0.32);
     context.fill();
   }
@@ -208,16 +208,16 @@ function drawResult(context: CanvasRenderingContext2D, options: ShareCardOptions
   context.save();
   context.textAlign = "center";
 
-  context.fillStyle = options.won ? "#50e3c2" : "#ff4d4d";
-  context.font = "600 168px Geist Variable, Inter, system-ui, sans-serif";
-  context.letterSpacing = "-8px";
+  context.fillStyle = options.won ? VERDICT_FILL.correct : VERDICT_FILL.wrong;
+  context.font = "500 168px Geist Variable, Inter, system-ui, sans-serif";
+  context.letterSpacing = "-5px";
   context.fillText(options.result, CARD_WIDTH / 2, 1470);
 
   context.fillStyle = "rgba(250,250,250,0.62)";
   context.font = "400 34px Geist Mono Variable, ui-monospace, monospace";
-  context.letterSpacing = "2px";
+  context.letterSpacing = "0px";
   context.fillText(
-    options.won ? `SOLVED IN ${options.seconds}S` : "NOT SOLVED",
+    options.won ? `Solved in ${options.seconds}s` : "Not solved",
     CARD_WIDTH / 2,
     1528,
   );

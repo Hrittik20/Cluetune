@@ -193,7 +193,7 @@ export function GuessInput({
 
   const skipLabel = useMemo(() => {
     if (skipLabelProp) return skipLabelProp;
-    if (nextUnlockSeconds == null) return "Give Up";
+    if (nextUnlockSeconds == null) return "Give up";
     return `Skip (+${nextUnlockSeconds}s)`;
   }, [skipLabelProp, nextUnlockSeconds]);
 

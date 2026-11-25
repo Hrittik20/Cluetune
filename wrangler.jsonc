@@ -1,5 +1,7 @@
 {
   "name": "cluetune",
+  // Custom entry so the Duel Durable Objects can be exported next to Astro.
+  "main": "./src/worker.ts",
   "compatibility_flags": [
     "nodejs_compat",
     "global_fetch_strictly_public"
@@ -16,6 +18,16 @@
       "database_id": "ccdeea56-e47b-4ea0-9691-d665ca809ba4",
       "migrations_dir": "migrations"
     }
+  ],
+  // Duel: one DuelRoom per match, one global Matchmaker for the queue and room codes.
+  "durable_objects": {
+    "bindings": [
+      { "name": "DUEL_ROOM", "class_name": "DuelRoom" },
+      { "name": "MATCHMAKER", "class_name": "Matchmaker" }
+    ]
+  },
+  "migrations": [
+    { "tag": "duel-v1", "new_sqlite_classes": ["DuelRoom", "Matchmaker"] }
   ],
   "ratelimits": [
     {

@@ -22,7 +22,7 @@ export interface LocaleTranslation {
   modes: {
     eyebrow: string;
     heading: string;
-    items: { href: string; name: string; meta: string; blurb: string; accent: string; featured?: boolean }[];
+    items: { href: string; name: string; meta: string; blurb: string; featured?: boolean }[];
   };
   why: {
     eyebrow: string;
@@ -65,66 +65,68 @@ const EN: LocaleTranslation = {
   },
   modes: {
     eyebrow: "Other ways to play",
-    heading: "Four more modes, all drawing from the same catalogue.",
+    heading: "Five more modes, all drawing from the same catalogue",
     items: [
       {
         href: "/unlimited",
         name: "Unlimited",
         meta: "No cooldown",
         blurb: "Keep going. Same catalogue, live streak and accuracy, filters for genre, decade and obscurity.",
-        accent: "var(--cluetune-cyan)",
         featured: true,
+      },
+      {
+        href: "/duel",
+        name: "Duel",
+        meta: "1v1 · New",
+        blurb: "Real-time song guessing against a friend or a quick-match rival. Best of three.",
       },
       {
         href: "/drunk",
         name: "Drunk",
         meta: "Drunk / high",
         blurb: "Guess drunk songs or high songs from a wasted first listen. Skip and the mix sobers up.",
-        accent: "var(--cluetune-pink)",
       },
       {
         href: "/lyrics",
         name: "Lyrics Guess",
         meta: "Read it",
         blurb: "A few lines of the song. Guess the title. Skip to reveal the next lines if you are stuck.",
-        accent: "var(--cluetune-violet)",
       },
       {
         href: "/gauntlet",
         name: "Genre Gauntlet",
         meta: "5 rounds",
         blurb: "Pick a pack — hyperpop, K-pop, Afrobeats, drill — and run five back to back.",
-        accent: "var(--cluetune-amber)",
       },
     ],
   },
   why: {
     eyebrow: "Why this one",
-    heading: "Built for the part everyone else treats as an afterthought.",
+    heading: "Built for the part everyone else treats as an afterthought",
     items: [
       {
-        title: "A result card, not a screenshot.",
+        title: "A result card, not a screenshot",
         body: "Finish a round and you get a rendered 9:16 image with your clip's waveform, guess pattern and time-to-guess. It drops straight into a Story or a TikTok upload.",
       },
       {
-        title: "Challenge links that need no account.",
+        title: "Challenge links that need no account",
         body: "Send a friend the exact clip you just played. They open the link, play it in the browser, and get scored against you. Nobody signs up.",
       },
       {
-        title: "The record is the interface.",
+        title: "The record is the interface",
         body: "No progress bar. A vinyl that spins with the clip, grooves that move with the spectrum, and a needle-skip glitch every time you miss.",
       },
       {
-        title: "No cooldown after you're done.",
+        title: "No cooldown after you're done",
         body: "The daily is one clip. Unlimited is right underneath it — keep playing, with filters, for as long as you like.",
       },
     ],
   },
   how: {
     eyebrow: "How a round works",
-    heading: "Six rungs, and the clip grows on every miss.",
+    heading: "Six rungs, and the clip grows on every miss",
     body: "The ladder is deliberately steep at the start. One second is barely a snare hit — that is the whole point. Guess wrong and the next rung hands you enough to hear the hook.",
-    rulesLink: "Read the Rules",
+    rulesLink: "Read the rules",
     playLink: "Play Unlimited",
   },
   about: {
@@ -174,64 +176,66 @@ const ES: LocaleTranslation = {
   },
   modes: {
     eyebrow: "Otras formas de jugar",
-    heading: "Cuatro modos más, todos con el mismo catálogo.",
+    heading: "Cuatro modos más, todos con el mismo catálogo",
     items: [
       {
         href: "/unlimited",
         name: "Ilimitado",
         meta: "Sin límite",
         blurb: "Sigue jugando. Mismo catálogo, racha en vivo y filtros por género, década y dificultad.",
-        accent: "var(--cluetune-cyan)",
         featured: true,
+      },
+      {
+        href: "/duel",
+        name: "Duel",
+        meta: "1v1",
+        blurb: "Real-time 1v1 song guessing. Invite a friend or quick match.",
       },
       {
         href: "/drunk",
         name: "Drunk",
         meta: "Drunk / high",
         blurb: "Adivina canciones borrachas o high con la primera escucha destrozada. Salta y la mezcla se aclara.",
-        accent: "var(--cluetune-pink)",
       },
       {
         href: "/lyrics",
         name: "Letra",
         meta: "Léela",
         blurb: "Unas líneas de la canción. Adivina el título. Salta para ver más letra si te atascas.",
-        accent: "var(--cluetune-violet)",
       },
       {
         href: "/gauntlet",
         name: "Desafío de género",
         meta: "5 rondas",
         blurb: "Elige un pack — K-pop, Afrobeats, drill — y juega cinco rondas seguidas.",
-        accent: "var(--cluetune-amber)",
       },
     ],
   },
   why: {
     eyebrow: "Por qué este",
-    heading: "Hecho para lo que otros tratan como un detalle menor.",
+    heading: "Hecho para lo que otros tratan como un detalle menor",
     items: [
       {
-        title: "Una tarjeta de resultado, no una captura.",
+        title: "Una tarjeta de resultado, no una captura",
         body: "Al terminar una ronda obtienes una imagen 9:16 con la forma de onda, el patrón de intentos y el tiempo. Lista para Stories o TikTok.",
       },
       {
-        title: "Enlaces de reto sin cuenta.",
+        title: "Enlaces de reto sin cuenta",
         body: "Envía a un amigo el clip exacto que acabas de escuchar. Abre el enlace, juega y compara puntuaciones. Nadie se registra.",
       },
       {
-        title: "El disco es la interfaz.",
+        title: "El disco es la interfaz",
         body: "Sin barra de progreso. Un vinilo que gira con el clip y un salto de aguja cada vez que fallas.",
       },
       {
-        title: "Sin espera después del diario.",
+        title: "Sin espera después del diario",
         body: "El reto diario es un clip. Ilimitado está justo debajo — sigue jugando con filtros todo lo que quieras.",
       },
     ],
   },
   how: {
     eyebrow: "Cómo funciona una ronda",
-    heading: "Seis escalones, y el clip crece con cada fallo.",
+    heading: "Seis escalones, y el clip crece con cada fallo",
     body: "La escalera es empinada al principio a propósito. Un segundo es apenas un golpe de caja — ese es el punto. Falla y el siguiente escalón te da suficiente audio para oír el estribillo.",
     rulesLink: "Leer las reglas",
     playLink: "Jugar ilimitado",
@@ -312,64 +316,66 @@ const JA: LocaleTranslation = {
   },
   modes: {
     eyebrow: "他のプレイ方法",
-    heading: "同じカタログから遊べる4つのモード。",
+    heading: "同じカタログから遊べる4つのモード",
     items: [
       {
         href: "/unlimited",
         name: "無制限",
         meta: "制限なし",
         blurb: "続けてプレイ。連勝記録とジャンル・年代・難易度フィルター付き。",
-        accent: "var(--cluetune-cyan)",
         featured: true,
+      },
+      {
+        href: "/duel",
+        name: "Duel",
+        meta: "1v1",
+        blurb: "Real-time 1v1 song guessing. Invite a friend or quick match.",
       },
       {
         href: "/drunk",
         name: "Drunk",
         meta: "Drunk / high",
         blurb: "酔った最初の再生から曲を当てる。スキップするとミックスがクリアに。",
-        accent: "var(--cluetune-pink)",
       },
       {
         href: "/lyrics",
         name: "歌詞当て",
         meta: "読む",
         blurb: "数行の歌詞から曲名を当てる。困ったらスキップで次の歌詞を表示。",
-        accent: "var(--cluetune-violet)",
       },
       {
         href: "/gauntlet",
         name: "ジャンルチャレンジ",
         meta: "5ラウンド",
         blurb: "K-pop、Afrobeats、ドリルなどのパックで5曲連続チャレンジ。",
-        accent: "var(--cluetune-amber)",
       },
     ],
   },
   why: {
     eyebrow: "選ばれる理由",
-    heading: "他のゲームが後回しにする部分にこだわった。",
+    heading: "他のゲームが後回しにする部分にこだわった",
     items: [
       {
-        title: "スクリーンショットではなく結果カード。",
+        title: "スクリーンショットではなく結果カード",
         body: "ラウンド終了後、波形・回答パターン・所要時間入りの9:16画像を生成。ストーリーやTikTokにそのまま投稿。",
       },
       {
-        title: "アカウント不要のチャレンジリンク。",
+        title: "アカウント不要のチャレンジリンク",
         body: "聞いたクリップのリンクを友達に送るだけ。相手はブラウザで開いてスコアを競える。登録不要。",
       },
       {
-        title: "レコードがUI。",
+        title: "レコードがUI",
         body: "プログレスバーなし。クリップに合わせて回るレコードと、ミス時のニードルスキップ演出。",
       },
       {
-        title: "デイリー後もすぐプレイ。",
+        title: "デイリー後もすぐプレイ",
         body: "デイリーは1曲。すぐ下の無制限モードでフィルター付きで好きなだけ続けられる。",
       },
     ],
   },
   how: {
     eyebrow: "ラウンドの流れ",
-    heading: "6段階。ミスするたびにクリップが伸びる。",
+    heading: "6段階。ミスするたびにクリップが伸びる",
     body: "最初は意図的に短い。1秒はスネアの一撃程度——それがこのゲームの醍醐味。外すと次の段階でサビが聞こえる長さになる。",
     rulesLink: "ルールを読む",
     playLink: "無制限でプレイ",
@@ -446,64 +452,66 @@ const FR: LocaleTranslation = {
   },
   modes: {
     eyebrow: "Autres modes",
-    heading: "Quatre modes de plus, le même catalogue.",
+    heading: "Quatre modes de plus, le même catalogue",
     items: [
       {
         href: "/unlimited",
         name: "Illimité",
         meta: "Sans limite",
         blurb: "Continuez à jouer. Série en direct, filtres par genre, décennie et difficulté.",
-        accent: "var(--cluetune-cyan)",
         featured: true,
+      },
+      {
+        href: "/duel",
+        name: "Duel",
+        meta: "1v1",
+        blurb: "Real-time 1v1 song guessing. Invite a friend or quick match.",
       },
       {
         href: "/drunk",
         name: "Drunk",
         meta: "Drunk / high",
         blurb: "Devinez des chansons saoules ou high dès la première écoute gâchée. Passez et le mix se clarifie.",
-        accent: "var(--cluetune-pink)",
       },
       {
         href: "/lyrics",
         name: "Paroles",
         meta: "Lisez",
         blurb: "Quelques lignes de la chanson. Devinez le titre. Passez pour voir la suite.",
-        accent: "var(--cluetune-violet)",
       },
       {
         href: "/gauntlet",
         name: "Défi genre",
         meta: "5 manches",
         blurb: "Choisissez un pack — K-pop, Afrobeats, drill — et enchaînez cinq manches.",
-        accent: "var(--cluetune-amber)",
       },
     ],
   },
   why: {
     eyebrow: "Pourquoi celui-ci",
-    heading: "Conçu pour ce que les autres négligent.",
+    heading: "Conçu pour ce que les autres négligent",
     items: [
       {
-        title: "Une carte de résultat, pas une capture.",
+        title: "Une carte de résultat, pas une capture",
         body: "À la fin d'une manche, une image 9:16 avec la forme d'onde, le schéma de tentatives et le temps. Prête pour Stories ou TikTok.",
       },
       {
-        title: "Liens défi sans compte.",
+        title: "Liens défi sans compte",
         body: "Envoyez à un ami l'extrait exact que vous venez d'entendre. Il ouvre le lien, joue et compare son score. Aucune inscription.",
       },
       {
-        title: "Le disque est l'interface.",
+        title: "Le disque est l'interface",
         body: "Pas de barre de progression. Un vinyle qui tourne avec l'extrait et un saut d'aiguille à chaque erreur.",
       },
       {
-        title: "Pas d'attente après le quotidien.",
+        title: "Pas d'attente après le quotidien",
         body: "Le défi quotidien est un extrait. Illimité est juste en dessous — jouez avec des filtres aussi longtemps que vous voulez.",
       },
     ],
   },
   how: {
     eyebrow: "Comment fonctionne une manche",
-    heading: "Six paliers, l'extrait grandit à chaque erreur.",
+    heading: "Six paliers, l'extrait grandit à chaque erreur",
     body: "L'échelle est volontairement raide au début. Une seconde, c'est à peine une caisse claire — c'est tout l'intérêt. Ratez et le palier suivant révèle assez pour entendre le refrain.",
     rulesLink: "Lire les règles",
     playLink: "Jouer en illimité",
@@ -580,64 +588,66 @@ const DE: LocaleTranslation = {
   },
   modes: {
     eyebrow: "Weitere Spielmodi",
-    heading: "Vier weitere Modi, ein Katalog.",
+    heading: "Vier weitere Modi, ein Katalog",
     items: [
       {
         href: "/unlimited",
         name: "Unbegrenzt",
         meta: "Kein Limit",
         blurb: "Weiterspielen. Serie, Genauigkeit und Filter nach Genre, Jahrzehnt und Schwierigkeit.",
-        accent: "var(--cluetune-cyan)",
         featured: true,
+      },
+      {
+        href: "/duel",
+        name: "Duel",
+        meta: "1v1",
+        blurb: "Real-time 1v1 song guessing. Invite a friend or quick match.",
       },
       {
         href: "/drunk",
         name: "Drunk",
         meta: "Drunk / high",
         blurb: "Errate betrunkene oder high Songs beim chaotischen ersten Hören. Skippen und der Mix nüchtert sich.",
-        accent: "var(--cluetune-pink)",
       },
       {
         href: "/lyrics",
         name: "Songtext",
         meta: "Lesen",
         blurb: "Ein paar Zeilen des Songs. Errate den Titel. Überspringen für mehr Text.",
-        accent: "var(--cluetune-violet)",
       },
       {
         href: "/gauntlet",
         name: "Genre-Challenge",
         meta: "5 Runden",
         blurb: "Wähle ein Paket — K-Pop, Afrobeats, Drill — und spiele fünf Runden hintereinander.",
-        accent: "var(--cluetune-amber)",
       },
     ],
   },
   why: {
     eyebrow: "Warum dieses",
-    heading: "Für den Teil, den andere vernachlässigen.",
+    heading: "Für den Teil, den andere vernachlässigen",
     items: [
       {
-        title: "Eine Ergebniskarte, kein Screenshot.",
+        title: "Eine Ergebniskarte, kein Screenshot",
         body: "Nach einer Runde ein 9:16-Bild mit Wellenform, Ratemuster und Zeit. Direkt für Story oder TikTok.",
       },
       {
-        title: "Challenge-Links ohne Konto.",
+        title: "Challenge-Links ohne Konto",
         body: "Schick einem Freund den exakten Clip. Er öffnet den Link, spielt und vergleicht die Punktzahl. Keine Anmeldung.",
       },
       {
-        title: "Die Schallplatte ist die Oberfläche.",
+        title: "Die Schallplatte ist die Oberfläche",
         body: "Kein Fortschrittsbalken. Eine Vinylscheibe, die mit dem Clip dreht, und ein Nadel-Sprung bei jedem Fehler.",
       },
       {
-        title: "Keine Wartezeit nach dem Täglichen.",
+        title: "Keine Wartezeit nach dem Täglichen",
         body: "Das Tagesrätsel ist ein Clip. Unbegrenzt ist direkt darunter — spiele mit Filtern so lange du willst.",
       },
     ],
   },
   how: {
     eyebrow: "So funktioniert eine Runde",
-    heading: "Sechs Stufen, der Clip wächst bei jedem Fehler.",
+    heading: "Sechs Stufen, der Clip wächst bei jedem Fehler",
     body: "Die Leiter ist am Anfang absichtlich steil. Eine Sekunde ist kaum ein Snare-Hit — genau darum geht es. Verfehle und die nächste Stufe gibt genug Audio für den Refrain.",
     rulesLink: "Regeln lesen",
     playLink: "Unbegrenzt spielen",
@@ -714,64 +724,66 @@ const PT: LocaleTranslation = {
   },
   modes: {
     eyebrow: "Outras formas de jogar",
-    heading: "Mais quatro modos, o mesmo catálogo.",
+    heading: "Mais quatro modos, o mesmo catálogo",
     items: [
       {
         href: "/unlimited",
         name: "Ilimitado",
         meta: "Sem limite",
         blurb: "Continue jogando. Sequência ao vivo e filtros por género, década e dificuldade.",
-        accent: "var(--cluetune-cyan)",
         featured: true,
+      },
+      {
+        href: "/duel",
+        name: "Duel",
+        meta: "1v1",
+        blurb: "Real-time 1v1 song guessing. Invite a friend or quick match.",
       },
       {
         href: "/drunk",
         name: "Drunk",
         meta: "Drunk / high",
         blurb: "Adivinha músicas bêbadas ou high na primeira escuta destruída. Salta e a mistura fica sóbria.",
-        accent: "var(--cluetune-pink)",
       },
       {
         href: "/lyrics",
         name: "Letra",
         meta: "Leia",
         blurb: "Algumas linhas da música. Adivinhe o título. Pule para ver mais letra.",
-        accent: "var(--cluetune-violet)",
       },
       {
         href: "/gauntlet",
         name: "Desafio de género",
         meta: "5 rodadas",
         blurb: "Escolha um pack — K-pop, Afrobeats, drill — e jogue cinco rodadas seguidas.",
-        accent: "var(--cluetune-amber)",
       },
     ],
   },
   why: {
     eyebrow: "Por que este",
-    heading: "Feito para o que outros tratam como detalhe.",
+    heading: "Feito para o que outros tratam como detalhe",
     items: [
       {
-        title: "Um cartão de resultado, não uma captura.",
+        title: "Um cartão de resultado, não uma captura",
         body: "Ao terminar uma rodada, uma imagem 9:16 com forma de onda, padrão de tentativas e tempo. Pronta para Stories ou TikTok.",
       },
       {
-        title: "Links de desafio sem conta.",
+        title: "Links de desafio sem conta",
         body: "Envie a um amigo o clip exato que acabou de ouvir. Ele abre o link, joga e compara a pontuação. Sem cadastro.",
       },
       {
-        title: "O disco é a interface.",
+        title: "O disco é a interface",
         body: "Sem barra de progresso. Um vinil que gira com o clip e um salto de agulha a cada erro.",
       },
       {
-        title: "Sem espera após o diário.",
+        title: "Sem espera após o diário",
         body: "O desafio diário é um clip. Ilimitado está logo abaixo — jogue com filtros o quanto quiser.",
       },
     ],
   },
   how: {
     eyebrow: "Como funciona uma rodada",
-    heading: "Seis degraus, o clip cresce a cada erro.",
+    heading: "Seis degraus, o clip cresce a cada erro",
     body: "A escada é íngreme no início de propósito. Um segundo é quase um bumbo — esse é o ponto. Erre e o próximo degrau revela áudio suficiente para ouvir o refrão.",
     rulesLink: "Ler as regras",
     playLink: "Jogar ilimitado",
@@ -848,64 +860,66 @@ const KO: LocaleTranslation = {
   },
   modes: {
     eyebrow: "다른 플레이 방법",
-    heading: "같은 카탈로그의 네 가지 모드.",
+    heading: "같은 카탈로그의 네 가지 모드",
     items: [
       {
         href: "/unlimited",
         name: "무제한",
         meta: "제한 없음",
         blurb: "계속 플레이. 연승 기록과 장르·연대·난이도 필터.",
-        accent: "var(--cluetune-cyan)",
         featured: true,
+      },
+      {
+        href: "/duel",
+        name: "Duel",
+        meta: "1v1",
+        blurb: "Real-time 1v1 song guessing. Invite a friend or quick match.",
       },
       {
         href: "/drunk",
         name: "Drunk",
         meta: "Drunk / high",
         blurb: "망가진 첫 재생으로 취한/하이 곡을 맞히세요. 스킵하면 믹스가 맑아집니다.",
-        accent: "var(--cluetune-pink)",
       },
       {
         href: "/lyrics",
         name: "가사 맞히기",
         meta: "읽기",
         blurb: "몇 줄의 가사로 곡명을 맞힙니다. 스킵으로 다음 가사를 볼 수 있습니다.",
-        accent: "var(--cluetune-violet)",
       },
       {
         href: "/gauntlet",
         name: "장르 챌린지",
         meta: "5라운드",
         blurb: "K-pop, Afrobeats, 드릴 등 팩을 골라 5곡 연속 도전.",
-        accent: "var(--cluetune-amber)",
       },
     ],
   },
   why: {
     eyebrow: "이 게임을 선택하는 이유",
-    heading: "다른 게임이 소홀히 하는 부분에 집중했습니다.",
+    heading: "다른 게임이 소홀히 하는 부분에 집중했습니다",
     items: [
       {
-        title: "스크린샷이 아닌 결과 카드.",
+        title: "스크린샷이 아닌 결과 카드",
         body: "라운드 종료 후 파형, 시도 패턴, 소요 시간이 담긴 9:16 이미지. 스토리나 TikTok에 바로 공유.",
       },
       {
-        title: "계정 없는 챌린지 링크.",
+        title: "계정 없는 챌린지 링크",
         body: "방금 들은 클립 링크를 친구에게 보내세요. 브라우저에서 열어 점수를 겨룹니다. 가입 불필요.",
       },
       {
-        title: "레코드가 UI.",
+        title: "레코드가 UI",
         body: "진행 바 없음. 클립에 맞춰 도는 레코드와 실수할 때마다 바늘 스킵 효과.",
       },
       {
-        title: "데일리 후에도 바로 플레이.",
+        title: "데일리 후에도 바로 플레이",
         body: "데일리는 한 곡. 바로 아래 무제한 모드로 필터와 함께 원하는 만큼 계속.",
       },
     ],
   },
   how: {
     eyebrow: "라운드 진행 방식",
-    heading: "6단계. 틀릴 때마다 클립이 길어집니다.",
+    heading: "6단계. 틀릴 때마다 클립이 길어집니다",
     body: "처음은 의도적으로 짧습니다. 1초는 스네어 한 방 정도 — 그게 이 게임의 핵심입니다. 틀리면 다음 단계에서 후렴을 들을 수 있는 길이가 됩니다.",
     rulesLink: "규칙 읽기",
     playLink: "무제한 플레이",
@@ -982,64 +996,66 @@ const IT: LocaleTranslation = {
   },
   modes: {
     eyebrow: "Altri modi di giocare",
-    heading: "Altri quattro modi, lo stesso catalogo.",
+    heading: "Altri quattro modi, lo stesso catalogo",
     items: [
       {
         href: "/unlimited",
         name: "Illimitato",
         meta: "Senza limiti",
         blurb: "Continua a giocare. Serie live e filtri per genere, decennio e difficoltà.",
-        accent: "var(--cluetune-cyan)",
         featured: true,
+      },
+      {
+        href: "/duel",
+        name: "Duel",
+        meta: "1v1",
+        blurb: "Real-time 1v1 song guessing. Invite a friend or quick match.",
       },
       {
         href: "/drunk",
         name: "Drunk",
         meta: "Drunk / high",
         blurb: "Indovina canzoni ubriache o high al primo ascolto rovinato. Salta e il mix si schiarisce.",
-        accent: "var(--cluetune-pink)",
       },
       {
         href: "/lyrics",
         name: "Testo",
         meta: "Leggi",
         blurb: "Qualche riga della canzone. Indovina il titolo. Salta per vedere altro testo.",
-        accent: "var(--cluetune-violet)",
       },
       {
         href: "/gauntlet",
         name: "Sfida genere",
         meta: "5 round",
         blurb: "Scegli un pack — K-pop, Afrobeats, drill — e gioca cinque round di fila.",
-        accent: "var(--cluetune-amber)",
       },
     ],
   },
   why: {
     eyebrow: "Perché questo",
-    heading: "Fatto per ciò che gli altri trascurano.",
+    heading: "Fatto per ciò che gli altri trascurano",
     items: [
       {
-        title: "Una scheda risultato, non uno screenshot.",
+        title: "Una scheda risultato, non uno screenshot",
         body: "A fine round, un'immagine 9:16 con forma d'onda, schema tentativi e tempo. Pronta per Stories o TikTok.",
       },
       {
-        title: "Link sfida senza account.",
+        title: "Link sfida senza account",
         body: "Invia a un amico il clip esatto che hai appena sentito. Apre il link, gioca e confronta il punteggio. Nessuna registrazione.",
       },
       {
-        title: "Il disco è l'interfaccia.",
+        title: "Il disco è l'interfaccia",
         body: "Nessuna barra di avanzamento. Un vinile che gira con il clip e un salto dell'ago a ogni errore.",
       },
       {
-        title: "Nessuna attesa dopo il giornaliero.",
+        title: "Nessuna attesa dopo il giornaliero",
         body: "La sfida giornaliera è un clip. Illimitato è subito sotto — gioca con filtri quanto vuoi.",
       },
     ],
   },
   how: {
     eyebrow: "Come funziona un round",
-    heading: "Sei gradini, il clip cresce a ogni errore.",
+    heading: "Sei gradini, il clip cresce a ogni errore",
     body: "La scala è ripida all'inizio di proposito. Un secondo è appena un colpo di rullante — è tutto il punto. Sbaglia e il gradino successivo rivela abbastanza audio per il ritornello.",
     rulesLink: "Leggi le regole",
     playLink: "Gioca illimitato",
@@ -1116,64 +1132,66 @@ const RU: LocaleTranslation = {
   },
   modes: {
     eyebrow: "Другие режимы",
-    heading: "Ещё четыре режима, один каталог.",
+    heading: "Ещё четыре режима, один каталог",
     items: [
       {
         href: "/unlimited",
         name: "Безлимит",
         meta: "Без лимита",
         blurb: "Играйте дальше. Серия, точность и фильтры по жанру, десятилетию и сложности.",
-        accent: "var(--cluetune-cyan)",
         featured: true,
+      },
+      {
+        href: "/duel",
+        name: "Duel",
+        meta: "1v1",
+        blurb: "Real-time 1v1 song guessing. Invite a friend or quick match.",
       },
       {
         href: "/drunk",
         name: "Drunk",
         meta: "Drunk / high",
         blurb: "Угадай пьяные или high песни с хаотичного первого прослушивания. Пропуск проясняет микс.",
-        accent: "var(--cluetune-pink)",
       },
       {
         href: "/lyrics",
         name: "По тексту",
         meta: "Читай",
         blurb: "Несколько строк песни. Угадайте название. Пропуск покажет следующие строки.",
-        accent: "var(--cluetune-violet)",
       },
       {
         href: "/gauntlet",
         name: "Жанровый вызов",
         meta: "5 раундов",
         blurb: "Выберите пак — K-pop, Afrobeats, drill — и сыграйте пять раундов подряд.",
-        accent: "var(--cluetune-amber)",
       },
     ],
   },
   why: {
     eyebrow: "Почему этот",
-    heading: "Сделано для того, что другие упускают.",
+    heading: "Сделано для того, что другие упускают",
     items: [
       {
-        title: "Карточка результата, не скриншот.",
+        title: "Карточка результата, не скриншот",
         body: "После раунда — изображение 9:16 с волной, схемой попыток и временем. Готово для Stories или TikTok.",
       },
       {
-        title: "Ссылки-вызовы без аккаунта.",
+        title: "Ссылки-вызовы без аккаунта",
         body: "Отправьте другу точный клип, который только что слышали. Он откроет ссылку, сыграет и сравнит счёт. Регистрация не нужна.",
       },
       {
-        title: "Пластинка — это интерфейс.",
+        title: "Пластинка — это интерфейс",
         body: "Без полосы прогресса. Винил крутится вместе с клипом, и скачок иглы при каждой ошибке.",
       },
       {
-        title: "Без ожидания после ежедневного.",
+        title: "Без ожидания после ежедневного",
         body: "Ежедневный вызов — один клип. Безлимит прямо под ним — играйте с фильтрами сколько угодно.",
       },
     ],
   },
   how: {
     eyebrow: "Как проходит раунд",
-    heading: "Шесть ступеней, клип растёт с каждой ошибкой.",
+    heading: "Шесть ступеней, клип растёт с каждой ошибкой",
     body: "Лестница намеренно крутая в начале. Одна секунда — едва удар малого барабана, в этом и суть. Ошибитесь — следующая ступень даст достаточно, чтобы услышать припев.",
     rulesLink: "Правила",
     playLink: "Играть безлимит",

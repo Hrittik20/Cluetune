@@ -135,7 +135,7 @@ function Chip({ label, pressed, onClick }: { label: string; pressed: boolean; on
       aria-pressed={pressed}
       onClick={onClick}
       className={[
-        "min-h-11 rounded-full px-3.5 py-2 text-body-sm transition-colors duration-150",
+        "min-h-11 rounded-md px-3.5 py-2 text-body-sm transition-colors duration-150",
         pressed
           ? "bg-ink text-on-primary"
           : "bg-canvas-soft-2 text-body shadow-level-1 hover:text-ink",

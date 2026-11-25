@@ -24,19 +24,6 @@ const VERDICT_TONE: Record<GuessVerdict, { dot: string; text: string; label: str
 };
 
 /**
- * One colour per rung, drawn from the brand mesh so the strip reads as a
- * clip timeline rather than a Wordle row. Order matches the six-attempt ladder.
- */
-const STEP_COLORS = [
-  "var(--cluetune-develop-end)",
-  "var(--cluetune-blue)",
-  "var(--cluetune-violet)",
-  "var(--cluetune-pink)",
-  "var(--cluetune-coral)",
-  "var(--cluetune-amber)",
-] as const;
-
-/**
  * The attempt ladder: a clip loading bar on top, then the guess list.
  *
  * Tile width is proportional to how much audio that rung unlocks. Fill follows
@@ -139,7 +126,6 @@ export function ClipLadderBar({
         const available = unlockedMs > previous;
         const played = Math.min(span, Math.max(0, positionMs - previous));
         const playedPct = span > 0 ? (played / span) * 100 : 0;
-        const color = STEP_COLORS[index] ?? STEP_COLORS[0];
 
         return (
           <li
@@ -148,17 +134,13 @@ export function ClipLadderBar({
             className="relative h-full overflow-hidden rounded-full bg-hairline"
           >
             {available ? (
-              <span
-                aria-hidden="true"
-                className="absolute inset-0 rounded-full opacity-30"
-                style={{ backgroundColor: color }}
-              />
+              <span aria-hidden="true" className="absolute inset-0 rounded-full bg-ink opacity-25" />
             ) : null}
             {playedPct > 0 ? (
               <span
                 aria-hidden="true"
-                className="absolute inset-y-0 left-0 rounded-full"
-                style={{ width: `${playedPct}%`, backgroundColor: color }}
+                className="absolute inset-y-0 left-0 rounded-full bg-ink"
+                style={{ width: `${playedPct}%` }}
               />
             ) : null}
           </li>

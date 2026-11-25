@@ -1,5 +1,4 @@
 ---
-import MeshGradient from "../../components/MeshGradient.astro";
 import ModeCard from "../../components/ModeCard.astro";
 import Layout from "../../layouts/Layout.astro";
 import { GENRE_PACKS, filterCatalog } from "../../lib/catalog";
@@ -14,10 +13,8 @@ const packs = GENRE_PACKS.map((pack) => ({
   title="Genre Gauntlet"
   description="Pick a genre pack — hyperpop, K-pop, Afrobeats, drill and more — then run five rounds back to back."
 >
-  <section class="relative isolate">
-    <MeshGradient intensity="soft" />
-
-    <div class="page-shell relative py-10 sm:py-16">
+  <section>
+    <div class="page-shell py-10 sm:py-16">
       <header class="mx-auto flex max-w-2xl flex-col items-center gap-3 text-center">
         <p class="eyebrow">Genre gauntlet</p>
         <h1 class="text-display-xl text-ink">Pick your pack. Five rounds, no breaks.</h1>
@@ -35,7 +32,6 @@ const packs = GENRE_PACKS.map((pack) => ({
               name={pack.name}
               blurb={pack.blurb}
               meta={`${pack.count} tracks`}
-              accent={pack.accent}
             />
           ))
         }

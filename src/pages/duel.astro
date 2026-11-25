@@ -1,0 +1,96 @@
+---
+import DuelLobbyMount from "../components/duel/DuelLobbyMount.astro";
+import Layout from "../layouts/Layout.astro";
+import { faqJsonLd } from "../lib/faqs";
+
+export const prerender = true;
+
+const faqs = [
+  {
+    q: "What is Cluetune Duel?",
+    a: "Duel is a real-time 1v1 song-guessing match. You and a rival hear the same clip at the same moment. Best of three songs, with sudden death if the points are tied.",
+  },
+  {
+    q: "Do I need an account to duel?",
+    a: "No. Create a private room, join with a four-letter code, or hit Quick match — all without signing up.",
+  },
+  {
+    q: "How do rounds work in Duel?",
+    a: "Each song has six clip lengths (1s to 16s). On every length you get one guess. If both of you guess before the timer ends, the clip grows immediately. First correct gets a bonus.",
+  },
+];
+---
+
+<Layout
+  title="Duel — 1v1 Song Guess Game Online"
+  description="Play Cluetune Duel: a real-time multiplayer heardle-style 1v1. Guess the song against a friend or quick match. Free, no account."
+  keywords="multiplayer heardle, guess the song with friends, song quiz 1v1, music duel online, cluetune duel, guess song multiplayer"
+  faqJsonLd={faqJsonLd(faqs)}
+>
+  <section>
+    <div class="page-shell pb-6 pt-2 sm:pb-16 sm:pt-5">
+      <header class="mx-auto mb-5 flex max-w-md flex-col items-center gap-1.5 text-center sm:mb-8 sm:max-w-2xl sm:gap-2">
+        <p class="badge">Duel · 1v1 · New</p>
+        <h1 class="text-balance text-display-sm text-ink sm:text-display-md">
+          Guess the song against someone else
+        </h1>
+        <p class="max-w-lg text-body-sm text-body sm:text-body-md">
+          Same clip, same moment. Best of three.
+        </p>
+      </header>
+
+      <div class="mx-auto max-w-md sm:max-w-lg">
+        <DuelLobbyMount />
+      </div>
+    </div>
+  </section>
+
+  <section class="page-shell py-12 sm:py-16" aria-labelledby="duel-seo-heading">
+    <article class="mx-auto flex max-w-prose flex-col gap-5 text-body-md text-body">
+      <h2 id="duel-seo-heading" class="text-display-lg text-ink">
+        A multiplayer song quiz that fits in a browser tab
+      </h2>
+      <p>
+        Cluetune Duel is a real-time 1v1 guess-the-song mode: you and a rival hear the same clip grow
+        from one second to sixteen, with one guess at each length. It is the multiplayer Heardle /
+        Songless-style game people search for when they want to play against a friend online.
+      </p>
+      <p>
+        Create a private room and send a four-letter code or link, or hit Quick match and we’ll pair
+        you with whoever is waiting. Either way, the match is best of three songs, scored on how early
+        you name the track.
+      </p>
+      <div class="flex flex-col gap-2">
+        <h3 class="mt-2 text-display-sm text-ink">Play a multiplayer Heardle with friends</h3>
+        <p>
+          There is no account and no download. Open /duel on your phone or laptop, pick a nickname,
+          and start. Emotes replace chat, rematch is one tap, and a share card lets you brag (or cry)
+          in a Story.
+        </p>
+      </div>
+      <div class="flex flex-col gap-2">
+        <h3 class="mt-2 text-display-sm text-ink">Quick match or private room</h3>
+        <p>
+          Looking for “guess the song with friends”, “song quiz 1v1”, or “music duel online”? This is
+          that — free at cluetune.com/duel.
+        </p>
+      </div>
+    </article>
+  </section>
+
+  <section class="page-shell pb-12" aria-labelledby="duel-faq-heading">
+    <article class="mx-auto flex max-w-prose flex-col gap-6">
+      <h2 id="duel-faq-heading" class="text-display-lg text-ink">Duel FAQ</h2>
+      <dl class="flex flex-col gap-6">
+        {
+          faqs.map((faq) => (
+            <div class="flex flex-col gap-2">
+              <dt class="text-display-sm text-ink">{faq.q}</dt>
+              <dd class="text-body-md text-body">{faq.a}</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </article>
+  </section>
+</Layout>

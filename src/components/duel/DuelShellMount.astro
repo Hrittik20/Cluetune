@@ -1,0 +1,13 @@
+---
+import DuelShell from "./DuelShell";
+
+interface Props {
+  roomId: string;
+  code?: string | null;
+  bot?: boolean;
+}
+
+const { roomId, code = null, bot = false } = Astro.props;
+---
+
+<DuelShell client:load roomId={roomId} code={code} bot={bot} />

@@ -548,7 +548,7 @@ export default function GameShell(props: GameShellProps) {
 
   const skipLabel = lyricsMode
     ? nextUnlockSeconds == null
-      ? "Give Up"
+      ? "Give up"
       : nextLyricBatch > 0
         ? `Skip (+${nextLyricBatch} line${nextLyricBatch === 1 ? "" : "s"})`
         : "Skip"
@@ -556,7 +556,7 @@ export default function GameShell(props: GameShellProps) {
 
   const showPlayer = Boolean(current.source) && (!lyricsMode || finished);
   const nextCtaLabel =
-    mode === "gauntlet" ? `Round ${completedRounds + 1} of ${GAUNTLET_LENGTH}` : "Next Round";
+    mode === "gauntlet" ? `Round ${completedRounds + 1} of ${GAUNTLET_LENGTH}` : "Next round";
   const showNextCta = finished && !gauntletComplete;
   const tier = counted ? (current.tier ?? songTier(current.track.difficulty)) : undefined;
   const crowdStanding =
@@ -789,7 +789,7 @@ function ErrorState({ message, onRetry }: { message: string; onRetry: () => void
       <h2 className="text-display-sm text-ink">No clip to play</h2>
       <p className="max-w-prose text-body-sm text-body">{message}</p>
       <button type="button" className="btn btn-primary btn-md" onClick={onRetry}>
-        Try Again
+        Try again
       </button>
     </div>
   );
@@ -800,7 +800,7 @@ function UnavailableState({ reason, onSkip }: { reason?: string; onSkip: () => v
     <div className="card-soft flex flex-col items-center gap-4 p-8 text-center" role="alert">
       <p className="text-body-md text-ink">{reason ?? "This track has no playable preview."}</p>
       <button type="button" className="btn btn-primary btn-md" onClick={onSkip}>
-        Pick Another Track
+        Pick another track
       </button>
     </div>
   );
@@ -851,7 +851,7 @@ function GauntletProgress({
         {Array.from({ length: total }, (_, index) => (
           <li
             key={index}
-            className={`h-1.5 w-8 rounded-full ${index < completed ? "bg-tone-correct" : "bg-hairline"}`}
+            className={`h-1.5 w-8 rounded-full ${index < completed ? "bg-ink" : "bg-hairline"}`}
           />
         ))}
       </ol>
@@ -866,7 +866,7 @@ function GauntletSummary({ session, packName }: { session: SessionStats; packNam
     <div className="card flex flex-col items-center gap-4 p-8 text-center">
       <p className="eyebrow">Gauntlet complete</p>
       <h2 className="text-display-lg text-ink">
-        {session.wins} of {session.rounds} in the {packName ?? "pack"}.
+        {session.wins} of {session.rounds} in the {packName ?? "pack"}
       </h2>
       <p className="text-body-md text-body">
         {average ? `${average.toFixed(1)} guesses per win.` : "No wins this run."} Accuracy{" "}
@@ -874,7 +874,7 @@ function GauntletSummary({ session, packName }: { session: SessionStats; packNam
       </p>
       <div className="mt-2 flex flex-wrap justify-center gap-2">
         <a className="btn btn-primary btn-md" href="/gauntlet">
-          Pick Another Pack
+          Pick another pack
         </a>
         <a className="btn btn-secondary btn-md" href="/unlimited">
           Play Unlimited
@@ -886,11 +886,11 @@ function GauntletSummary({ session, packName }: { session: SessionStats; packNam
 
 function ArrowIcon() {
   return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
       <path
         d="M5 12h14M13 6l6 6-6 6"
         stroke="currentColor"
-        strokeWidth="2"
+        strokeWidth="1.5"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
@@ -901,7 +901,7 @@ function ArrowIcon() {
 function PlayIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path d="M8 5.5v13L19 12 8 5.5Z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+      <path d="M8 5.5v13L19 12 8 5.5Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
     </svg>
   );
 }
@@ -909,7 +909,7 @@ function PlayIcon() {
 function PauseIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path d="M7 5h3v14H7V5Zm7 0h3v14h-3V5Z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+      <path d="M7 5h3v14H7V5Zm7 0h3v14h-3V5Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
     </svg>
   );
 }
@@ -920,11 +920,11 @@ function RestartIcon() {
       <path
         d="M3 12a9 9 0 1 0 3-6.7L3 8"
         stroke="currentColor"
-        strokeWidth="2"
+        strokeWidth="1.5"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-      <path d="M3 3v5h5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M3 3v5h5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }

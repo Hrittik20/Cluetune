@@ -13,6 +13,7 @@ export const prerender = true;
 const BASE_PAGES: { path: string; changefreq: string; priority: string }[] = [
   { path: "/", changefreq: "daily", priority: "1.0" },
   { path: "/unlimited", changefreq: "weekly", priority: "0.9" },
+  { path: "/duel", changefreq: "weekly", priority: "0.9" },
   { path: "/drunk", changefreq: "weekly", priority: "0.8" },
   { path: "/lyrics", changefreq: "weekly", priority: "0.8" },
   { path: "/gauntlet", changefreq: "weekly", priority: "0.8" },

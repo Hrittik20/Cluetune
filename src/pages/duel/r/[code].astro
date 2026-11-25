@@ -1,0 +1,36 @@
+---
+import { env } from "cloudflare:workers";
+import DuelShellMount from "../../../components/duel/DuelShellMount.astro";
+import Layout from "../../../layouts/Layout.astro";
+import { ROOM_CODE_LENGTH } from "../../../lib/duel/protocol";
+import { matchmakerStub } from "../../../server/duel/stubs";
+
+export const prerender = false;
+
+const raw = (Astro.params.code ?? "").trim().toUpperCase();
+const bot = import.meta.env.DEV && Astro.url.searchParams.get("bot") === "1";
+
+if (!/^[A-Z]{4}$/.test(raw) || raw.length !== ROOM_CODE_LENGTH) {
+  return Astro.redirect("/duel", 302);
+}
+
+const roomId = await matchmakerStub(env).lookup(raw).catch(() => null);
+if (!roomId) {
+  return Astro.redirect("/duel", 302);
+}
+---
+
+<Layout
+  title={`Duel ${raw}`}
+  description="Someone invited you to a Cluetune Duel. Join the room and guess the song — no account needed."
+  noindex
+>
+  <section class="relative isolate">
+    <div class="page-shell relative pb-4 pt-2 sm:pb-16 sm:pt-5">
+      <header class="mx-auto mb-3 flex max-w-xl flex-col items-center gap-0.5 text-center sm:mb-4">
+        <p class="eyebrow">Private duel · <span class="tabular tracking-[0.1em]" translate="no">{raw}</span></p>
+      </header>
+      <DuelShellMount roomId={roomId} code={raw} bot={bot} />
+    </div>
+  </section>
+</Layout>

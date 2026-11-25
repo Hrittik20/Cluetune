@@ -36,6 +36,7 @@ audio.
 | --- | --- | --- |
 | **Daily** | `/` | One clip for everyone, resets at *your* local midnight. Streaks persist. This is the landing page. `/daily` redirects here. |
 | **Unlimited** | `/unlimited` | Continuous rounds, no cooldown, live session stats, genre/decade/difficulty filters. |
+| **Duel** | `/duel` | Real-time 1v1. Same clip for both players, best of three. Private room or quick match. No account. |
 | **Drunk / High** | `/drunk` | First listen is distorted (pitch, slow, echo, reverb); skip sobers the mix. Also searchable as high mode. `/sped-up` and `/faded` redirect here. |
 | **Lyrics Guess** | `/lyrics` | A few lines of the song. Guess the title. Skip or miss to reveal the next lines. `/lyric-flip` redirects here. |
 | **Genre Gauntlet** | `/gauntlet/[pack]` | Five back-to-back rounds from one scene. Six packs. |
@@ -114,7 +115,6 @@ src/
 │  │  ├─ RevealPanel.tsx    win/loss reveal, track info, challenge link
 │  │  ├─ ShareCard.tsx      9:16 result card, rendered to canvas
 │  │  └─ useAudioClip.ts    playback with hard clip boundaries + optional FFT
-│  ├─ MeshGradient.astro  the brand's only decorative system
 │  └─ Nav / Footer / ModeCard
 ├─ lib/
 │  ├─ catalog.ts         the track pool + genre packs

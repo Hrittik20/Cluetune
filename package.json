@@ -8,6 +8,7 @@
   "scripts": {
     "dev": "astro dev",
     "og:generate": "node scripts/generate-og.mjs",
+    "icons:generate": "node scripts/generate-icons.mjs",
     "prebuild": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\" && npm run og:generate",
     "build": "astro build",
     "preview": "astro preview",
@@ -19,6 +20,8 @@
     "deezer:fetch": "npx tsx scripts/fetch-deezer-ids.mts",
     "deezer:apply": "npx tsx scripts/apply-deezer-patch.mts",
     "itunes:fetch": "npx tsx scripts/fetch-itunes-ids.mts",
+    "duel:check": "npx tsx scripts/duel-engine-check.mts",
+    "duel:smoke": "node scripts/duel-smoke.mjs",
     "astro": "astro"
   },
   "dependencies": {

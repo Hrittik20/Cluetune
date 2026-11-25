@@ -65,12 +65,12 @@ export default function StatsBoard() {
                   </span>
                   <div className="h-6 flex-1 overflow-hidden rounded-sm bg-canvas-soft-2">
                     <div
-                      className="flex h-full items-center justify-end rounded-sm bg-tone-correct px-2"
+                      className={`flex h-full items-center justify-end rounded-sm px-2 ${
+                        count > 0 && count === maxBucket ? "bg-ink text-on-primary" : "bg-hairline-strong text-ink"
+                      }`}
                       style={{ width: `${Math.max(count ? 8 : 0, (count / maxBucket) * 100)}%` }}
                     >
-                      {count > 0 ? (
-                        <span className="tabular text-caption font-medium text-[#08080a]">{count}</span>
-                      ) : null}
+                      {count > 0 ? <span className="tabular text-caption font-medium">{count}</span> : null}
                     </div>
                   </div>
                 </li>
@@ -93,7 +93,7 @@ export default function StatsBoard() {
                   <th
                     key={heading}
                     scope="col"
-                    className="px-3 py-2.5 font-mono text-caption font-normal uppercase tracking-[0.16em] text-mute"
+                    className="px-3 py-2.5 font-mono text-caption font-normal text-mute"
                   >
                     {heading}
                   </th>
@@ -147,7 +147,7 @@ export default function StatsBoard() {
               setState(fresh);
             }}
           >
-            Reset All Stats
+            Reset all stats
           </button>
         </div>
       </section>

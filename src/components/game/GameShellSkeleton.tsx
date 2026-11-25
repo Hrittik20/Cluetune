@@ -45,8 +45,8 @@ export function GameShellSkeleton({
             </radialGradient>
           </defs>
           <circle cx="88" cy="88" r="87" fill={`url(#${gradId})`} stroke="rgba(255,255,255,0.08)" />
-          <circle cx="88" cy="88" r="28" fill="#0a0a0c" stroke="rgba(255,255,255,0.06)" />
-          <circle cx="88" cy="88" r="5" fill="#1a1a1f" />
+          <circle cx="88" cy="88" r="28" fill="#e6ddca" />
+          <circle cx="88" cy="88" r="2.5" fill="#08080a" />
         </svg>
 
         {lyricsMode ? (
@@ -85,9 +85,9 @@ export function GameShellSkeleton({
 
       {showFilters ? (
         <div className="flex flex-wrap gap-2 pt-1" aria-hidden="true">
-          <div className="h-11 w-28 rounded-full bg-canvas-soft-2" />
-          <div className="h-11 w-24 rounded-full bg-canvas-soft-2" />
-          <div className="h-11 w-32 rounded-full bg-canvas-soft-2" />
+          <div className="h-11 w-28 rounded-[10px] bg-canvas-soft-2" />
+          <div className="h-11 w-24 rounded-[10px] bg-canvas-soft-2" />
+          <div className="h-11 w-32 rounded-[10px] bg-canvas-soft-2" />
         </div>
       ) : null}
     </div>

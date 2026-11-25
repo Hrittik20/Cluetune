@@ -1,7 +1,6 @@
 ---
 import GameShellFrame from "../../components/GameShellFrame.astro";
 import GameShellMount from "../../components/GameShellMount.astro";
-import MeshGradient from "../../components/MeshGradient.astro";
 import Layout from "../../layouts/Layout.astro";
 import { GENRE_PACKS, getPack } from "../../lib/catalog";
 
@@ -18,8 +17,6 @@ if (!pack) {
 
 <Layout title={`${pack.name} Gauntlet`} description={`${pack.blurb} Five rounds back to back.`}>
   <section class="relative isolate">
-    <MeshGradient intensity="soft" />
-
     <div class="page-shell relative pb-10 pt-3 sm:pb-16 sm:pt-5">
       <nav aria-label="Breadcrumb" class="mx-auto mb-3 max-w-2xl">
         <a href="/gauntlet" class="rounded-xs text-body-sm text-mute hover:text-ink">

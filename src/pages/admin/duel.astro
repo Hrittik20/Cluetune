@@ -1,0 +1,103 @@
+---
+import { env } from "cloudflare:workers";
+import Layout from "../../layouts/Layout.astro";
+import type { DuelAdminStats } from "../../lib/duel/protocol";
+import { authorizeAdmin } from "../../server/duel/adminAuth";
+import { matchmakerStub } from "../../server/duel/stubs";
+
+export const prerender = false;
+
+if (!authorizeAdmin(Astro.request, Astro.url)) {
+  return new Response("Not found.", { status: 404 });
+}
+
+let stats: DuelAdminStats | null = null;
+try {
+  stats = await matchmakerStub(env).stats();
+} catch {
+  stats = null;
+}
+
+function ms(value: number | null | undefined): string {
+  if (value == null) return "—";
+  if (value < 1000) return `${value}ms`;
+  return `${(value / 1000).toFixed(1)}s`;
+}
+---
+
+<Layout title="Duel admin" description="Internal Duel stats." noindex>
+  <div class="page-shell py-10 sm:py-16">
+    <header class="mb-8 flex max-w-3xl flex-col gap-2">
+      <p class="eyebrow">Internal</p>
+      <h1 class="text-display-md text-ink">Duel admin</h1>
+      <p class="text-body-sm text-mute">Not linked anywhere. Protect with Cloudflare Access on /admin/*.</p>
+    </header>
+
+    {
+      !stats ? (
+        <p class="text-body-md text-tone-wrong">Could not load stats.</p>
+      ) : (
+        <div class="grid max-w-4xl gap-6 md:grid-cols-2">
+          <section class="card flex flex-col gap-3 p-5">
+            <h2 class="text-display-sm text-ink">Queue</h2>
+            <p class="tabular text-display-md text-ink">{stats.queue.size}</p>
+            <p class="text-body-sm text-mute">players waiting right now</p>
+            {
+              stats.queue.waitingMs.length ? (
+                <ul class="mt-2 flex flex-col gap-1 text-caption text-mute">
+                  {stats.queue.waitingMs.slice(0, 12).map((wait, index) => (
+                    <li>
+                      #{index + 1}: waited {ms(wait)}
+                    </li>
+                  ))}
+                </ul>
+              ) : null
+            }
+          </section>
+
+          <section class="card flex flex-col gap-3 p-5">
+            <h2 class="text-display-sm text-ink">Live</h2>
+            <p class="tabular text-display-md text-ink">{stats.liveRooms}</p>
+            <p class="text-body-sm text-mute">rooms in play</p>
+            <p class="mt-2 text-body-sm text-body">
+              Median queue wait: <span class="tabular text-ink">{ms(stats.medianQueueWaitMs)}</span>
+            </p>
+            <p class="text-body-sm text-body">
+              Median match: <span class="tabular text-ink">{ms(stats.medianMatchMs)}</span>
+            </p>
+          </section>
+
+          <section class="card flex flex-col gap-3 p-5 md:col-span-2">
+            <h2 class="text-display-sm text-ink">Today · {stats.today.date} UTC</h2>
+            <dl class="grid gap-3 sm:grid-cols-3">
+              <div>
+                <dt class="text-caption text-mute">Matches started</dt>
+                <dd class="tabular text-display-sm text-ink">{stats.today.matchesStarted}</dd>
+              </div>
+              <div>
+                <dt class="text-caption text-mute">Matches finished</dt>
+                <dd class="tabular text-display-sm text-ink">{stats.today.matchesFinished}</dd>
+              </div>
+              <div>
+                <dt class="text-caption text-mute">Private rooms</dt>
+                <dd class="tabular text-display-sm text-ink">{stats.today.privateRoomsCreated}</dd>
+              </div>
+              <div>
+                <dt class="text-caption text-mute">Queue joins</dt>
+                <dd class="tabular text-display-sm text-ink">{stats.today.queueJoins}</dd>
+              </div>
+              <div>
+                <dt class="text-caption text-mute">Queue matches</dt>
+                <dd class="tabular text-display-sm text-ink">{stats.today.queueMatches}</dd>
+              </div>
+              <div>
+                <dt class="text-caption text-mute">Queue abandons</dt>
+                <dd class="tabular text-display-sm text-ink">{stats.today.queueAbandons}</dd>
+              </div>
+            </dl>
+          </section>
+        </div>
+      )
+    }
+  </div>
+</Layout>

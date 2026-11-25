@@ -1,6 +1,5 @@
 ---
 import GameShellMount from "../../components/GameShellMount.astro";
-import MeshGradient from "../../components/MeshGradient.astro";
 import Layout from "../../layouts/Layout.astro";
 import { getTrack } from "../../lib/catalog";
 import { decodeChallenge, modeLabel } from "../../lib/share";
@@ -34,8 +33,6 @@ const headline = solved
   noindex
 >
   <section class="relative isolate">
-    <MeshGradient intensity="soft" />
-
     <div class="page-shell relative pb-10 pt-3 sm:pb-16 sm:pt-5">
       <header class="mx-auto mb-4 flex max-w-2xl flex-col items-center gap-2 text-center">
         <p class="eyebrow">{modeLabel(payload.m)} challenge</p>

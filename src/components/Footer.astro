@@ -10,6 +10,7 @@ const columns = [
     links: [
       { href: "/", label: "Daily challenge" },
       { href: "/unlimited", label: "Unlimited" },
+      { href: "/duel", label: "Duel" },
       { href: "/drunk", label: "Drunk mode", drunk: true },
       { href: "/lyrics", label: "Lyrics Guess" },
       { href: "/gauntlet", label: "Genre Gauntlet" },
@@ -58,7 +59,6 @@ const year = new Date().getFullYear();
                     <>
                       <span class="label-drunk">Drunk</span>
                       <span>mode</span>
-                      <span class="badge-new">New</span>
                     </>
                   ) : (
                     link.label

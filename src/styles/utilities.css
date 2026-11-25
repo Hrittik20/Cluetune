@@ -26,14 +26,12 @@
   }
 }
 
-/* The technical voice of the system: mono, uppercase, tracked open. Used for
-   section eyebrows and metric labels only — never body copy. */
+/* The catalogue-number voice: small mono in sentence case, like the run-out
+   etching on a record. Section eyebrows and metric labels only. */
 @utility eyebrow {
   font-family: var(--font-mono);
   font-size: var(--text-caption);
   line-height: var(--text-caption--line-height);
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
   color: var(--cluetune-mute);
 }
 

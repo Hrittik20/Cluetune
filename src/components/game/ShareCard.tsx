@@ -102,7 +102,7 @@ export function ShareCard({ options, shareText, shareUrl }: ShareCardProps) {
 
       <div className="flex w-full flex-col gap-2 sm:flex-row sm:justify-center">
         <button type="button" className="btn btn-primary btn-md" onClick={handleShare} disabled={busy}>
-          {busy ? "Sharing…" : "Share Result"}
+          {busy ? "Sharing…" : "Share result"}
         </button>
         <button
           type="button"

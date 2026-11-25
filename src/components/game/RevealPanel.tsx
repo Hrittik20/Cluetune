@@ -80,7 +80,7 @@ export function RevealPanel({
       <header className="flex flex-col items-center gap-3 text-center">
         <p className="eyebrow">{won ? "Solved" : "Revealed"}</p>
         <h2 className="text-display-lg text-balance text-ink">
-          {won ? `Got it in ${state.guesses.length}.` : "That one got away."}
+          {won ? `Got it in ${state.guesses.length}` : "That one got away"}
         </h2>
         <p className="text-body-md text-body">
           {won
@@ -102,8 +102,15 @@ export function RevealPanel({
         ) : (
           <div
             aria-hidden="true"
-            className="size-32 shrink-0 rounded-lg bg-linear-135 from-[#007cf0] via-[#7928ca] to-[#ff0080] shadow-level-2 sm:size-40"
-          />
+            className="grid size-32 shrink-0 place-items-center rounded-lg bg-canvas-soft-2 shadow-level-1 sm:size-40"
+          >
+            <svg viewBox="0 0 64 64" className="size-16 text-mute sm:size-20" fill="none">
+              <circle cx="32" cy="32" r="30" stroke="currentColor" strokeWidth="1.5" />
+              <circle cx="32" cy="32" r="21" stroke="currentColor" strokeWidth="1.5" strokeOpacity="0.5" />
+              <circle cx="32" cy="32" r="10" fill="var(--color-paper)" fillOpacity="0.8" />
+              <circle cx="32" cy="32" r="1.5" fill="currentColor" />
+            </svg>
+          </div>
         )}
 
         <div className="flex min-w-0 flex-1 flex-col gap-2 text-center sm:text-left">
@@ -169,7 +176,7 @@ export function RevealPanel({
                 className="field h-10 min-w-0 flex-1 px-4 font-mono text-caption"
               />
               <button type="button" className="btn btn-secondary btn-md shrink-0" onClick={copyChallenge}>
-                {copied ? "Copied" : "Copy Link"}
+                {copied ? "Copied" : "Copy link"}
               </button>
             </div>
           </div>

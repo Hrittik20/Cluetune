@@ -571,7 +571,6 @@ export interface GenrePack {
   name: string;
   blurb: string;
   genres: Genre[];
-  accent: string;
 }
 
 export const GENRE_PACKS: GenrePack[] = [
@@ -580,42 +579,36 @@ export const GENRE_PACKS: GenrePack[] = [
     name: "Hyperpop",
     blurb: "Blown-out, pitch-shifted and proudly unlistenable to your parents.",
     genres: ["hyperpop"],
-    accent: "var(--cluetune-pink)",
   },
   {
     slug: "kpop",
     name: "K-Pop",
     blurb: "Four generations of the most engineered pop on earth.",
     genres: ["kpop"],
-    accent: "var(--cluetune-violet)",
   },
   {
     slug: "afrobeats",
     name: "Afrobeats",
     blurb: "Lagos to London, log drums and all.",
     genres: ["afrobeats"],
-    accent: "var(--cluetune-amber)",
   },
   {
     slug: "drill",
     name: "Drill",
     blurb: "Sliding 808s from Brooklyn to Brixton.",
     genres: ["drill"],
-    accent: "var(--cluetune-coral)",
   },
   {
     slug: "throwback",
     name: "Throwback",
     blurb: "Everything your algorithm forgot, 1965 to 1999.",
     genres: ["pop", "rock", "rnb", "jazz", "country"],
-    accent: "var(--cluetune-cyan)",
   },
   {
     slug: "club",
     name: "Club",
     blurb: "Four to the floor, filter house and festival drops.",
     genres: ["electronic"],
-    accent: "var(--cluetune-develop-end)",
   },
 ];
 

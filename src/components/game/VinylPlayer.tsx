@@ -287,8 +287,7 @@ function drawSpectrum(context: CanvasRenderingContext2D, outer: number, state: D
     const x1 = Math.cos(angle) * (inner + length);
     const y1 = Math.sin(angle) * (inner + length);
 
-    const hueStop = i / count;
-    context.strokeStyle = spectrumColor(hueStop, 0.28 + level * 0.6);
+    context.strokeStyle = `rgba(239, 231, 214, ${0.22 + level * 0.6})`;
     context.lineWidth = Math.max(1.5, outer * 0.014);
     context.beginPath();
     context.moveTo(x0, y0);
@@ -297,28 +296,6 @@ function drawSpectrum(context: CanvasRenderingContext2D, outer: number, state: D
   }
 
   context.restore();
-}
-
-/** Samples the brand mesh so the spectrum reads as the gradient, not a rainbow. */
-function spectrumColor(stop: number, alpha: number): string {
-  const stops: [number, number, number][] = [
-    [0, 124, 240],
-    [0, 223, 216],
-    [121, 40, 202],
-    [255, 0, 128],
-    [255, 77, 77],
-    [249, 203, 40],
-  ];
-
-  const scaled = stop * (stops.length - 1);
-  const index = Math.min(stops.length - 2, Math.floor(scaled));
-  const t = scaled - index;
-
-  const from = stops[index]!;
-  const to = stops[index + 1]!;
-  const mix = from.map((channel, i) => Math.round(channel + (to[i]! - channel) * t));
-
-  return `rgba(${mix[0]}, ${mix[1]}, ${mix[2]}, ${alpha})`;
 }
 
 /** Outer dial: dim for the whole ladder, bright for what has been unlocked. */
@@ -347,7 +324,7 @@ function drawLadder(context: CanvasRenderingContext2D, outer: number, state: Dra
   if (playedFraction > 0) {
     context.beginPath();
     context.arc(0, 0, radius, start, start + TAU * playedFraction);
-    context.strokeStyle = "#50e3c2";
+    context.strokeStyle = "#efe7d6";
     context.stroke();
 
     // Playhead pip riding the leading edge of the played arc.
@@ -377,19 +354,25 @@ function drawLabel(context: CanvasRenderingContext2D, outer: number, state: Draw
     context.drawImage(state.artwork, -labelRadius, -labelRadius, diameter, diameter);
     context.restore();
   } else {
-    // Pre-reveal the label is the brand mesh, never the artwork.
-    const mesh = context.createLinearGradient(-labelRadius, -labelRadius, labelRadius, labelRadius);
-    mesh.addColorStop(0, "#007cf0");
-    mesh.addColorStop(0.3, "#00dfd8");
-    mesh.addColorStop(0.6, "#7928ca");
-    mesh.addColorStop(0.82, "#ff0080");
-    mesh.addColorStop(1, "#f9cb28");
-
-    context.fillStyle = mesh;
+    // Pre-reveal the label is a blank white-label pressing, never the artwork.
+    const paper = context.createRadialGradient(0, -labelRadius * 0.3, 0, 0, 0, labelRadius);
+    paper.addColorStop(0, "#f3ecdd");
+    paper.addColorStop(1, "#ddd3bf");
+    context.fillStyle = paper;
     context.fillRect(-labelRadius, -labelRadius, labelRadius * 2, labelRadius * 2);
 
-    context.fillStyle = "rgba(8,8,10,0.55)";
-    context.fillRect(-labelRadius, -labelRadius, labelRadius * 2, labelRadius * 2);
+    // Printed rings, rotating with the disc so the spin reads on the label too.
+    context.save();
+    context.rotate(state.angle);
+    context.strokeStyle = "rgba(24,24,27,0.22)";
+    context.lineWidth = 1;
+    context.beginPath();
+    context.arc(0, 0, labelRadius * 0.82, 0.3, TAU - 0.3);
+    context.stroke();
+    context.beginPath();
+    context.arc(0, 0, labelRadius * 0.38, 0, TAU);
+    context.stroke();
+    context.restore();
   }
 
   context.restore();
@@ -415,10 +398,10 @@ function drawChromaticSplit(context: CanvasRenderingContext2D, size: number, int
   context.globalCompositeOperation = "lighter";
   context.globalAlpha = intensity * 0.4;
 
-  context.fillStyle = "#ff0080";
+  context.fillStyle = "#ff3b30";
   context.fillRect(-offset, 0, size, size);
 
-  context.fillStyle = "#00dfd8";
+  context.fillStyle = "#00b8ff";
   context.fillRect(offset, 0, size, size);
 
   context.restore();
