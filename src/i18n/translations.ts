@@ -65,7 +65,7 @@ const EN: LocaleTranslation = {
   },
   modes: {
     eyebrow: "Other ways to play",
-    heading: "Five more modes, all drawing from the same catalogue",
+    heading: "More modes, all drawing from the same catalogue",
     items: [
       {
         href: "/unlimited",

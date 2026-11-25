@@ -2,7 +2,7 @@
 import { NAV_ITEMS, SITE } from "../consts";
 import { localeFromPath, localizedPath, pathWithoutLocale } from "../i18n/config";
 
-const path = Astro.url.pathname.replace(/\/$/, "") || "/";
+const path = Astro.url.pathname.replace(/(?:\/index)?\.html$/, "").replace(/\/$/, "") || "/";
 const locale = localeFromPath(path);
 const routePath = pathWithoutLocale(path);
 

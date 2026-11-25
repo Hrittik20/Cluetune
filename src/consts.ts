@@ -65,6 +65,12 @@ export interface NavItem {
   tag?: string;
 }
 
+/**
+ * Duel launch switch. While false, every Duel link is hidden and the worker
+ * answers Duel pages and APIs with the 404 page.
+ */
+export const DUEL_ENABLED = false;
+
 export const NAV_ITEMS: NavItem[] = [
   { href: "/", label: "Daily" },
   { href: "/unlimited", label: "Unlimited" },
@@ -72,4 +78,4 @@ export const NAV_ITEMS: NavItem[] = [
   { href: "/drunk", label: "Drunk" },
   { href: "/lyrics", label: "Lyrics" },
   { href: "/gauntlet", label: "Gauntlet" },
-];
+].filter((item) => DUEL_ENABLED || item.href !== "/duel");

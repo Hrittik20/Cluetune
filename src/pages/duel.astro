@@ -3,7 +3,8 @@ import DuelLobbyMount from "../components/duel/DuelLobbyMount.astro";
 import Layout from "../layouts/Layout.astro";
 import { faqJsonLd } from "../lib/faqs";
 
-export const prerender = true;
+// On demand so the worker's DUEL_ENABLED gate sees the request; static assets are served before the worker runs.
+export const prerender = false;
 
 const faqs = [
   {

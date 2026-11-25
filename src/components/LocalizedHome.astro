@@ -4,6 +4,7 @@ import GameShellFrame from "./GameShellFrame.astro";
 import GameShellMount from "./GameShellMount.astro";
 import ModeCard from "../components/ModeCard.astro";
 import Layout from "../layouts/Layout.astro";
+import { DUEL_ENABLED } from "../consts";
 import { LOCALES, type LocaleCode, getHomeHreflangs, localizedPath } from "../i18n/config";
 import { faqJsonLdForLocale, getTranslation } from "../i18n/translations";
 
@@ -55,8 +56,18 @@ const hreflangs = getHomeHreflangs();
       </h2>
     </div>
 
-    <div class="mt-8 grid gap-4 sm:mt-10 sm:grid-cols-2 md:grid-cols-3">
-      {t.modes.items.map((mode) => <ModeCard {...mode} href={localizedPath(locale, mode.href)} />)}
+    <div class:list={["mt-8 grid gap-4 sm:mt-10 sm:grid-cols-2", DUEL_ENABLED && "md:grid-cols-3"]}>
+      {
+        t.modes.items
+          .filter((mode) => DUEL_ENABLED || mode.href !== "/duel")
+          .map((mode) => (
+            <ModeCard
+              {...mode}
+              featured={DUEL_ENABLED && mode.featured}
+              href={localizedPath(locale, mode.href)}
+            />
+          ))
+      }
     </div>
   </section>
 

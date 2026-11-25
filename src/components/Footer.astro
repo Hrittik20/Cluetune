@@ -1,5 +1,5 @@
 ---
-import { SITE } from "../consts";
+import { DUEL_ENABLED, SITE } from "../consts";
 import { localeFromPath, localizedPath } from "../i18n/config";
 
 const locale = localeFromPath(Astro.url.pathname);
@@ -14,7 +14,7 @@ const columns = [
       { href: "/drunk", label: "Drunk mode", drunk: true },
       { href: "/lyrics", label: "Lyrics Guess" },
       { href: "/gauntlet", label: "Genre Gauntlet" },
-    ],
+    ].filter((link) => DUEL_ENABLED || link.href !== "/duel"),
   },
   {
     title: "Your game",

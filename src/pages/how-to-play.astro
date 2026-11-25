@@ -1,5 +1,6 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import { DUEL_ENABLED } from "../consts";
 import { CLIP_LADDER_MS, MAX_ATTEMPTS } from "../lib/game";
 import { faqJsonLd } from "../lib/faqs";
 
@@ -53,10 +54,14 @@ const faqs = [
     q: "How does Lyrics Guess work?",
     a: "You see a few lines of the song and type the title. A skip or a miss reveals the next lines. The clip plays after you finish the round, so the words have to do the work.",
   },
-  {
-    q: "What is Duel?",
-    a: "A real-time 1v1 match. You and a rival hear the same clip grow from 1s to 16s, with one guess at each length. Best of three songs — create a private room or hit Quick match. No account.",
-  },
+  ...(DUEL_ENABLED
+    ? [
+        {
+          q: "What is Duel?",
+          a: "A real-time 1v1 match. You and a rival hear the same clip grow from 1s to 16s, with one guess at each length. Best of three songs — create a private room or hit Quick match. No account.",
+        },
+      ]
+    : []),
 ];
 ---
 
@@ -134,15 +139,19 @@ const faqs = [
       </p>
     </section>
 
-    <section class="mt-14 max-w-3xl sm:mt-20" aria-labelledby="duel-mode">
-      <h2 id="duel-mode" class="text-display-md text-ink">Duel</h2>
-      <p class="mt-4 max-w-prose text-body-md text-body">
-        Real-time 1v1. You and a rival hear the same clip grow through the ladder, with one guess at
-        each length. If both of you act before the timer ends, the clip grows immediately. Best of
-        three songs — create a private room, join with a four-letter code, or hit Quick match at
-        <a href="/duel" class="text-link underline underline-offset-4">/duel</a>.
-      </p>
-    </section>
+    {
+      DUEL_ENABLED && (
+        <section class="mt-14 max-w-3xl sm:mt-20" aria-labelledby="duel-mode">
+          <h2 id="duel-mode" class="text-display-md text-ink">Duel</h2>
+          <p class="mt-4 max-w-prose text-body-md text-body">
+            Real-time 1v1. You and a rival hear the same clip grow through the ladder, with one guess
+            at each length. If both of you act before the timer ends, the clip grows immediately. Best
+            of three songs — create a private room, join with a four-letter code, or hit Quick match
+            at <a href="/duel" class="text-link underline underline-offset-4">/duel</a>.
+          </p>
+        </section>
+      )
+    }
 
     <section class="mt-20 max-w-3xl" aria-labelledby="faq">
       <h2 id="faq" class="text-display-lg text-ink">Questions</h2>
@@ -161,7 +170,7 @@ const faqs = [
 
     <div class="mt-14 flex flex-wrap gap-3">
       <a href="/" class="btn btn-primary btn-lg">Play Today’s Daily</a>
-      <a href="/duel" class="btn btn-secondary btn-lg">Duel</a>
+      {DUEL_ENABLED && <a href="/duel" class="btn btn-secondary btn-lg">Duel</a>}
       <a href="/unlimited" class="btn btn-ghost btn-lg">Unlimited</a>
     </div>
   </div>

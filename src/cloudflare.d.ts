@@ -74,6 +74,7 @@ declare module "cloudflare:workers" {
   }
 
   interface WorkerEnv {
+    ASSETS: { fetch(input: Request | URL | string): Promise<Response> };
     DB?: D1Database;
     RESULT_LIMITER?: RateLimit;
     DUEL_ROOM: DurableObjectNamespace<import("./server/duel/DuelRoom").DuelRoom>;

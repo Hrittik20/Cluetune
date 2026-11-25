@@ -1,5 +1,5 @@
 import type { APIRoute } from "astro";
-import { SITE } from "../consts";
+import { DUEL_ENABLED, SITE } from "../consts";
 import { GENRE_PACKS } from "../lib/catalog";
 import { LOCALE_CODES, localePath, localizedPath } from "../i18n/config";
 import { MODE_SLUGS } from "../i18n/mode-pages";
@@ -13,7 +13,7 @@ export const prerender = true;
 const BASE_PAGES: { path: string; changefreq: string; priority: string }[] = [
   { path: "/", changefreq: "daily", priority: "1.0" },
   { path: "/unlimited", changefreq: "weekly", priority: "0.9" },
-  { path: "/duel", changefreq: "weekly", priority: "0.9" },
+  ...(DUEL_ENABLED ? [{ path: "/duel", changefreq: "weekly", priority: "0.9" }] : []),
   { path: "/drunk", changefreq: "weekly", priority: "0.8" },
   { path: "/lyrics", changefreq: "weekly", priority: "0.8" },
   { path: "/gauntlet", changefreq: "weekly", priority: "0.8" },
